@@ -1,0 +1,41 @@
+syntax = "proto3";
+
+
+service UserDataManager {
+    rpc AddUser(UserData) returns (AddUserResponse) {}
+    rpc GetUserData(GetUserDataRequest) returns (UserData) {}
+    rpc GetUserIDByUsername(GetUserIDByUsernameRequest) returns (GetUserIDByUsernameResponse) {}
+}
+
+message UserData {
+    //Main Data Which ZeroTechh Collects
+    string username = 1;
+    string email = 2;
+    string userID = 3;
+    string password = 4;
+
+    //Extra Data Which ZeroTechh Collects
+    string birthDay = 5;
+    string gender = 6;
+
+    string error = 7;
+}
+
+message AddUserResponse {
+    string userID = 8;
+    string error = 9;
+}
+
+message GetUserDataRequest {
+    string userID = 10;
+    string field = 11;
+}
+
+message GetUserIDByUsernameRequest {
+    string username = 12;
+}
+
+message GetUserIDByUsernameResponse {
+    string userID = 13;
+    string error = 14;
+}
