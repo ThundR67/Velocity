@@ -3,39 +3,67 @@ syntax = "proto3";
 
 service UserDataManager {
     rpc AddUser(UserData) returns (AddUserResponse) {}
-    rpc GetUserData(GetUserDataRequest) returns (UserData) {}
-    rpc GetUserIDByUsername(GetUserIDByUsernameRequest) returns (GetUserIDByUsernameResponse) {}
+    rpc GetUser(GetUserRequest) returns (UserData) {}
+    rpc GetUserByUsernameOrEmail(GetUserByUsernameOrEmailRequest) returns (UserData) {}
+    rpc AuthUser(AuthUserRequest) returns (AuthUserResponse) {}
+    rpc UpdateUser(UpdateUserRequest) returns (UpdateUserResponse) {}
+    rpc DeleteUser(DeleteUserRequest) returns (DeleteUserResponse) {}
 }
 
+//AddUser Function
 message UserData {
-    //Main Data Which ZeroTechh Collects
-    string username = 1;
-    string email = 2;
-    string userID = 3;
-    string password = 4;
-
-    //Extra Data Which ZeroTechh Collects
-    string birthDay = 5;
-    string gender = 6;
-
-    string error = 7;
+    map<string, string> data = 1;
+    string error = 2;
 }
 
 message AddUserResponse {
-    string userID = 8;
-    string error = 9;
+    string userID = 3;
+    string error = 4;
 }
 
-message GetUserDataRequest {
-    string userID = 10;
-    string field = 11;
+//GetUser Function
+message GetUserRequest {
+    string userID= 9;
 }
 
-message GetUserIDByUsernameRequest {
-    string username = 12;
+
+//GetUserIDByUsername Function
+message GetUserByUsernameOrEmailRequest {
+    string username = 10;
+    string email = 11;
 }
 
-message GetUserIDByUsernameResponse {
-    string userID = 13;
-    string error = 14;
+
+//Auth User Function
+message AuthUserRequest {
+    string username = 14;
+    string email = 15;
+    string password = 16;
+}
+
+message AuthUserResponse {
+    bool valid = 17;
+    string error = 18;
+}
+
+//UpdateUser Function
+message UpdateUserRequest {
+    string userID = 19;
+    string field = 20;
+    string updatedValue = 21;
+}
+
+message UpdateUserResponse {
+    string error = 22;
+}
+
+//DeleteUser Function
+message DeleteUserRequest {
+    string userID = 23;
+    string username = 24;
+    string password = 25;
+}
+
+message DeleteUserResponse {
+    string error = 26;
 }

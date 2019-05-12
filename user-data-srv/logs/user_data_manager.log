@@ -1,0 +1,121 @@
+2019/05/12 12:54:08 [Debug] user-data-manager Init(:38) > Initializing ...
+2019/05/12 13:40:13 [Debug] user-data-manager.UserDataManager AddUser(:84) > Adding User With Data: map[Username:7Rf0fQuH5D]
+2019/05/12 13:40:17 [Debug] user-data-manager.UserDataManager generateID(:61) > Generating New User ID
+2019/05/12 13:40:17 [Debug] user-data-manager.UserDataManager GetUser(:145) > Trying To Get User With UserID: UsTkV2nocJuYwQ-e8ZoqMVjVlf0xHJUTNWnyve1Z52lZuH4vchvn-NLXrNg69-IU
+2019/05/12 13:41:27 [Debug] user-data-manager.UserDataManager AddUser(:84) > Adding User With Data: map[Username:pMkJPXH3cH UserExtraData:map[]]
+2019/05/12 13:41:31 [Debug] user-data-manager.UserDataManager generateID(:61) > Generating New User ID
+2019/05/12 13:41:31 [Debug] user-data-manager.UserDataManager GetUser(:145) > Trying To Get User With UserID: rU67Yga0jYpnsNhZHxVVpzVU5oXxBctlNwgLF8Aq_VFuY071D1_zHiUuga73KHGp
+2019/05/12 13:41:31 [Debug] user-data-manager.UserDataManager GetUser(:145) > Trying To Get User With UserID: rU67Yga0jYpnsNhZHxVVpzVU5oXxBctlNwgLF8Aq_VFuY071D1_zHiUuga73KHGp
+2019/05/12 13:56:40 [Debug] user-data-manager.UserDataManager AddUser(:84) > Adding User With Data: map[Username:_97Yx4h3Ep Password:_97Yx4h3Ep UserExtraData:map[]]
+2019/05/12 13:56:44 [Debug] user-data-manager.UserDataManager GetUser(:145) > Trying To Get User With UserID: Email Exists
+2019/05/12 13:56:44 [Debug] user-data-manager.UserDataManager AuthUser(:128) > Authing User _97Yx4h3Ep With Password _97Yx4h3Ep
+2019/05/12 13:56:44 [Debug] user-data-manager.UserDataManager AuthUser(:128) > Authing User _97Yx4h3Ep With Password wrong-password
+2019/05/12 13:56:44 [Debug] user-data-manager.UserDataManager UpdateUser(:158) > Updating Password Field To _ht8aVAwYH Of User ID Email Exists
+2019/05/12 13:56:44 [Debug] user-data-manager.UserDataManager GetUser(:145) > Trying To Get User With UserID: Email Exists
+2019/05/12 13:56:44 [Debug] user-data-manager.UserDataManager AuthUser(:128) > Authing User _97Yx4h3Ep With Password _ht8aVAwYH
+2019/05/12 13:56:44 [Debug] user-data-manager.UserDataManager GetUser(:145) > Trying To Get User With UserID: Email Exists
+2019/05/12 13:58:02 [Debug] user-data-manager.UserDataManager AddUser(:84) > Adding User With Data: map[Password:0CEe1GW8ZT UserExtraData:map[] Username:0CEe1GW8ZT]
+2019/05/12 13:58:06 [Debug] user-data-manager.UserDataManager GetUser(:145) > Trying To Get User With UserID: Email Exists
+2019/05/12 13:58:06 [Debug] user-data-manager.UserDataManager AuthUser(:128) > Authing User 0CEe1GW8ZT With Password 0CEe1GW8ZT
+2019/05/12 13:58:06 [Debug] user-data-manager.UserDataManager AuthUser(:128) > Authing User 0CEe1GW8ZT With Password wrong-password
+2019/05/12 13:58:06 [Debug] user-data-manager.UserDataManager UpdateUser(:158) > Updating Password Field To y5bp9y3xJJ Of User ID Email Exists
+2019/05/12 13:58:06 [Debug] user-data-manager.UserDataManager GetUser(:145) > Trying To Get User With UserID: Email Exists
+2019/05/12 13:58:06 [Debug] user-data-manager.UserDataManager AuthUser(:128) > Authing User 0CEe1GW8ZT With Password y5bp9y3xJJ
+2019/05/12 13:58:06 [Debug] user-data-manager.UserDataManager GetUser(:145) > Trying To Get User With UserID: Email Exists
+2019/05/12 13:58:55 [Debug] user-data-manager.UserDataManager AddUser(:84) > Adding User With Data: map[Username:NxYawl6Lgs Password:NxYawl6Lgs UserExtraData:map[]]
+2019/05/12 13:58:59 [Debug] user-data-manager.UserDataManager GetUser(:145) > Trying To Get User With UserID: Email Exists
+2019/05/12 13:58:59 [Debug] user-data-manager.UserDataManager AuthUser(:128) > Authing User NxYawl6Lgs With Password NxYawl6Lgs
+2019/05/12 13:58:59 [Debug] user-data-manager.UserDataManager AuthUser(:128) > Authing User NxYawl6Lgs With Password wrong-password
+2019/05/12 13:58:59 [Debug] user-data-manager.UserDataManager UpdateUser(:158) > Updating Password Field To Iq7CDgTgGb Of User ID Email Exists
+2019/05/12 13:58:59 [Debug] user-data-manager.UserDataManager GetUser(:145) > Trying To Get User With UserID: Email Exists
+2019/05/12 13:58:59 [Debug] user-data-manager.UserDataManager AuthUser(:128) > Authing User NxYawl6Lgs With Password Iq7CDgTgGb
+2019/05/12 13:58:59 [Debug] user-data-manager.UserDataManager GetUser(:145) > Trying To Get User With UserID: Email Exists
+2019/05/12 13:59:39 [Debug] user-data-manager.UserDataManager AddUser(:84) > Adding User With Data: map[Username:afNZRyqo2K Password:afNZRyqo2K Email:afNZRyqo2K UserExtraData:map[]]
+2019/05/12 13:59:43 [Debug] user-data-manager.UserDataManager generateID(:61) > Generating New User ID
+2019/05/12 13:59:43 [Debug] user-data-manager.UserDataManager GetUser(:145) > Trying To Get User With UserID: fdwfOn2KqyM4oAzyoEIcZ1vxpPiSgrmZeJi2t0CzGOYLK6lupgYiALzH8Yx5awem
+2019/05/12 13:59:43 [Debug] user-data-manager.UserDataManager GetUser(:145) > Trying To Get User With UserID: fdwfOn2KqyM4oAzyoEIcZ1vxpPiSgrmZeJi2t0CzGOYLK6lupgYiALzH8Yx5awem
+2019/05/12 13:59:43 [Debug] user-data-manager.UserDataManager AuthUser(:128) > Authing User afNZRyqo2K With Password afNZRyqo2K
+2019/05/12 13:59:43 [Debug] user-data-manager.UserDataManager AuthUser(:128) > Authing User afNZRyqo2K With Password wrong-password
+2019/05/12 13:59:43 [Debug] user-data-manager.UserDataManager UpdateUser(:158) > Updating Password Field To aGiYIKC_oL Of User ID fdwfOn2KqyM4oAzyoEIcZ1vxpPiSgrmZeJi2t0CzGOYLK6lupgYiALzH8Yx5awem
+2019/05/12 13:59:43 [Debug] user-data-manager.UserDataManager GetUser(:145) > Trying To Get User With UserID: fdwfOn2KqyM4oAzyoEIcZ1vxpPiSgrmZeJi2t0CzGOYLK6lupgYiALzH8Yx5awem
+2019/05/12 13:59:43 [Debug] user-data-manager.UserDataManager AuthUser(:128) > Authing User afNZRyqo2K With Password aGiYIKC_oL
+2019/05/12 13:59:43 [Debug] user-data-manager.UserDataManager GetUser(:145) > Trying To Get User With UserID: fdwfOn2KqyM4oAzyoEIcZ1vxpPiSgrmZeJi2t0CzGOYLK6lupgYiALzH8Yx5awem
+2019/05/12 14:00:42 [Debug] user-data-manager.UserDataManager AddUser(:84) > Adding User With Data: map[Username:dUVP890Dsi Password:dUVP890Dsi Email:dUVP890Dsi UserExtraData:map[]]
+2019/05/12 14:00:46 [Debug] user-data-manager.UserDataManager generateID(:61) > Generating New User ID
+2019/05/12 14:00:46 [Debug] user-data-manager.UserDataManager GetUser(:145) > Trying To Get User With UserID: le0wq1eTQEWcnBVGcRU6JtuNYpMV5kCvoJwTLpDxuJZJ147wH6CJinZVUxElolmA
+2019/05/12 14:00:46 [Debug] user-data-manager.UserDataManager GetUser(:145) > Trying To Get User With UserID: le0wq1eTQEWcnBVGcRU6JtuNYpMV5kCvoJwTLpDxuJZJ147wH6CJinZVUxElolmA
+2019/05/12 14:00:46 [Debug] user-data-manager.UserDataManager AuthUser(:128) > Authing User dUVP890Dsi With Password dUVP890Dsi
+2019/05/12 14:00:46 [Debug] user-data-manager.UserDataManager AuthUser(:128) > Authing User dUVP890Dsi With Password wrong-password
+2019/05/12 14:00:46 [Debug] user-data-manager.UserDataManager UpdateUser(:158) > Updating Password Field To k1W3oCc7k4 Of User ID le0wq1eTQEWcnBVGcRU6JtuNYpMV5kCvoJwTLpDxuJZJ147wH6CJinZVUxElolmA
+2019/05/12 14:00:46 [Debug] user-data-manager.UserDataManager GetUser(:145) > Trying To Get User With UserID: le0wq1eTQEWcnBVGcRU6JtuNYpMV5kCvoJwTLpDxuJZJ147wH6CJinZVUxElolmA
+2019/05/12 14:00:46 [Debug] user-data-manager.UserDataManager AuthUser(:128) > Authing User dUVP890Dsi With Password k1W3oCc7k4
+2019/05/12 14:00:46 [Debug] user-data-manager.UserDataManager GetUser(:145) > Trying To Get User With UserID: le0wq1eTQEWcnBVGcRU6JtuNYpMV5kCvoJwTLpDxuJZJ147wH6CJinZVUxElolmA
+2019/05/12 14:06:22 [Debug] user-data-manager.UserDataManager AddUser(:84) > Adding User With Data: map[Username:AAlYmT0lLK Password:AAlYmT0lLK Email:AAlYmT0lLK UserExtraData:map[]]
+2019/05/12 14:06:26 [Debug] user-data-manager.UserDataManager generateID(:61) > Generating New User ID
+2019/05/12 14:06:26 [Debug] user-data-manager.UserDataManager GetUser(:155) > Trying To Get User With UserID: F07wUKNjcym-3E8UQ3BbU7QU9_GTTKmTE-NfH4gJocCuU4lBGB2CXy_jY-9n4t1a
+2019/05/12 14:06:26 [Debug] user-data-manager.UserDataManager GetUser(:155) > Trying To Get User With UserID: F07wUKNjcym-3E8UQ3BbU7QU9_GTTKmTE-NfH4gJocCuU4lBGB2CXy_jY-9n4t1a
+2019/05/12 14:06:26 [Debug] user-data-manager.UserDataManager AuthUser(:137) > Authing User AAlYmT0lLK With Password AAlYmT0lLK
+2019/05/12 14:06:26 [Debug] user-data-manager.UserDataManager AuthUser(:137) > Authing User AAlYmT0lLK With Password wrong-password
+2019/05/12 14:06:26 [Debug] user-data-manager.UserDataManager UpdateUser(:168) > Updating Password Field To C98k1qGDIx Of User ID F07wUKNjcym-3E8UQ3BbU7QU9_GTTKmTE-NfH4gJocCuU4lBGB2CXy_jY-9n4t1a
+2019/05/12 14:06:26 [Debug] user-data-manager.UserDataManager GetUser(:155) > Trying To Get User With UserID: F07wUKNjcym-3E8UQ3BbU7QU9_GTTKmTE-NfH4gJocCuU4lBGB2CXy_jY-9n4t1a
+2019/05/12 14:06:26 [Debug] user-data-manager.UserDataManager AuthUser(:137) > Authing User AAlYmT0lLK With Password C98k1qGDIx
+2019/05/12 14:06:26 [Debug] user-data-manager.UserDataManager DeleteUser(:179) > Deleting User With UserID F07wUKNjcym-3E8UQ3BbU7QU9_GTTKmTE-NfH4gJocCuU4lBGB2CXy_jY-9n4t1a
+2019/05/12 14:06:26 [Debug] user-data-manager.UserDataManager UpdateUser(:168) > Updating UserExtraData.AccountStatus Field To Deleted Of User ID F07wUKNjcym-3E8UQ3BbU7QU9_GTTKmTE-NfH4gJocCuU4lBGB2CXy_jY-9n4t1a
+2019/05/12 14:06:26 [Debug] user-data-manager.UserDataManager GetUser(:155) > Trying To Get User With UserID: F07wUKNjcym-3E8UQ3BbU7QU9_GTTKmTE-NfH4gJocCuU4lBGB2CXy_jY-9n4t1a
+2019/05/12 14:07:10 [Debug] user-data-manager.UserDataManager AddUser(:84) > Adding User With Data: map[Username:TaawX9C2SJ Password:TaawX9C2SJ Email:TaawX9C2SJ UserExtraData:map[]]
+2019/05/12 14:07:14 [Debug] user-data-manager.UserDataManager generateID(:61) > Generating New User ID
+2019/05/12 14:07:14 [Debug] user-data-manager.UserDataManager GetUser(:155) > Trying To Get User With UserID: fbBxKHZhyTEPh98wiXrE1AxLF-7yAylr0g_yuO7VIV9I-7swJ9uGidbY6SpY2tGF
+2019/05/12 14:07:14 [Debug] user-data-manager.UserDataManager GetUser(:155) > Trying To Get User With UserID: fbBxKHZhyTEPh98wiXrE1AxLF-7yAylr0g_yuO7VIV9I-7swJ9uGidbY6SpY2tGF
+2019/05/12 14:07:14 [Debug] user-data-manager.UserDataManager AuthUser(:137) > Authing User TaawX9C2SJ With Password TaawX9C2SJ
+2019/05/12 14:07:14 [Debug] user-data-manager.UserDataManager AuthUser(:137) > Authing User TaawX9C2SJ With Password wrong-password
+2019/05/12 14:07:14 [Debug] user-data-manager.UserDataManager UpdateUser(:168) > Updating Password Field To 7buXtfXeQm Of User ID fbBxKHZhyTEPh98wiXrE1AxLF-7yAylr0g_yuO7VIV9I-7swJ9uGidbY6SpY2tGF
+2019/05/12 14:07:14 [Debug] user-data-manager.UserDataManager GetUser(:155) > Trying To Get User With UserID: fbBxKHZhyTEPh98wiXrE1AxLF-7yAylr0g_yuO7VIV9I-7swJ9uGidbY6SpY2tGF
+2019/05/12 14:07:14 [Debug] user-data-manager.UserDataManager AuthUser(:137) > Authing User TaawX9C2SJ With Password 7buXtfXeQm
+2019/05/12 14:07:14 [Debug] user-data-manager.UserDataManager DeleteUser(:179) > Deleting User With UserID fbBxKHZhyTEPh98wiXrE1AxLF-7yAylr0g_yuO7VIV9I-7swJ9uGidbY6SpY2tGF
+2019/05/12 14:07:14 [Debug] user-data-manager.UserDataManager UpdateUser(:168) > Updating UserExtraData.AccountStatus Field To Deleted Of User ID fbBxKHZhyTEPh98wiXrE1AxLF-7yAylr0g_yuO7VIV9I-7swJ9uGidbY6SpY2tGF
+2019/05/12 14:07:14 [Debug] user-data-manager.UserDataManager GetUser(:155) > Trying To Get User With UserID: fbBxKHZhyTEPh98wiXrE1AxLF-7yAylr0g_yuO7VIV9I-7swJ9uGidbY6SpY2tGF
+2019/05/12 14:08:21 [Debug] user-data-manager.UserDataManager AddUser(:84) > Adding User With Data: map[UserExtraData:map[] Username:SlogP3SGcv Password:SlogP3SGcv Email:SlogP3SGcv]
+2019/05/12 14:08:25 [Debug] user-data-manager.UserDataManager generateID(:61) > Generating New User ID
+2019/05/12 14:08:25 [Debug] user-data-manager.UserDataManager GetUser(:155) > Trying To Get User With UserID: XWv2jo8pzxGJBFgaNYa97bYpenceUCEDLwlHh5SQEjMJgJ-9aUCYsmXlv11p008R
+2019/05/12 14:08:25 [Debug] user-data-manager.UserDataManager GetUser(:155) > Trying To Get User With UserID: XWv2jo8pzxGJBFgaNYa97bYpenceUCEDLwlHh5SQEjMJgJ-9aUCYsmXlv11p008R
+2019/05/12 14:08:25 [Debug] user-data-manager.UserDataManager AuthUser(:137) > Authing User SlogP3SGcv With Password SlogP3SGcv
+2019/05/12 14:08:25 [Debug] user-data-manager.UserDataManager AuthUser(:137) > Authing User SlogP3SGcv With Password wrong-password
+2019/05/12 14:08:25 [Debug] user-data-manager.UserDataManager UpdateUser(:168) > Updating Password Field To SF-pWdcvPA Of User ID XWv2jo8pzxGJBFgaNYa97bYpenceUCEDLwlHh5SQEjMJgJ-9aUCYsmXlv11p008R
+2019/05/12 14:08:25 [Debug] user-data-manager.UserDataManager GetUser(:155) > Trying To Get User With UserID: XWv2jo8pzxGJBFgaNYa97bYpenceUCEDLwlHh5SQEjMJgJ-9aUCYsmXlv11p008R
+2019/05/12 14:08:25 [Debug] user-data-manager.UserDataManager AuthUser(:137) > Authing User SlogP3SGcv With Password SF-pWdcvPA
+2019/05/12 14:08:25 [Debug] user-data-manager.UserDataManager DeleteUser(:179) > Deleting User With UserID XWv2jo8pzxGJBFgaNYa97bYpenceUCEDLwlHh5SQEjMJgJ-9aUCYsmXlv11p008R
+2019/05/12 14:08:25 [Debug] user-data-manager.UserDataManager UpdateUser(:168) > Updating UserExtraData.AccountStatus Field To Deleted Of User ID XWv2jo8pzxGJBFgaNYa97bYpenceUCEDLwlHh5SQEjMJgJ-9aUCYsmXlv11p008R
+2019/05/12 14:08:25 [Debug] user-data-manager.UserDataManager GetUser(:155) > Trying To Get User With UserID: XWv2jo8pzxGJBFgaNYa97bYpenceUCEDLwlHh5SQEjMJgJ-9aUCYsmXlv11p008R
+2019/05/12 14:09:09 [Debug] user-data-manager.UserDataManager AddUser(:84) > Adding User With Data: map[Password:SFhAL-zUYV Email:SFhAL-zUYV UserExtraData:map[] Username:SFhAL-zUYV]
+2019/05/12 14:09:13 [Debug] user-data-manager.UserDataManager generateID(:61) > Generating New User ID
+2019/05/12 14:09:13 [Debug] user-data-manager.UserDataManager GetUser(:155) > Trying To Get User With UserID: qvvLiHtHqnYoiZ7KzH8xQejou4u17UdEzOazuz-QwSyk8UQYt3fTbsXqhfspaKou
+2019/05/12 14:09:13 [Debug] user-data-manager.UserDataManager GetUser(:155) > Trying To Get User With UserID: qvvLiHtHqnYoiZ7KzH8xQejou4u17UdEzOazuz-QwSyk8UQYt3fTbsXqhfspaKou
+2019/05/12 14:09:13 [Debug] user-data-manager.UserDataManager AuthUser(:137) > Authing User SFhAL-zUYV With Password SFhAL-zUYV
+2019/05/12 14:09:13 [Debug] user-data-manager.UserDataManager AuthUser(:137) > Authing User SFhAL-zUYV With Password wrong-password
+2019/05/12 14:09:13 [Debug] user-data-manager.UserDataManager UpdateUser(:168) > Updating Password Field To _QQndHFjtM Of User ID qvvLiHtHqnYoiZ7KzH8xQejou4u17UdEzOazuz-QwSyk8UQYt3fTbsXqhfspaKou
+2019/05/12 14:09:13 [Debug] user-data-manager.UserDataManager AuthUser(:137) > Authing User SFhAL-zUYV With Password _QQndHFjtM
+2019/05/12 14:09:13 [Debug] user-data-manager.UserDataManager DeleteUser(:179) > Deleting User With UserID qvvLiHtHqnYoiZ7KzH8xQejou4u17UdEzOazuz-QwSyk8UQYt3fTbsXqhfspaKou
+2019/05/12 14:09:13 [Debug] user-data-manager.UserDataManager UpdateUser(:168) > Updating UserExtraData.AccountStatus Field To Deleted Of User ID qvvLiHtHqnYoiZ7KzH8xQejou4u17UdEzOazuz-QwSyk8UQYt3fTbsXqhfspaKou
+2019/05/12 14:09:13 [Debug] user-data-manager.UserDataManager GetUser(:155) > Trying To Get User With UserID: qvvLiHtHqnYoiZ7KzH8xQejou4u17UdEzOazuz-QwSyk8UQYt3fTbsXqhfspaKou
+2019/05/12 14:09:24 [Debug] user-data-manager.UserDataManager AddUser(:84) > Adding User With Data: map[Username:phSBG4D_nZ Password:phSBG4D_nZ Email:phSBG4D_nZ UserExtraData:map[]]
+2019/05/12 14:09:28 [Debug] user-data-manager.UserDataManager generateID(:61) > Generating New User ID
+2019/05/12 14:09:28 [Debug] user-data-manager.UserDataManager GetUser(:155) > Trying To Get User With UserID: KSR89FzGar0oEairWDCarEvoPZQ1clHj13EplJP1W4QzvdAIe58xfr0L6Sz_CpGj
+2019/05/12 14:09:28 [Debug] user-data-manager.UserDataManager GetUser(:155) > Trying To Get User With UserID: KSR89FzGar0oEairWDCarEvoPZQ1clHj13EplJP1W4QzvdAIe58xfr0L6Sz_CpGj
+2019/05/12 14:09:28 [Debug] user-data-manager.UserDataManager AuthUser(:137) > Authing User phSBG4D_nZ With Password phSBG4D_nZ
+2019/05/12 14:09:28 [Debug] user-data-manager.UserDataManager AuthUser(:137) > Authing User phSBG4D_nZ With Password wrong-password
+2019/05/12 14:09:28 [Debug] user-data-manager.UserDataManager UpdateUser(:168) > Updating Password Field To mYleXyJ-mf Of User ID KSR89FzGar0oEairWDCarEvoPZQ1clHj13EplJP1W4QzvdAIe58xfr0L6Sz_CpGj
+2019/05/12 14:09:28 [Debug] user-data-manager.UserDataManager AuthUser(:137) > Authing User phSBG4D_nZ With Password mYleXyJ-mf
+2019/05/12 14:09:28 [Debug] user-data-manager.UserDataManager DeleteUser(:179) > Deleting User With UserID KSR89FzGar0oEairWDCarEvoPZQ1clHj13EplJP1W4QzvdAIe58xfr0L6Sz_CpGj
+2019/05/12 14:09:28 [Debug] user-data-manager.UserDataManager UpdateUser(:168) > Updating UserExtraData.AccountStatus Field To Deleted Of User ID KSR89FzGar0oEairWDCarEvoPZQ1clHj13EplJP1W4QzvdAIe58xfr0L6Sz_CpGj
+2019/05/12 14:09:28 [Debug] user-data-manager.UserDataManager GetUser(:155) > Trying To Get User With UserID: KSR89FzGar0oEairWDCarEvoPZQ1clHj13EplJP1W4QzvdAIe58xfr0L6Sz_CpGj
+2019/05/12 14:10:06 [Debug] user-data-manager.UserDataManager AddUser(:84) > Adding User With Data: map[UserExtraData:map[] Username:pjte0Jq2sp Password:pjte0Jq2sp Email:pjte0Jq2sp]
+2019/05/12 14:10:10 [Debug] user-data-manager.UserDataManager generateID(:61) > Generating New User ID
+2019/05/12 14:10:10 [Debug] user-data-manager.UserDataManager GetUser(:155) > Trying To Get User With UserID: q2r_wJhe4uETxTXRB1Ek97snyKAHs8FEWV2dyHEgl_auDLhynAIuExprNICkxOp4
+2019/05/12 14:10:10 [Debug] user-data-manager.UserDataManager GetUser(:155) > Trying To Get User With UserID: q2r_wJhe4uETxTXRB1Ek97snyKAHs8FEWV2dyHEgl_auDLhynAIuExprNICkxOp4
+2019/05/12 14:10:10 [Debug] user-data-manager.UserDataManager AuthUser(:137) > Authing User pjte0Jq2sp With Password pjte0Jq2sp
+2019/05/12 14:10:10 [Debug] user-data-manager.UserDataManager AuthUser(:137) > Authing User pjte0Jq2sp With Password wrong-password
+2019/05/12 14:10:10 [Debug] user-data-manager.UserDataManager UpdateUser(:168) > Updating Password Field To IkijM_Xz89 Of User ID q2r_wJhe4uETxTXRB1Ek97snyKAHs8FEWV2dyHEgl_auDLhynAIuExprNICkxOp4
+2019/05/12 14:10:10 [Debug] user-data-manager.UserDataManager AuthUser(:137) > Authing User pjte0Jq2sp With Password IkijM_Xz89
+2019/05/12 14:10:10 [Debug] user-data-manager.UserDataManager DeleteUser(:179) > Deleting User With UserID q2r_wJhe4uETxTXRB1Ek97snyKAHs8FEWV2dyHEgl_auDLhynAIuExprNICkxOp4
+2019/05/12 14:10:10 [Debug] user-data-manager.UserDataManager UpdateUser(:168) > Updating UserExtraData.AccountStatus Field To Deleted Of User ID q2r_wJhe4uETxTXRB1Ek97snyKAHs8FEWV2dyHEgl_auDLhynAIuExprNICkxOp4
+2019/05/12 14:10:10 [Debug] user-data-manager.UserDataManager GetUser(:155) > Trying To Get User With UserID: q2r_wJhe4uETxTXRB1Ek97snyKAHs8FEWV2dyHEgl_auDLhynAIuExprNICkxOp4
