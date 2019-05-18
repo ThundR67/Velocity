@@ -9,6 +9,7 @@ import (
 
 	logger "github.com/jex-lin/golang-logger"
 	"go.mongodb.org/mongo-driver/bson"
+	primitive "go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -34,11 +35,14 @@ type UserDataManager struct {
 }
 
 //Init Connects To MongoDB
-func (userDataManager *UserDataManager) Init() {
+func (userDataManager *UserDataManager) Init() error {
 	log.Debug("Initializing ...")
-	var err error
 
-	client, _ := mongo.NewClient(options.Client().ApplyURI(ConfigMongoDBAddress))
+	client, err := mongo.NewClient(options.Client().ApplyURI(ConfigMongoDBAddress))
+	if err != nil {
+		log.Criticalf("Error Caused At UserDataManager Initialization While Connecting To MongoDB: %s", err)
+		return err
+	}
 
 	//Creating A Timeout Context
 
@@ -46,14 +50,15 @@ func (userDataManager *UserDataManager) Init() {
 
 	//Doing The Actual Connection
 	err = client.Connect(userDataManager.Ctx)
-
 	if err != nil {
 		log.Criticalf("Error Caused At UserDataManager Initialization While Connecting To MongoDB: %s", err)
+		return err
 	}
 
 	//Connection To The Collectiong Which This struct Will Use
 	userDataManager.Collection = client.Database(ConfigZeroTechhDB).
 		Collection(ConfigUserDataCollection)
+	return err
 }
 
 //generateID Generates A New ID
@@ -123,6 +128,8 @@ func (userDataManager UserDataManager) GetUserByUsernameOrEmail(username, email 
 	err := userDataManager.Collection.FindOne(userDataManager.Ctx, filter).Decode(&user)
 	if user == nil {
 		return nil, UserDoesNotExistError{}
+	} else if err != nil {
+		return nil, err
 	}
 
 	if keepPwd {
@@ -133,21 +140,22 @@ func (userDataManager UserDataManager) GetUserByUsernameOrEmail(username, email 
 }
 
 //AuthUser Auths User Based On Username And Password
-func (userDataManager UserDataManager) AuthUser(username, email, password string) (bool, error) {
+func (userDataManager UserDataManager) AuthUser(username, email, password string) (bool, string, error) {
 	log.Debugf("Authing User %s With Password %s", username, password)
 
 	//TODO Add Hashing To Check Password
 	user, err := userDataManager.GetUserByUsernameOrEmail(username, email, true)
 	if err != nil && user == nil {
-		return false, errors.New("Invalid Username Or Email")
+		return false, "", errors.New("Invalid Username Or Email")
 	} else if err != nil {
-		return false, err
+		return false, "", err
 	}
 	valid := user[ConfigPasswordField] == password
 	if !valid {
-		return false, errors.New("Invalid Password")
+		return false, "", errors.New("Invalid Password")
 	}
-	return valid, nil
+
+	return valid, user[ConfigUserIDField].(primitive.ObjectID).String(), nil
 }
 
 //GetUser Returns A User Based On UserID
@@ -174,7 +182,7 @@ func (userDataManager UserDataManager) UpdateUser(userID, field, newValue string
 
 //DeleteUser Marks User's Account Status As Deleted
 func (userDataManager UserDataManager) DeleteUser(userID, username, password string) error {
-	valid, _ := userDataManager.AuthUser(username, "", password)
+	valid, _, _ := userDataManager.AuthUser(username, "", password)
 	if valid {
 		log.Debugf("Deleting User With UserID %s", userID)
 		return userDataManager.UpdateUser(userID, fmt.Sprintf("%s.%s", ConfigUserExtraDataField, ConfigAccountStatusField),

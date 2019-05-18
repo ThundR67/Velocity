@@ -14,14 +14,20 @@ func main() {
 
 	//Creating Service
 	service := micro.NewService(
-		micro.Name("Velocity.basic-auth-srv"),
+		micro.Name("user-data-srv"),
 	)
 
 	service.Init()
 
 	//Initialising service handler
 	userDataService := userDataManager.UserDataService{}
-	userDataService.Init()
+	err := userDataService.Init()
+	if err != nil {
+		msg := "Not Able To Connect To MongoDB Server Due To Error " + err.Error()
+		Log.Critical(msg)
+		//Panicing As Connection To MongoDB Failed
+		panic(msg)
+	}
 
 	//Registering Service
 	proto.RegisterUserDataManagerHandler(service.Server(), userDataService)

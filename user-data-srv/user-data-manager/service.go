@@ -34,8 +34,9 @@ type UserDataService struct {
 }
 
 //Init Initializes
-func (userDataService UserDataService) Init() {
-	userDataService.userDataClient.Init()
+func (userDataService *UserDataService) Init() error {
+	err := userDataService.userDataClient.Init()
+	return err
 }
 
 //AddUser Handles AddUser Function
@@ -75,12 +76,14 @@ func (userDataService UserDataService) GetUserByUsernameOrEmail(ctx context.Cont
 
 //AuthUser Handles AuthUser Function
 func (userDataService UserDataService) AuthUser(ctx context.Context, request *proto.AuthUserRequest, response *proto.AuthUserResponse) error {
-	valid, err := userDataService.userDataClient.AuthUser(request.Username, request.Email, request.Password)
+	valid, userID, err := userDataService.userDataClient.AuthUser(request.Username, request.Email, request.Password)
 	if err != nil {
 		Log.Criticalf("AuthUser With Username %s Email %s Returned Error %s", request.Username, request.Email, err)
 		response.Error = err.Error()
+		return err
 	}
 	response.Valid = valid
+	response.UserID = userID
 	return err
 }
 
