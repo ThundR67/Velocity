@@ -2,7 +2,7 @@ package main
 
 import (
 	proto "github.com/SonicRoshan/Velocity/user-data-srv/proto"
-	userDataManager "github.com/SonicRoshan/Velocity/user-data-srv/user-data-manager"
+	userDataService "github.com/SonicRoshan/Velocity/user-data-srv/service"
 	logger "github.com/jex-lin/golang-logger"
 	micro "github.com/micro/go-micro"
 )
@@ -20,7 +20,7 @@ func main() {
 	service.Init()
 
 	//Initialising service handler
-	userDataService := userDataManager.UserDataService{}
+	userDataService := userDataService.UserDataService{}
 	err := userDataService.Init()
 	if err != nil {
 		msg := "Not Able To Connect To MongoDB Server Due To Error " + err.Error()

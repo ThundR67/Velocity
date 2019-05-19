@@ -7,23 +7,19 @@ import (
 	"math/rand"
 	"time"
 
-	logger "github.com/jex-lin/golang-logger"
+	"github.com/SonicRoshan/Velocity/user-data-srv/config"
 	"go.mongodb.org/mongo-driver/bson"
-	primitive "go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
-
-//Loding Logger
-var log = logger.NewLogFile(ConfigLogFile)
 
 //Generates A 65 char long user id
 func generateRandomStringForID() string {
 	seededRand := rand.New(
 		rand.NewSource(time.Now().UnixNano()))
-	b := make([]byte, ConfigUserIDLength)
+	b := make([]byte, config.ConfigUserIDLength)
 	for i := range b {
-		b[i] = ConfigUserIDCharset[seededRand.Intn(len(ConfigUserIDCharset))]
+		b[i] = config.ConfigUserIDCharset[seededRand.Intn(len(config.ConfigUserIDCharset))]
 	}
 	return string(b)
 }
@@ -36,34 +32,30 @@ type UserDataManager struct {
 
 //Init Connects To MongoDB
 func (userDataManager *UserDataManager) Init() error {
-	log.Debug("Initializing ...")
 
-	client, err := mongo.NewClient(options.Client().ApplyURI(ConfigMongoDBAddress))
+	client, err := mongo.NewClient(options.Client().ApplyURI(config.ConfigMongoDBAddress))
 	if err != nil {
-		log.Criticalf("Error Caused At UserDataManager Initialization While Connecting To MongoDB: %s", err)
 		return err
 	}
 
 	//Creating A Timeout Context
 
-	userDataManager.Ctx, _ = context.WithTimeout(context.Background(), ConfigTimeout)
+	userDataManager.Ctx, _ = context.WithTimeout(context.Background(), config.ConfigTimeout)
 
 	//Doing The Actual Connection
 	err = client.Connect(userDataManager.Ctx)
 	if err != nil {
-		log.Criticalf("Error Caused At UserDataManager Initialization While Connecting To MongoDB: %s", err)
 		return err
 	}
 
 	//Connection To The Collectiong Which This struct Will Use
-	userDataManager.Collection = client.Database(ConfigZeroTechhDB).
-		Collection(ConfigUserDataCollection)
+	userDataManager.Collection = client.Database(config.ConfigZeroTechhDB).
+		Collection(config.ConfigUserDataCollection)
 	return err
 }
 
 //generateID Generates A New ID
 func (userDataManager UserDataManager) generateID() string {
-	log.Debug("Generating New User ID")
 	var userID string
 	idFound := false
 	for !idFound {
@@ -86,20 +78,19 @@ func (userDataManager UserDataManager) doesFieldValueExist(field string, value i
 
 //AddUser Adds An User To DB
 func (userDataManager UserDataManager) AddUser(user map[string]interface{}) (string, error) {
-	log.Debugf("Adding User With Data: %s", user)
 	//Checking If Username Or Email Exist
-	if userDataManager.doesFieldValueExist(ConfigUsernameField, user[ConfigUsernameField]) {
-		return UsernameExistsMsg, nil
-	} else if userDataManager.doesFieldValueExist(ConfigEmailField, user[ConfigEmailField]) {
-		return EmailExistsMsg, nil
+	if userDataManager.doesFieldValueExist(config.ConfigUsernameField, user[config.ConfigUsernameField]) {
+		return config.UsernameExistsMsg, nil
+	} else if userDataManager.doesFieldValueExist(config.ConfigEmailField, user[config.ConfigEmailField]) {
+		return config.EmailExistsMsg, nil
 	}
 	//Generating A Unique ID
 	userID := userDataManager.generateID()
-	user[ConfigUserIDField] = userID
+	user[config.ConfigUserIDField] = userID
 
 	//Adding Some Extra Data
-	user[ConfigUserExtraDataField].(map[string]interface{})[ConfigAccountCreationUTCField] = time.Now().Unix()
-	user[ConfigUserExtraDataField].(map[string]interface{})[ConfigAccountStatusField] = ConfigAccountStatusActive
+	user[config.ConfigUserExtraDataField].(map[string]interface{})[config.ConfigAccountCreationUTCField] = time.Now().Unix()
+	user[config.ConfigUserExtraDataField].(map[string]interface{})[config.ConfigAccountStatusField] = config.ConfigAccountStatusActive
 
 	_, err := userDataManager.Collection.InsertOne(userDataManager.Ctx, user)
 	return userID, err
@@ -119,15 +110,15 @@ func (userDataManager UserDataManager) GetUserByUsernameOrEmail(username, email 
 	var filter bson.M
 
 	if username != "" {
-		filter = bson.M{ConfigUsernameField: username}
+		filter = bson.M{config.ConfigUsernameField: username}
 	} else if email != "" {
-		filter = bson.M{ConfigEmailField: username}
+		filter = bson.M{config.ConfigEmailField: username}
 	}
 
 	var user bson.M
 	err := userDataManager.Collection.FindOne(userDataManager.Ctx, filter).Decode(&user)
 	if user == nil {
-		return nil, UserDoesNotExistError{}
+		return nil, config.UserDoesNotExistError{}
 	} else if err != nil {
 		return nil, err
 	}
@@ -135,13 +126,12 @@ func (userDataManager UserDataManager) GetUserByUsernameOrEmail(username, email 
 	if keepPwd {
 		return user, err
 	}
-	delete(user, ConfigPasswordField) //Removing The Password Field
+	delete(user, config.ConfigPasswordField) //Removing The Password Field
 	return user, err
 }
 
 //AuthUser Auths User Based On Username And Password
 func (userDataManager UserDataManager) AuthUser(username, email, password string) (bool, string, error) {
-	log.Debugf("Authing User %s With Password %s", username, password)
 
 	//TODO Add Hashing To Check Password
 	user, err := userDataManager.GetUserByUsernameOrEmail(username, email, true)
@@ -150,31 +140,29 @@ func (userDataManager UserDataManager) AuthUser(username, email, password string
 	} else if err != nil {
 		return false, "", err
 	}
-	valid := user[ConfigPasswordField] == password
+	valid := user[config.ConfigPasswordField] == password
 	if !valid {
 		return false, "", errors.New("Invalid Password")
 	}
 
-	return valid, user[ConfigUserIDField].(primitive.ObjectID).String(), nil
+	return valid, user[config.ConfigUserIDField].(string), nil
 }
 
 //GetUser Returns A User Based On UserID
 func (userDataManager UserDataManager) GetUser(userID string) (map[string]interface{}, error) {
-	log.Debugf("Trying To Get User With UserID: %s", userID)
 	var user bson.M
-	filter := bson.M{ConfigUserIDField: userID}
+	filter := bson.M{config.ConfigUserIDField: userID}
 	err := userDataManager.Collection.FindOne(userDataManager.Ctx, filter).Decode(&user)
 	if user == nil {
-		return nil, UserDoesNotExistError{}
+		return nil, config.UserDoesNotExistError{}
 	}
-	delete(user, ConfigPasswordField) //Removing The Password Field
+	delete(user, config.ConfigPasswordField) //Removing The Password Field
 	return user, err
 }
 
 //UpdateUser Updates A Field Of A User
 func (userDataManager UserDataManager) UpdateUser(userID, field, newValue string) error {
-	log.Debugf("Updating %s Field To %s Of User ID %s", field, newValue, userID)
-	filter := bson.M{ConfigUserIDField: userID}
+	filter := bson.M{config.ConfigUserIDField: userID}
 	update := bson.M{"$set": bson.M{field: newValue}}
 	_, err := userDataManager.Collection.UpdateOne(userDataManager.Ctx, filter, update)
 	return err
@@ -184,9 +172,8 @@ func (userDataManager UserDataManager) UpdateUser(userID, field, newValue string
 func (userDataManager UserDataManager) DeleteUser(userID, username, password string) error {
 	valid, _, _ := userDataManager.AuthUser(username, "", password)
 	if valid {
-		log.Debugf("Deleting User With UserID %s", userID)
-		return userDataManager.UpdateUser(userID, fmt.Sprintf("%s.%s", ConfigUserExtraDataField, ConfigAccountStatusField),
-			ConfigAccountStatusDeleted)
+		return userDataManager.UpdateUser(userID, fmt.Sprintf("%s.%s", config.ConfigUserExtraDataField, config.ConfigAccountStatusField),
+			config.ConfigAccountStatusDeleted)
 	}
 	return errors.New("Invalid Auth Info")
 }

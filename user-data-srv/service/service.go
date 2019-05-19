@@ -1,9 +1,11 @@
-package userdatamanager
+package userdataservice
 
 import (
 	"context"
 
+	"github.com/SonicRoshan/Velocity/user-data-srv/config"
 	proto "github.com/SonicRoshan/Velocity/user-data-srv/proto"
+	userDataManager "github.com/SonicRoshan/Velocity/user-data-srv/user-data-manager"
 	logger "github.com/jex-lin/golang-logger"
 )
 
@@ -30,7 +32,7 @@ func castFromInterfaceToString(mapInput map[string]interface{}) map[string]strin
 
 //UserDataService Is The Main Service Struct
 type UserDataService struct {
-	userDataClient UserDataManager
+	userDataClient userDataManager.UserDataManager
 }
 
 //Init Initializes
@@ -44,7 +46,7 @@ func (userDataService UserDataService) AddUser(ctx context.Context, request *pro
 	userID, err := userDataService.userDataClient.AddUser(castFromStringToInterface(request.Data))
 	if err != nil {
 		Log.Criticalf("AddUser With Data %v Returned Error %s", request.Data, err)
-	} else if userID == UsernameExistsMsg || userID == EmailExistsMsg {
+	} else if userID == config.UsernameExistsMsg || userID == config.EmailExistsMsg {
 		response.Error = userID
 	} else {
 		response.UserID = userID

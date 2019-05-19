@@ -1,14 +1,25 @@
-package userdatamanager
+package config
 
 import (
+	"os"
+	"strings"
 	"time"
 
-	config "github.com/ufoscout/go-up"
+	goup "github.com/ufoscout/go-up"
 )
 
+func getConfigFilePath() string {
+	dir, _ := os.Getwd()
+	split := strings.Split(dir, "\\")
+	if split[len(split)-1] == "user-data-manager" {
+		return "../config/main.config"
+	}
+	return "config/main.config"
+}
+
 //Loading Up Config File
-var configurations, _ = config.NewGoUp().
-	AddFile("config/config.properties", true).
+var configurations, _ = goup.NewGoUp().
+	AddFile(getConfigFilePath(), false).
 	Build()
 
 //UserDoesNotExistError Occurs When A User Does Not Exist
