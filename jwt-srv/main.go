@@ -1,16 +1,22 @@
 package main
 
 import (
+	logger "github.com/SonicRoshan/Velocity/global/logs"
 	proto "github.com/SonicRoshan/Velocity/jwt-srv/proto"
 	jwtservice "github.com/SonicRoshan/Velocity/jwt-srv/service"
-	logger "github.com/jex-lin/golang-logger"
 	micro "github.com/micro/go-micro"
 )
 
 func main() {
+	//Loading logger
+	log := logger.GetLogger("jwt_service_log.log")
 
-	//Log Loding Logger
-	var log = logger.NewLogFile("logs/main.log")
+	//Handling a panic
+	defer func() {
+		if r := recover(); r != nil {
+			log.Criticalf("Service Paniced Due To Reason %s", r)
+		}
+	}()
 
 	//Creating Service
 	service := micro.NewService(

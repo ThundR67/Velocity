@@ -1,2 +1,46 @@
 2019/05/16 15:02:42 [Critical] user-data-manager.UserDataService AuthUser(:81) > AuthUser With Username Docker Email  Returned Error Invalid Password
 2019/05/16 15:02:49 [Critical] user-data-manager.UserDataService AuthUser(:81) > AuthUser With Username Docker Email  Returned Error Invalid Password
+2019/05/19 15:23:32 [Critical] service.UserDataService AuthUser(:83) > AuthUser With Username roshan Email  Returned Error Invalid Username Or Email
+2019/05/19 15:32:39 [Critical] service.UserDataService AuthUser(:83) > AuthUser With Username roshan Email  Returned Error Invalid Username Or Email
+2019/05/19 15:33:05 [Critical] service.UserDataService AuthUser(:83) > AuthUser With Username Roshan Email  Returned Error Invalid Username Or Email
+2019/05/19 15:33:13 [Critical] service.UserDataService AuthUser(:83) > AuthUser With Username Roshan Email  Returned Error Invalid Username Or Email
+2019/05/19 15:33:19 [Critical] service.UserDataService AuthUser(:83) > AuthUser With Username Roshan Email  Returned Error Invalid Username Or Email
+2019/05/19 15:33:32 [Critical] service.UserDataService AuthUser(:83) > AuthUser With Username Roshan Email  Returned Error Invalid Username Or Email
+2019/05/19 15:35:18 [Critical] service.UserDataService AuthUser(:83) > AuthUser With Username Roshan Email  Returned Error Invalid Username Or Email
+2019/05/19 15:38:15 [Critical] service.UserDataService AuthUser(:90) > AuthUser With Username Roshan Email  Returned Error User Does Not Exist
+2019/05/19 15:38:17 [Critical] service.UserDataService AuthUser(:90) > AuthUser With Username Roshan Email  Returned Error User Does Not Exist
+2019/05/19 15:38:36 [Critical] service.UserDataService AuthUser(:90) > AuthUser With Username Roshan Email  Returned Error User Does Not Exist
+2019/05/19 15:39:26 [Critical] service.UserDataService AuthUser(:90) > AuthUser With Username dt Email  Returned Error User Does Not Exist
+2019/05/19 15:39:31 [Critical] service.UserDataService AuthUser(:90) > AuthUser With Username dt Email  Returned Error User Does Not Exist
+2019/05/19 15:39:33 [Critical] service.UserDataService AuthUser(:90) > AuthUser With Username dt Email  Returned Error User Does Not Exist
+2019/05/19 15:40:31 [Critical] service.UserDataService AuthUser(:90) > AuthUser With Username dt Email  Returned Error User Does Not Exist
+2019/05/19 15:40:48 [Critical] service.UserDataService AuthUser(:90) > AuthUser With Username dt Email  Returned Error User Does Not Exist
+2019/05/19 15:42:04 [Critical] service.UserDataService AuthUser(:90) > AuthUser With Username dt Email  Returned Error context deadline exceeded
+2019/05/19 15:42:06 [Critical] service.UserDataService AuthUser(:90) > AuthUser With Username dt Email  Returned Error connection(localhost:27017[-2]) unable to write wire message to network: connection(localhost:27017[-2]) failed to write: context deadline exceeded
+2019/05/19 15:42:09 [Critical] service.UserDataService AuthUser(:90) > AuthUser With Username dt Email  Returned Error context deadline exceeded
+2019/05/19 15:42:12 [Critical] service.UserDataService AuthUser(:90) > AuthUser With Username dt Email  Returned Error context deadline exceeded
+2019/05/19 15:42:14 [Critical] service.UserDataService AuthUser(:90) > AuthUser With Username dt Email  Returned Error context deadline exceeded
+2019/05/19 15:42:29 [Critical] service.UserDataService AuthUser(:90) > AuthUser With Username dt Email  Returned Error context deadline exceeded
+2019/05/19 15:42:31 [Critical] service.UserDataService AuthUser(:90) > AuthUser With Username dt Email  Returned Error context deadline exceeded
+2019/05/20 13:39:36 [Critical] service.UserDataService AuthUser(:85) > AuthUser With Username Rhan Email  Returned Error mongo: no documents in result
+2019/05/20 13:39:36 [Critical] service.UserDataService AuthUser(:85) > AuthUser With Username Rhan Email  Returned Error mongo: no documents in result
+2019/05/20 13:39:36 [Critical] service.UserDataService AuthUser(:85) > AuthUser With Username Rhan Email  Returned Error mongo: no documents in result
+2019/05/20 13:39:36 [Critical] service.UserDataService AuthUser(:85) > AuthUser With Username Rhan Email  Returned Error mongo: no documents in result
+2019/05/20 13:39:36 [Critical] service.UserDataService AuthUser(:85) > AuthUser With Username Rhan Email  Returned Error mongo: no documents in result
+2019/05/20 13:39:36 [Critical] service.UserDataService AuthUser(:85) > AuthUser With Username Rhan Email  Returned Error mongo: no documents in result
+2019/05/20 13:39:36 [Critical] service.UserDataService AuthUser(:85) > AuthUser With Username Rhan Email  Returned Error mongo: no documents in result
+2019/05/20 13:39:36 [Critical] service.UserDataService AuthUser(:85) > AuthUser With Username Rhan Email  Returned Error mongo: no documents in result
+2019/05/20 13:39:36 [Critical] service.UserDataService AuthUser(:85) > AuthUser With Username Rhan Email  Returned Error mongo: no documents in result
+2019/05/20 13:39:36 [Critical] service.UserDataService AuthUser(:85) > AuthUser With Username Rhan Email  Returned Error mongo: no documents in result
+2019/05/20 13:39:52 [Critical] service.UserDataService AuthUser(:85) > AuthUser With Username Rhan Email  Returned Error mongo: no documents in result
+2019/05/20 13:39:52 [Critical] service.UserDataService AuthUser(:85) > AuthUser With Username Rhan Email  Returned Error mongo: no documents in result
+2019/05/20 13:39:52 [Critical] service.UserDataService AuthUser(:85) > AuthUser With Username Rhan Email  Returned Error mongo: no documents in result
+2019/05/20 13:39:52 [Critical] service.UserDataService AuthUser(:85) > AuthUser With Username Rhan Email  Returned Error mongo: no documents in result
+2019/05/20 13:39:52 [Critical] service.UserDataService AuthUser(:85) > AuthUser With Username Rhan Email  Returned Error mongo: no documents in result
+2019/05/20 13:39:52 [Critical] service.UserDataService AuthUser(:85) > AuthUser With Username Rhan Email  Returned Error mongo: no documents in result
+2019/05/20 13:39:52 [Critical] service.UserDataService AuthUser(:85) > AuthUser With Username Rhan Email  Returned Error mongo: no documents in result
+2019/05/20 13:39:52 [Critical] service.UserDataService AuthUser(:85) > AuthUser With Username Rhan Email  Returned Error mongo: no documents in result
+2019/05/20 13:39:52 [Critical] service.UserDataService AuthUser(:85) > AuthUser With Username Rhan Email  Returned Error mongo: no documents in result
+2019/05/20 13:39:52 [Critical] service.UserDataService AuthUser(:85) > AuthUser With Username Rhan Email  Returned Error mongo: no documents in result
+2019/05/20 13:40:49 [Critical] service.UserDataService AuthUser(:85) > AuthUser With Username Rhan Email  Returned Error mongo: no documents in result
+2019/05/20 13:51:25 [Debug] service.UserDataService AuthUser(:84) > false

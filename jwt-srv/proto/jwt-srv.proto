@@ -1,14 +1,14 @@
 syntax = "proto3";
 
 service JWTManager {
-    rpc GenerateFreshAccessToken(UserData) returns (Token) {}
-    rpc GenerateAccessAndRefreshToken(UserData) returns (AccessAndRefreshToken) {}
+    rpc GenerateFreshAccessToken(JWTData) returns (Token) {}
+    rpc GenerateAccessAndRefreshToken(JWTData) returns (AccessAndRefreshToken) {}
     rpc GenerateAccessAndRefreshTokenBasedOnRefreshToken(Token) returns (AccessAndRefreshToken) {}
     rpc ValidateFreshAccessToken(Token) returns (Claims) {}
     rpc ValidateToken(Token) returns (Claims) {}
 }
 
-message UserData {
+message JWTData {
     string userIdentity = 1;
     repeated string scopes = 2;
 }
@@ -29,7 +29,7 @@ message TokenValid {
 }
 
 message Claims {
-    UserData userData = 8;
+    JWTData jwtData = 8;
     double creationUTC = 9;
     double expirationUTC = 10;
     bool valid = 11;

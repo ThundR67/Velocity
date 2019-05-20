@@ -3,7 +3,7 @@ package jwtservice
 import (
 	"context"
 
-	config "github.com/SonicRoshan/Velocity/jwt-srv/config"
+	"github.com/SonicRoshan/Velocity/global/config"
 	jwtmanager "github.com/SonicRoshan/Velocity/jwt-srv/jwt-manager"
 	proto "github.com/SonicRoshan/Velocity/jwt-srv/proto"
 	logger "github.com/jex-lin/golang-logger"
@@ -21,7 +21,7 @@ type Service struct {
 func (service Service) Init() { service.manager = jwtmanager.JWTManager{} }
 
 //GenerateFreshAccessToken generates fresh access token based on user identity
-func (service Service) GenerateFreshAccessToken(ctx context.Context, request *proto.UserData, response *proto.Token) error {
+func (service Service) GenerateFreshAccessToken(ctx context.Context, request *proto.JWTData, response *proto.Token) error {
 	log.Debugf("Generating Fresh Access Token With User Identity %s", request.UserIdentity)
 	token, err := service.manager.GenerateFreshAccesToken(request.UserIdentity)
 	if err != nil {
@@ -34,7 +34,7 @@ func (service Service) GenerateFreshAccessToken(ctx context.Context, request *pr
 }
 
 //GenerateAccessAndRefreshToken generates access and refresh token based on userIdentity
-func (service Service) GenerateAccessAndRefreshToken(ctx context.Context, request *proto.UserData, response *proto.AccessAndRefreshToken) error {
+func (service Service) GenerateAccessAndRefreshToken(ctx context.Context, request *proto.JWTData, response *proto.AccessAndRefreshToken) error {
 	log.Debugf("Generation Access And Refresh Token For User Identity %s", request.UserIdentity)
 	accessToken, refreshToken, err := service.manager.GenerateAccessAndRefreshToken(
 		request.UserIdentity,
@@ -91,9 +91,9 @@ func (service Service) ValidateToken(ctx context.Context, request *proto.Token, 
 		return nil
 	}
 
-	response.UserData.UserIdentity = claims[config.ConfigUserIdentityField].(string)
-	response.UserData.Scopes = jwtmanager.SliceInterfaceToString(claims[config.ConfigScopesField].([]interface{}))
-	response.CreationUTC = claims[config.ConfigCreationUTCField].(float64)
-	response.ExpirationUTC = claims[config.ConfigExpirationUTCField].(float64)
+	response.JwtData.UserIdentity = claims[config.JWTConfigUserIdentityField].(string)
+	response.JwtData.Scopes = jwtmanager.SliceInterfaceToString(claims[config.JWTConfigScopesField].([]interface{}))
+	response.CreationUTC = claims[config.JWTConfigCreationUTCField].(float64)
+	response.ExpirationUTC = claims[config.JWTConfigExpirationUTCField].(float64)
 	return err
 }

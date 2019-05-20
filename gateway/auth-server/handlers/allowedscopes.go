@@ -1,4 +1,4 @@
-package jwtmanager
+package handlers
 
 /*This file contains list of all allowed scope
 This is temporary file, as in future, when Velocity

@@ -4,8 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	config "github.com/SonicRoshan/Velocity/jwt-srv/config"
-	"github.com/SonicRoshan/Velocity/jwt-srv/jwt-manager/scopes"
+	"github.com/SonicRoshan/Velocity/global/config"
 	jwt "github.com/dgrijalva/jwt-go"
 )
 
@@ -36,11 +35,11 @@ type customClaim struct {
 
 func (cc customClaim) toMap() map[string]interface{} {
 	return map[string]interface{}{
-		config.ConfigUserIdentityField:  cc.UserIdentity,
-		config.ConfigIsFreshField:       cc.Fresh,
-		config.ConfigScopesField:        cc.Scopes,
-		config.ConfigCreationUTCField:   cc.CreationUTC,
-		config.ConfigExpirationUTCField: cc.ExpirationUTC,
+		config.JWTConfigUserIdentityField:  cc.UserIdentity,
+		config.JWTConfigIsFreshField:       cc.Fresh,
+		config.JWTConfigScopesField:        cc.Scopes,
+		config.JWTConfigCreationUTCField:   cc.CreationUTC,
+		config.JWTConfigExpirationUTCField: cc.ExpirationUTC,
 	}
 }
 
@@ -55,33 +54,33 @@ func (jwtManager JWTManager) isExpired(expirationTime time.Time) bool {
 //generateClaimsForFreshToken generates claims for fresh acces token
 func (jwtManager JWTManager) generateClaimsForFreshToken(userIdentity string) jwt.MapClaims {
 	currentTime := time.Now()
-	freshAccessTokenExpirationTime := currentTime.Add(time.Minute * config.ConfigFreshAccessTokenExpirationTimeMinutes)
+	freshAccessTokenExpirationTime := currentTime.Add(time.Minute * config.JWTConfigFreshAccessTokenExpirationTimeMinutes)
 	return jwt.MapClaims{
-		config.ConfigUserIdentityField:  userIdentity,
-		config.ConfigIsFreshField:       true,
-		config.ConfigCreationUTCField:   currentTime.Unix(),
-		config.ConfigExpirationUTCField: freshAccessTokenExpirationTime.Unix(),
+		config.JWTConfigUserIdentityField:  userIdentity,
+		config.JWTConfigIsFreshField:       true,
+		config.JWTConfigCreationUTCField:   currentTime.Unix(),
+		config.JWTConfigExpirationUTCField: freshAccessTokenExpirationTime.Unix(),
 	}
 }
 
 //generateClaims for acces and refresh token
 func (jwtManager JWTManager) generateClaims(userIdentity string, scopes []string) (jwt.MapClaims, jwt.MapClaims) {
 	currentTime := time.Now()
-	accessTokenExpirationTime := currentTime.Add(time.Minute * config.ConfigAccessTokenExpirationTimeMinutes)
-	refreshTokenExpirationTime := currentTime.Add(time.Hour * 24 * config.ConfigRefreshTokenExpirationTimeDays)
+	accessTokenExpirationTime := currentTime.Add(time.Minute * config.JWTConfigAccessTokenExpirationTimeMinutes)
+	refreshTokenExpirationTime := currentTime.Add(time.Hour * 24 * config.JWTConfigRefreshTokenExpirationTimeDays)
 	accessTokenClaims := jwt.MapClaims{
-		config.ConfigUserIdentityField:  userIdentity,
-		config.ConfigIsFreshField:       false,
-		config.ConfigScopesField:        scopes,
-		config.ConfigCreationUTCField:   currentTime.Unix(),
-		config.ConfigExpirationUTCField: accessTokenExpirationTime.Unix(),
+		config.JWTConfigUserIdentityField:  userIdentity,
+		config.JWTConfigIsFreshField:       false,
+		config.JWTConfigScopesField:        scopes,
+		config.JWTConfigCreationUTCField:   currentTime.Unix(),
+		config.JWTConfigExpirationUTCField: accessTokenExpirationTime.Unix(),
 	}
 
 	refreshTokenClaims := jwt.MapClaims{
-		config.ConfigUserIdentityField:  userIdentity,
-		config.ConfigScopesField:        scopes,
-		config.ConfigCreationUTCField:   currentTime,
-		config.ConfigExpirationUTCField: refreshTokenExpirationTime.Unix(),
+		config.JWTConfigUserIdentityField:  userIdentity,
+		config.JWTConfigScopesField:        scopes,
+		config.JWTConfigCreationUTCField:   currentTime,
+		config.JWTConfigExpirationUTCField: refreshTokenExpirationTime.Unix(),
 	}
 	return accessTokenClaims, refreshTokenClaims
 }
@@ -90,16 +89,12 @@ func (jwtManager JWTManager) generateClaims(userIdentity string, scopes []string
 func (jwtManager JWTManager) GenerateFreshAccesToken(userIdentity string) (string, error) {
 	freshAccessTokenClaims := jwtManager.generateClaimsForFreshToken(userIdentity)
 	freshAccessToken := jwt.NewWithClaims(jwt.SigningMethodHS256, freshAccessTokenClaims)
-	freshAccessTokenString, err := freshAccessToken.SignedString(config.ConfigSigningSecret)
+	freshAccessTokenString, err := freshAccessToken.SignedString(config.JWTConfigSigningSecret)
 	return freshAccessTokenString, err
 }
 
 //GenerateAccessAndRefreshToken will create a access and refresh token
 func (jwtManager JWTManager) GenerateAccessAndRefreshToken(userIdentity string, scopesRequested []string) (string, string, error) {
-	//Check if scopes are allowed
-	if !scopes.MatchScopesRequestedToScopesAllowed(scopesRequested, allowedScopes) {
-		return "", "", InvalidScopesError{}
-	}
 
 	//Generating claims
 	accessTokenClaims, refreshTokenClaims := jwtManager.generateClaims(userIdentity, scopesRequested)
@@ -109,11 +104,11 @@ func (jwtManager JWTManager) GenerateAccessAndRefreshToken(userIdentity string, 
 	refreshToken := jwt.NewWithClaims(jwt.SigningMethodHS256, refreshTokenClaims)
 
 	// Sign and get the complete encoded token as a string using the secret
-	accessTokenString, err := accessToken.SignedString(config.ConfigSigningSecret)
+	accessTokenString, err := accessToken.SignedString(config.JWTConfigSigningSecret)
 	if err != nil {
 		return "", "", err
 	}
-	refreshTokenString, err := refreshToken.SignedString(config.ConfigSigningSecret)
+	refreshTokenString, err := refreshToken.SignedString(config.JWTConfigSigningSecret)
 	return accessTokenString, refreshTokenString, err
 }
 
@@ -122,10 +117,10 @@ to create new access and refresh token*/
 func (jwtManager JWTManager) GenerateAccessAndRefreshTokenBasedOnRefreshToken(refreshTokenString string) (string, string, error) {
 	valid, claims, err := jwtManager.ValidateToken(refreshTokenString)
 	if !valid || err != nil {
-		return "", "", InvalidTokenError{}
+		return "", "", config.InvalidTokenError
 	}
-	userIdentity := claims[config.ConfigUserIdentityField].(string)
-	scopes := SliceInterfaceToString(claims[config.ConfigScopesField].([]interface{}))
+	userIdentity := claims[config.JWTConfigUserIdentityField].(string)
+	scopes := SliceInterfaceToString(claims[config.JWTConfigScopesField].([]interface{}))
 	return jwtManager.GenerateAccessAndRefreshToken(userIdentity, scopes)
 }
 
@@ -135,9 +130,9 @@ func (jwtManager JWTManager) ValidateFreshAccessToken(tokenString string) (bool,
 	if err != nil {
 		return false, err
 	} else if !valid {
-		return false, InvalidTokenError{}
+		return false, config.InvalidTokenError
 	}
-	return claims[config.ConfigIsFreshField].(bool), nil
+	return claims[config.JWTConfigIsFreshField].(bool), nil
 }
 
 //ValidateToken will validate token and return its claims
@@ -148,18 +143,18 @@ func (jwtManager JWTManager) ValidateToken(tokenString string) (bool, map[string
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
 		}
-		return config.ConfigSigningSecret, nil
+		return config.JWTConfigSigningSecret, nil
 	})
 
 	if err != nil {
 		return false, nil, err
 	}
 
-	expirationTime := timeFromFloat64(claims[config.ConfigExpirationUTCField].(float64))
+	expirationTime := timeFromFloat64(claims[config.JWTConfigExpirationUTCField].(float64))
 	if !token.Valid {
-		return false, nil, InvalidTokenError{}
+		return false, nil, config.InvalidTokenError
 	} else if jwtManager.isExpired(expirationTime) {
-		return false, nil, TokenExpiredError{}
+		return false, nil, config.TokenExpiredError
 	}
 	return true, claims, nil
 }
