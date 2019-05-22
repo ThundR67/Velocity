@@ -35,10 +35,12 @@ var _ server.Option
 
 type UserDataManagerService interface {
 	AddUser(ctx context.Context, in *UserData, opts ...client.CallOption) (*AddUserResponse, error)
-	GetUser(ctx context.Context, in *GetUserRequest, opts ...client.CallOption) (*UserData, error)
+	GetUserData(ctx context.Context, in *GetUserRequest, opts ...client.CallOption) (*UserData, error)
+	GetUserExtraData(ctx context.Context, in *GetUserRequest, opts ...client.CallOption) (*UserData, error)
 	GetUserByUsernameOrEmail(ctx context.Context, in *GetUserByUsernameOrEmailRequest, opts ...client.CallOption) (*UserData, error)
 	AuthUser(ctx context.Context, in *AuthUserRequest, opts ...client.CallOption) (*AuthUserResponse, error)
-	UpdateUser(ctx context.Context, in *UpdateUserRequest, opts ...client.CallOption) (*UpdateUserResponse, error)
+	UpdateUserData(ctx context.Context, in *UpdateUserRequest, opts ...client.CallOption) (*UpdateUserResponse, error)
+	UpdateUserExtraData(ctx context.Context, in *UpdateUserRequest, opts ...client.CallOption) (*UpdateUserResponse, error)
 	DeleteUser(ctx context.Context, in *DeleteUserRequest, opts ...client.CallOption) (*DeleteUserResponse, error)
 }
 
@@ -70,8 +72,18 @@ func (c *userDataManagerService) AddUser(ctx context.Context, in *UserData, opts
 	return out, nil
 }
 
-func (c *userDataManagerService) GetUser(ctx context.Context, in *GetUserRequest, opts ...client.CallOption) (*UserData, error) {
-	req := c.c.NewRequest(c.name, "UserDataManager.GetUser", in)
+func (c *userDataManagerService) GetUserData(ctx context.Context, in *GetUserRequest, opts ...client.CallOption) (*UserData, error) {
+	req := c.c.NewRequest(c.name, "UserDataManager.GetUserData", in)
+	out := new(UserData)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userDataManagerService) GetUserExtraData(ctx context.Context, in *GetUserRequest, opts ...client.CallOption) (*UserData, error) {
+	req := c.c.NewRequest(c.name, "UserDataManager.GetUserExtraData", in)
 	out := new(UserData)
 	err := c.c.Call(ctx, req, out, opts...)
 	if err != nil {
@@ -100,8 +112,18 @@ func (c *userDataManagerService) AuthUser(ctx context.Context, in *AuthUserReque
 	return out, nil
 }
 
-func (c *userDataManagerService) UpdateUser(ctx context.Context, in *UpdateUserRequest, opts ...client.CallOption) (*UpdateUserResponse, error) {
-	req := c.c.NewRequest(c.name, "UserDataManager.UpdateUser", in)
+func (c *userDataManagerService) UpdateUserData(ctx context.Context, in *UpdateUserRequest, opts ...client.CallOption) (*UpdateUserResponse, error) {
+	req := c.c.NewRequest(c.name, "UserDataManager.UpdateUserData", in)
+	out := new(UpdateUserResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userDataManagerService) UpdateUserExtraData(ctx context.Context, in *UpdateUserRequest, opts ...client.CallOption) (*UpdateUserResponse, error) {
+	req := c.c.NewRequest(c.name, "UserDataManager.UpdateUserExtraData", in)
 	out := new(UpdateUserResponse)
 	err := c.c.Call(ctx, req, out, opts...)
 	if err != nil {
@@ -124,20 +146,24 @@ func (c *userDataManagerService) DeleteUser(ctx context.Context, in *DeleteUserR
 
 type UserDataManagerHandler interface {
 	AddUser(context.Context, *UserData, *AddUserResponse) error
-	GetUser(context.Context, *GetUserRequest, *UserData) error
+	GetUserData(context.Context, *GetUserRequest, *UserData) error
+	GetUserExtraData(context.Context, *GetUserRequest, *UserData) error
 	GetUserByUsernameOrEmail(context.Context, *GetUserByUsernameOrEmailRequest, *UserData) error
 	AuthUser(context.Context, *AuthUserRequest, *AuthUserResponse) error
-	UpdateUser(context.Context, *UpdateUserRequest, *UpdateUserResponse) error
+	UpdateUserData(context.Context, *UpdateUserRequest, *UpdateUserResponse) error
+	UpdateUserExtraData(context.Context, *UpdateUserRequest, *UpdateUserResponse) error
 	DeleteUser(context.Context, *DeleteUserRequest, *DeleteUserResponse) error
 }
 
 func RegisterUserDataManagerHandler(s server.Server, hdlr UserDataManagerHandler, opts ...server.HandlerOption) error {
 	type userDataManager interface {
 		AddUser(ctx context.Context, in *UserData, out *AddUserResponse) error
-		GetUser(ctx context.Context, in *GetUserRequest, out *UserData) error
+		GetUserData(ctx context.Context, in *GetUserRequest, out *UserData) error
+		GetUserExtraData(ctx context.Context, in *GetUserRequest, out *UserData) error
 		GetUserByUsernameOrEmail(ctx context.Context, in *GetUserByUsernameOrEmailRequest, out *UserData) error
 		AuthUser(ctx context.Context, in *AuthUserRequest, out *AuthUserResponse) error
-		UpdateUser(ctx context.Context, in *UpdateUserRequest, out *UpdateUserResponse) error
+		UpdateUserData(ctx context.Context, in *UpdateUserRequest, out *UpdateUserResponse) error
+		UpdateUserExtraData(ctx context.Context, in *UpdateUserRequest, out *UpdateUserResponse) error
 		DeleteUser(ctx context.Context, in *DeleteUserRequest, out *DeleteUserResponse) error
 	}
 	type UserDataManager struct {
@@ -155,8 +181,12 @@ func (h *userDataManagerHandler) AddUser(ctx context.Context, in *UserData, out 
 	return h.UserDataManagerHandler.AddUser(ctx, in, out)
 }
 
-func (h *userDataManagerHandler) GetUser(ctx context.Context, in *GetUserRequest, out *UserData) error {
-	return h.UserDataManagerHandler.GetUser(ctx, in, out)
+func (h *userDataManagerHandler) GetUserData(ctx context.Context, in *GetUserRequest, out *UserData) error {
+	return h.UserDataManagerHandler.GetUserData(ctx, in, out)
+}
+
+func (h *userDataManagerHandler) GetUserExtraData(ctx context.Context, in *GetUserRequest, out *UserData) error {
+	return h.UserDataManagerHandler.GetUserExtraData(ctx, in, out)
 }
 
 func (h *userDataManagerHandler) GetUserByUsernameOrEmail(ctx context.Context, in *GetUserByUsernameOrEmailRequest, out *UserData) error {
@@ -167,8 +197,12 @@ func (h *userDataManagerHandler) AuthUser(ctx context.Context, in *AuthUserReque
 	return h.UserDataManagerHandler.AuthUser(ctx, in, out)
 }
 
-func (h *userDataManagerHandler) UpdateUser(ctx context.Context, in *UpdateUserRequest, out *UpdateUserResponse) error {
-	return h.UserDataManagerHandler.UpdateUser(ctx, in, out)
+func (h *userDataManagerHandler) UpdateUserData(ctx context.Context, in *UpdateUserRequest, out *UpdateUserResponse) error {
+	return h.UserDataManagerHandler.UpdateUserData(ctx, in, out)
+}
+
+func (h *userDataManagerHandler) UpdateUserExtraData(ctx context.Context, in *UpdateUserRequest, out *UpdateUserResponse) error {
+	return h.UserDataManagerHandler.UpdateUserExtraData(ctx, in, out)
 }
 
 func (h *userDataManagerHandler) DeleteUser(ctx context.Context, in *DeleteUserRequest, out *DeleteUserResponse) error {

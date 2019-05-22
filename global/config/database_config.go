@@ -15,8 +15,13 @@ var (
 	DBConfigTimeout = time.Duration(getIntConfig("database.timeoutSeconds", dbConfigManager)) * time.Second
 	//DBConfigZeroTechhDB Is The ZeroTechhDB Name
 	DBConfigZeroTechhDB = getStringConfig("database.zerotechhDB", dbConfigManager)
+
 	//DBConfigUserDataCollection Is UserData Collection
 	DBConfigUserDataCollection = getStringConfig("database.zerotechhDB.UserDataCollection", dbConfigManager)
+	//DBConfigUserExtraDataCollection Is Where Extra Data Is Stored
+	DBConfigUserExtraDataCollection = getStringConfig("database.zerotechhDB.UserExtraDataCollection", dbConfigManager)
+	//DBConfigUserMetaDataCollection Is Where User's meta Data Is Stored
+	DBConfigUserMetaDataCollection = getStringConfig("database.zerotechhDB.UserMetaDataCollection", dbConfigManager)
 
 	//DBConfigUserIDField Is UserID Field
 	DBConfigUserIDField = getStringConfig("database.zerotechhDB.UserDataCollection.UserIDField", dbConfigManager)
@@ -27,19 +32,17 @@ var (
 	//DBConfigPasswordField Is Password Field
 	DBConfigPasswordField = getStringConfig("database.zerotechhDB.UserDataCollection.PasswordField", dbConfigManager)
 
-	//DBConfigUserExtraDataField Is Where Extra Data Is Stored
-	DBConfigUserExtraDataField = getStringConfig("database.zerotechhDB.UserDataCollection.UserExtraDataField", dbConfigManager)
-
 	//DBConfigBirthdayUTCField is the birthday field
-	DBConfigBirthdayUTCField = getStringConfig("database.zerotechhDB.UserDataCollection.UserExtraData.BirthdayUTCField", dbConfigManager)
+	DBConfigBirthdayUTCField = getStringConfig("database.zerotechhDB.UserExtraDataCollection.BirthdayUTCField", dbConfigManager)
 	//DBConfigGenderField is the gender field
-	DBConfigGenderField = getStringConfig("database.zerotechhDB.UserDataCollection.UserExtraData.GenderField", dbConfigManager)
+	DBConfigGenderField = getStringConfig("database.zerotechhDB.UserExtraDataCollection.GenderField", dbConfigManager)
 	//DBConfigFirstNameField is first name field
-	DBConfigFirstNameField = getStringConfig("database.zerotechhDB.UserDataCollection.UserExtraData.FirstNameField", dbConfigManager)
+	DBConfigFirstNameField = getStringConfig("database.zerotechhDB.UserExtraDataCollection.FirstNameField", dbConfigManager)
 	//DBConfigLastNameField is last name field
-	DBConfigLastNameField = getStringConfig("database.zerotechhDB.UserDataCollection.UserExtraData.LastNameField", dbConfigManager)
+	DBConfigLastNameField = getStringConfig("database.zerotechhDB.UserExtraDataCollection.LastNameField", dbConfigManager)
+
 	//DBConfigAccountCreationUTCField Is UTC Of When Account Was Created
-	DBConfigAccountCreationUTCField = getStringConfig("database.zerotechhDB.UserDataCollection.UserExtraData.AccountCreationUTCField", dbConfigManager)
+	DBConfigAccountCreationUTCField = getStringConfig("database.zerotechhDB.UserMetaDataCollection.AccountCreationUTCField", dbConfigManager)
 	//DBConfigAccountStatusField Is Current Status Of Account Field
-	DBConfigAccountStatusField = getStringConfig("database.zerotechhDB.UserDataCollection.UserExtraData.AccountStatusField", dbConfigManager)
+	DBConfigAccountStatusField = getStringConfig("database.zerotechhDB.UserMetaDataCollection.AccountStatusField", dbConfigManager)
 )

@@ -1,24 +1,26 @@
 syntax = "proto3";
 
-
 service UserDataManager {
     rpc AddUser(UserData) returns (AddUserResponse) {}
-    rpc GetUser(GetUserRequest) returns (UserData) {}
+    rpc GetUserData(GetUserRequest) returns (UserData) {}
+    rpc GetUserExtraData(GetUserRequest) returns (UserData) {}
     rpc GetUserByUsernameOrEmail(GetUserByUsernameOrEmailRequest) returns (UserData) {}
     rpc AuthUser(AuthUserRequest) returns (AuthUserResponse) {}
-    rpc UpdateUser(UpdateUserRequest) returns (UpdateUserResponse) {}
+    rpc UpdateUserData(UpdateUserRequest) returns (UpdateUserResponse) {}
+    rpc UpdateUserExtraData(UpdateUserRequest) returns (UpdateUserResponse) {}
     rpc DeleteUser(DeleteUserRequest) returns (DeleteUserResponse) {}
 }
 
 //AddUser Function
 message UserData {
-    map<string, string> data = 1;
-    string error = 2;
+    map<string, string> userMainData = 1;
+    map<string, string> userExtraData = 2;
+    string message = 27;
 }
 
 message AddUserResponse {
     string userID = 3;
-    string error = 4;
+    string message = 4;
 }
 
 //GetUser Function
@@ -43,7 +45,7 @@ message AuthUserRequest {
 
 message AuthUserResponse {
     bool valid = 17;
-    string error = 18;
+    string message = 18;
     string userID = 27;
 }
 
@@ -55,7 +57,7 @@ message UpdateUserRequest {
 }
 
 message UpdateUserResponse {
-    string error = 22;
+    string message = 22;
 }
 
 //DeleteUser Function
@@ -66,5 +68,5 @@ message DeleteUserRequest {
 }
 
 message DeleteUserResponse {
-    string error = 26;
+    string message = 26;
 }

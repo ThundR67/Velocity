@@ -41,76 +41,94 @@ func (userDataService *UserDataService) Init() error {
 	return err
 }
 
-//AddUser Handles AddUser Function
-func (userDataService UserDataService) AddUser(ctx context.Context, request *proto.UserData, response *proto.AddUserResponse) error {
-	userID, err := userDataService.userDataClient.AddUser(castFromStringToInterface(request.Data))
+func (userDataService *UserDataService) getData(ctx context.Context, request *proto.GetUserRequest, collection string) (map[string]interface{}, error) {
+	userData, err := userDataService.userDataClient.GetUserData(request.UserID, collection)
 	if err != nil {
-		if err != config.UsernameExistError && err != config.EmailExistError {
-			serviceLog.Criticalf("AddUser With Data %v Returned Error %s", request.Data, err)
-		}
-		response.Error = err.Error()
+		serviceLog.Warnf("getData With Collection %s With UserID %s Returned Error %+v", collection, request.UserID, err)
+		return nil, err
+	}
+	return userData, err
+}
+
+func (userDataService *UserDataService) updateData(ctx context.Context, request *proto.UpdateUserRequest, collection string) error {
+	err := userDataService.userDataClient.UpdateUserData(request.UserID, request.Field, request.UpdatedValue, collection)
+	if err != nil {
+		serviceLog.Warnf("UpdateUser With Id %s Returned Error %+v", request.UserID, err)
 		return err
 	}
+	return err
+}
+
+//AddUser Handles AddUser Function
+func (userDataService UserDataService) AddUser(ctx context.Context, request *proto.UserData, response *proto.AddUserResponse) error {
+	userMainData := castFromStringToInterface(request.UserMainData)
+	userExtraData := castFromStringToInterface(request.UserExtraData)
+	userID, msg, err := userDataService.userDataClient.AddUser(userMainData, userExtraData)
+	if err != nil {
+		serviceLog.Warnf("AddUser With Data %v Returned Error %+v", userMainData, err)
+		return err
+	}
+	response.Message = msg
 	response.UserID = userID
 	return err
 }
 
-//GetUser Handles GetUser Function
-func (userDataService UserDataService) GetUser(ctx context.Context, request *proto.GetUserRequest, response *proto.UserData) error {
-	userData, err := userDataService.userDataClient.GetUser(request.UserID)
-	if err != nil {
-		serviceLog.Criticalf("GetUser With UserID %s Returned Error %s", request.UserID, err)
-		response.Error = err.Error()
-	}
-	response.Data = castFromInterfaceToString(userData)
+//GetUserData Handles GetUserData Function
+func (userDataService UserDataService) GetUserData(ctx context.Context, request *proto.GetUserRequest, response *proto.UserData) error {
+	data, err := userDataService.getData(ctx, request, config.DBConfigUserDataCollection)
+	response.UserMainData = castFromInterfaceToString(data)
+	return err
+}
+
+//GetUserExtraData Handles GetUserExtraData Function
+func (userDataService UserDataService) GetUserExtraData(ctx context.Context, request *proto.GetUserRequest, response *proto.UserData) error {
+	data, err := userDataService.getData(ctx, request, config.DBConfigUserExtraDataCollection)
+	response.UserExtraData = castFromInterfaceToString(data)
 	return err
 }
 
 //GetUserByUsernameOrEmail Handles GetUserByUsernameOrEmail Function
 func (userDataService UserDataService) GetUserByUsernameOrEmail(ctx context.Context, request *proto.GetUserByUsernameOrEmailRequest, response *proto.UserData) error {
-	userData, err := userDataService.userDataClient.GetUserByUsernameOrEmail(request.Username, request.Email)
+	userData, msg, err := userDataService.userDataClient.GetUserByUsernameOrEmail(request.Username, request.Email)
 	if err != nil {
-		serviceLog.Criticalf("GetUserByUsernameOrEmail With Username %s Email %s Returned Error %s", request.Username, request.Email, err)
-		response.Error = err.Error()
+		serviceLog.Warnf("GetUserByUsernameOrEmail With Username %s Email %s Returned Error %+v", request.Username, request.Email, err)
+		return err
 	}
-	response.Data = castFromInterfaceToString(userData)
+	response.Message = msg
+	response.UserMainData = castFromInterfaceToString(userData)
 	return err
 }
 
 //AuthUser Handles AuthUser Function
 func (userDataService UserDataService) AuthUser(ctx context.Context, request *proto.AuthUserRequest, response *proto.AuthUserResponse) error {
-	valid, userID, err := userDataService.userDataClient.AuthUser(request.Username, request.Email, request.Password)
+	valid, userID, msg, err := userDataService.userDataClient.AuthUser(request.Username, request.Email, request.Password)
 	if err != nil {
-		if err != config.InvalidUsernameOrEmailError && err != config.InvalidPasswordError {
-			serviceLog.Criticalf("AuthUser With Username %s Email %s Returned Error %s", request.Username, request.Email, err)
-		}
-		response.Error = err.Error()
+		serviceLog.Warnf("AuthUser With Username %s Email %s Returned Error %+v", request.Username, request.Email, err)
 		return err
 	}
+	response.Message = msg
 	response.Valid = valid
 	response.UserID = userID
 	return err
 }
 
-//UpdateUser Handles UpdateUser Function
-func (userDataService UserDataService) UpdateUser(ctx context.Context, request *proto.UpdateUserRequest, response *proto.UpdateUserResponse) error {
-	err := userDataService.userDataClient.UpdateUser(request.UserID, request.Field, request.UpdatedValue)
-	if err != nil {
-		serviceLog.Criticalf("UpdateUser With Id %s Returned Error %s", request.UserID, err)
-		response.Error = err.Error()
-	}
-	return err
+//UpdateUserData Handles UpdateUserData Function
+func (userDataService UserDataService) UpdateUserData(ctx context.Context, request *proto.UpdateUserRequest, response *proto.UpdateUserResponse) error {
+	return userDataService.updateData(ctx, request, config.DBConfigUserDataCollection)
+}
 
+//UpdateUserExtraData Handles UpdateUserData Function
+func (userDataService UserDataService) UpdateUserExtraData(ctx context.Context, request *proto.UpdateUserRequest, response *proto.UpdateUserResponse) error {
+	return userDataService.updateData(ctx, request, config.DBConfigUserExtraDataCollection)
 }
 
 //DeleteUser Handles DeleteUser Function
 func (userDataService UserDataService) DeleteUser(ctx context.Context, request *proto.DeleteUserRequest, response *proto.DeleteUserResponse) error {
-	err := userDataService.userDataClient.DeleteUser(request.UserID, request.Username, request.Password)
+	msg, err := userDataService.userDataClient.DeleteUser(request.UserID, request.Username, request.Password)
 	if err != nil {
-		if err != config.InvalidAuthDataError {
-			serviceLog.Criticalf("DeleteUser With UserID %s Returned Error %s", request.UserID, err.Error())
-		}
-		response.Error = err.Error()
+		serviceLog.Warnf("DeleteUser With UserID %s Returned Error %+v", request.UserID, err)
+		return err
 	}
+	response.Message = msg
 	return err
 }

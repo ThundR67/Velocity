@@ -6,6 +6,7 @@ import (
 
 	"github.com/SonicRoshan/Velocity/global/config"
 	jwt "github.com/dgrijalva/jwt-go"
+	"github.com/pkg/errors"
 )
 
 //timestampFromFloat64 converts float64 to time.time
@@ -22,25 +23,6 @@ func SliceInterfaceToString(slice []interface{}) []string {
 		output = append(output, val.(string))
 	}
 	return output
-}
-
-type customClaim struct {
-	UserIdentity  string   `json:"userIdentity"`
-	Fresh         bool     `json:"fresh"`
-	Scopes        []string `json:"scopes"`
-	CreationUTC   float64  `json:"creationUTC"`
-	ExpirationUTC float64  `json:"expirationUTC"`
-	jwt.Claims
-}
-
-func (cc customClaim) toMap() map[string]interface{} {
-	return map[string]interface{}{
-		config.JWTConfigUserIdentityField:  cc.UserIdentity,
-		config.JWTConfigIsFreshField:       cc.Fresh,
-		config.JWTConfigScopesField:        cc.Scopes,
-		config.JWTConfigCreationUTCField:   cc.CreationUTC,
-		config.JWTConfigExpirationUTCField: cc.ExpirationUTC,
-	}
 }
 
 //JWTManager is a low level jason web token manager
@@ -90,6 +72,10 @@ func (jwtManager JWTManager) GenerateFreshAccesToken(userIdentity string) (strin
 	freshAccessTokenClaims := jwtManager.generateClaimsForFreshToken(userIdentity)
 	freshAccessToken := jwt.NewWithClaims(jwt.SigningMethodHS256, freshAccessTokenClaims)
 	freshAccessTokenString, err := freshAccessToken.SignedString(config.JWTConfigSigningSecret)
+	if err != nil {
+		err = errors.Wrap(err, "Error In Generating Fresh Token During Signing Fresh Token")
+		return "", err
+	}
 	return freshAccessTokenString, err
 }
 
@@ -106,37 +92,51 @@ func (jwtManager JWTManager) GenerateAccessAndRefreshToken(userIdentity string, 
 	// Sign and get the complete encoded token as a string using the secret
 	accessTokenString, err := accessToken.SignedString(config.JWTConfigSigningSecret)
 	if err != nil {
+		err = errors.Wrap(err, "Error While Signing Access Token")
 		return "", "", err
 	}
 	refreshTokenString, err := refreshToken.SignedString(config.JWTConfigSigningSecret)
+	if err != nil {
+		err = errors.Wrap(err, "Error While Signing Refresh Token")
+		return "", "", err
+	}
 	return accessTokenString, refreshTokenString, err
 }
 
 /*GenerateAccessAndRefreshTokenBasedOnRefreshToken uses and validates refresh token
 to create new access and refresh token*/
-func (jwtManager JWTManager) GenerateAccessAndRefreshTokenBasedOnRefreshToken(refreshTokenString string) (string, string, error) {
-	valid, claims, err := jwtManager.ValidateToken(refreshTokenString)
-	if !valid || err != nil {
-		return "", "", config.InvalidTokenError
+func (jwtManager JWTManager) GenerateAccessAndRefreshTokenBasedOnRefreshToken(refreshTokenString string) (string, string, string, error) {
+	valid, claims, msg, err := jwtManager.ValidateToken(refreshTokenString)
+	if err != nil {
+		err = errors.Wrap(err, "Error While Validating Refresh Token")
+		return "", "", "", err
+	} else if !valid {
+		return "", "", config.InvalidTokenMsg, nil
 	}
 	userIdentity := claims[config.JWTConfigUserIdentityField].(string)
 	scopes := SliceInterfaceToString(claims[config.JWTConfigScopesField].([]interface{}))
-	return jwtManager.GenerateAccessAndRefreshToken(userIdentity, scopes)
+	accessToken, refreshToken, err := jwtManager.GenerateAccessAndRefreshToken(userIdentity, scopes)
+	if err != nil {
+		err = errors.Wrap(err, "Error While Generating Access And Refresh Token")
+		return "", "", msg, err
+	}
+	return accessToken, refreshToken, msg, nil
 }
 
 //ValidateFreshAccessToken validates fresh acces token
-func (jwtManager JWTManager) ValidateFreshAccessToken(tokenString string) (bool, error) {
-	valid, claims, err := jwtManager.ValidateToken(tokenString)
+func (jwtManager JWTManager) ValidateFreshAccessToken(tokenString string) (bool, string, error) {
+	valid, claims, msg, err := jwtManager.ValidateToken(tokenString)
 	if err != nil {
-		return false, err
+		err = errors.Wrap(err, "Error While ValidateToken Function With Fresh Token")
+		return false, msg, err
 	} else if !valid {
-		return false, config.InvalidTokenError
+		return false, config.InvalidTokenMsg, nil
 	}
-	return claims[config.JWTConfigIsFreshField].(bool), nil
+	return claims[config.JWTConfigIsFreshField].(bool), "", nil
 }
 
 //ValidateToken will validate token and return its claims
-func (jwtManager JWTManager) ValidateToken(tokenString string) (bool, map[string]interface{}, error) {
+func (jwtManager JWTManager) ValidateToken(tokenString string) (bool, map[string]interface{}, string, error) {
 	//Parsing the access token
 	claims := jwt.MapClaims{}
 	token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
@@ -147,14 +147,15 @@ func (jwtManager JWTManager) ValidateToken(tokenString string) (bool, map[string
 	})
 
 	if err != nil {
-		return false, nil, err
+		err = errors.Wrap(err, "Error While Parsing Token")
+		return false, nil, "", err
 	}
 
 	expirationTime := timeFromFloat64(claims[config.JWTConfigExpirationUTCField].(float64))
 	if !token.Valid {
-		return false, nil, config.InvalidTokenError
+		return false, nil, config.InvalidTokenMsg, nil
 	} else if jwtManager.isExpired(expirationTime) {
-		return false, nil, config.TokenExpiredError
+		return false, nil, config.TokenExpiredMsg, nil
 	}
-	return true, claims, nil
+	return true, claims, "", nil
 }

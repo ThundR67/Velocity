@@ -2,183 +2,189 @@ package userdatamanager
 
 import (
 	"context"
-	"fmt"
-	"math/rand"
-	"time"
 
 	"github.com/SonicRoshan/Velocity/global/config"
-	"go.mongodb.org/mongo-driver/bson"
+	"github.com/google/uuid"
+	"github.com/pkg/errors"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-//Generates A 65 char long user id
-func generateRandomStringForID() string {
-	seededRand := rand.New(
-		rand.NewSource(time.Now().UnixNano()))
-	b := make([]byte, config.UserDataConfigUserIDLength)
-	for i := range b {
-		b[i] = config.UserDataConfigUserIDCharset[seededRand.Intn(len(config.UserDataConfigUserIDCharset))]
-	}
-	return string(b)
+//Generates A Version 4 UUID
+func generateUUID() (string, error) {
+	id, err := uuid.NewRandom()
+	return id.String(), err
 }
 
 //UserDataManager The Main User Data Manager Which Will Communicate With MongoDB
 type UserDataManager struct {
-	Collection *mongo.Collection
-	Ctx        context.Context
+	database                *mongo.Database
+	userDataCollection      *mongo.Collection
+	userExtraDataCollection *mongo.Collection
+	userMetaDataCollection  *mongo.Collection
+	ctx                     context.Context
 }
 
 //Init Connects To MongoDB
-func (userDataManager *UserDataManager) Init() error {
-
+func (userDataManager *UserDataManager) Init(dbname ...string) error {
+	dbName := config.DBConfigZeroTechhDB
+	if dbname != nil {
+		dbName = dbname[0]
+	}
+	//Creating the client
 	client, err := mongo.NewClient(options.Client().ApplyURI(config.DBConfigMongoDBAddress))
 	if err != nil {
+		err = errors.Wrap(err, "Error While Creating Client To MongoDB")
 		return err
 	}
-
-	//Creating A Timeout Context
-
-	userDataManager.Ctx = context.TODO()
+	userDataManager.ctx = context.TODO()
 
 	//Doing The Actual Connection
-	err = client.Connect(userDataManager.Ctx)
+	err = client.Connect(userDataManager.ctx)
 	if err != nil {
+		err = errors.Wrap(err, "Error While Connecting To MongoDB")
 		return err
 	}
 
-	//Connection To The Collectiong Which This struct Will Use
-	userDataManager.Collection = client.Database(config.DBConfigZeroTechhDB).
-		Collection(config.DBConfigUserDataCollection)
+	//Connection To The DB Which This struct Will Use
+	userDataManager.database = client.Database(dbName)
+
+	//Connecting to all required collections
+	userDataManager.userDataCollection = userDataManager.database.Collection(config.DBConfigUserDataCollection)
+	userDataManager.userExtraDataCollection = userDataManager.database.Collection(config.DBConfigUserExtraDataCollection)
+	userDataManager.userMetaDataCollection = userDataManager.database.Collection(config.DBConfigUserMetaDataCollection)
+
 	return err
 }
 
 //generateID Generates A New ID
-func (userDataManager UserDataManager) generateID() string {
+func (userDataManager UserDataManager) generateID() (string, error) {
 	var userID string
+	var err error
 	idFound := false
+	userID = "ecbb811d-8be4-446e-b46d-45c1ddf4e606"
 	for !idFound {
-		userID = generateRandomStringForID()
+		userID, err = generateUUID()
+		if err != nil {
+			err = errors.Wrap(err, "Error While Generating UUID v4")
+			return "", err
+		}
 		/* idFound Will Be True If No User With UserID Exist,
 		If Exist Then idFound Will Be True And New ID Will Be Generated */
-		user, _ := userDataManager.GetUser(userID)
+		user, _ := readDocument(userDataManager.ctx,
+			config.DBConfigUserIDField,
+			userID,
+			userDataManager.userDataCollection)
 		idFound = user == nil
 	}
-	return userID
-}
-
-//doesFieldValueExist Checks If A Users Particular Field Has An Value
-func (userDataManager UserDataManager) doesFieldValueExist(field string, value interface{}) bool {
-	var user bson.M
-	filter := bson.M{field: value}
-	userDataManager.Collection.FindOne(userDataManager.Ctx, filter).Decode(&user)
-	return user != nil
+	return userID, nil
 }
 
 //AddUser Adds An User To DB
-func (userDataManager UserDataManager) AddUser(user map[string]interface{}) (string, error) {
+func (userDataManager UserDataManager) AddUser(userMainData, userExtraData map[string]interface{}) (string, string, error) {
 	//Checking if user data is valid
-	if !validateUserData(user) {
-		return "", config.InvalidUserDataError
+	if !validateUserMainData(userMainData) || !validateUserExtraData(userExtraData) {
+		return "", config.InvalidUserDataMsg, nil
 	}
 
 	//Checking If Username Or Email Exist
-	if userDataManager.doesFieldValueExist(config.DBConfigUsernameField, user[config.DBConfigUsernameField]) {
-		return "", config.UsernameExistError
-	} else if userDataManager.doesFieldValueExist(config.DBConfigEmailField, user[config.DBConfigEmailField]) {
-		return "", config.EmailExistError
+	usernameExist, _ := fieldExist(userDataManager.ctx, config.DBConfigUsernameField, userMainData[config.DBConfigUsernameField], userDataManager.userDataCollection)
+	emailExist, _ := fieldExist(userDataManager.ctx, config.DBConfigEmailField, userMainData[config.DBConfigEmailField], userDataManager.userDataCollection)
+
+	if usernameExist {
+		return "", config.UsernameExistMsg, nil
+	} else if emailExist {
+		return "", config.EmailExistMsg, nil
 	}
 
+	//making the meta data
+	userMetaData := generateUserMetaData()
+
 	//Generating A Unique ID
-	userID := userDataManager.generateID()
-	user[config.DBConfigUserIDField] = userID
+	userID, err := userDataManager.generateID()
+	if err != nil {
+		err = errors.Wrap(err, "Error While Generating ID")
+		return "", "", err
+	}
 
-	//Adding Some Extra Data
-	user[config.DBConfigUserExtraDataField].(map[string]interface{})[config.DBConfigAccountCreationUTCField] = time.Now().Unix()
-	user[config.DBConfigUserExtraDataField].(map[string]interface{})[config.DBConfigAccountStatusField] = config.UserDataConfigAccountStatusActive
+	//Adding that id
+	userMainData[config.DBConfigUserIDField] = userID
+	userExtraData[config.DBConfigUserIDField] = userID
+	userMetaData[config.DBConfigUserIDField] = userID
 
-	_, err := userDataManager.Collection.InsertOne(userDataManager.Ctx, user)
-	return userID, err
+	//Adding Data To Thier Respective Collections
+	createDocument(userDataManager.ctx, userMainData, userDataManager.userDataCollection)
+	createDocument(userDataManager.ctx, userExtraData, userDataManager.userExtraDataCollection)
+	createDocument(userDataManager.ctx, userMetaData, userDataManager.userMetaDataCollection)
+	return userID, "", nil
 }
 
 //GetUserByUsernameOrEmail Returns User Data Based On Username Or Email
-func (userDataManager UserDataManager) GetUserByUsernameOrEmail(username, email string, keepPwdOpt ...bool) (map[string]interface{}, error) {
+func (userDataManager UserDataManager) GetUserByUsernameOrEmail(username, email string) (map[string]interface{}, string, error) {
 	if username == "" && email == "" {
-		return nil, config.InvalidUsernameAndEmailError
+		return nil, config.InvalidUsernameAndEmailMsg, nil
 	}
 
-	keepPwd := false
-	if len(keepPwdOpt) > 0 {
-		keepPwd = keepPwdOpt[0]
-	}
-
-	var filter bson.M
-
+	//Checking of either username or email was given
+	var key, value string
 	if username != "" {
-		filter = bson.M{config.DBConfigUsernameField: username}
+		key = config.DBConfigUsernameField
+		value = username
 	} else if email != "" {
-		filter = bson.M{config.DBConfigEmailField: username}
+		key = config.DBConfigEmailField
+		value = email
 	}
 
-	var user bson.M
-	err := userDataManager.Collection.FindOne(userDataManager.Ctx, filter).Decode(&user)
+	//Reading document
+	userData, err := readDocument(userDataManager.ctx, key, value, userDataManager.userDataCollection)
 	if err != nil {
-		return nil, err
-	} else if user == nil {
-		return nil, config.UserDoesNotExistError
+		err = errors.Wrap(err, "Error While Reading Document")
+		return nil, "", err
+	} else if userData == nil {
+		return nil, config.InvalidUsernameOrEmailMsg, nil
 	}
 
-	if keepPwd {
-		return user, err
-	}
-	delete(user, config.DBConfigPasswordField) //Removing The Password Field
-	return user, err
+	return userData, "", nil
 }
 
 //AuthUser Auths User Based On Username And Password
-func (userDataManager UserDataManager) AuthUser(username, email, password string) (bool, string, error) {
+func (userDataManager UserDataManager) AuthUser(username, email, password string) (bool, string, string, error) {
 
-	//TODO Add Hashing To Check Password
-	user, err := userDataManager.GetUserByUsernameOrEmail(username, email, true)
-	if err != nil && user == nil {
-		return false, "", config.InvalidUsernameOrEmailError
-	} else if err != nil {
-		return false, "", err
+	//Checking email or username
+	user, msg, err := userDataManager.GetUserByUsernameOrEmail(username, email)
+	if err != nil || user == nil || msg != "" {
+		return false, "", config.InvalidUsernameOrEmailMsg, nil
 	}
+	//Checking password
 	valid := user[config.DBConfigPasswordField] == password
 	if !valid {
-		return false, "", config.InvalidPasswordError
+		return false, "", config.InvalidPasswordMsg, nil
 	}
 
-	return valid, user[config.DBConfigUserIDField].(string), nil
+	return valid, user[config.DBConfigUserIDField].(string), "", nil
 }
 
-//GetUser Returns A User Based On UserID
-func (userDataManager UserDataManager) GetUser(userID string) (map[string]interface{}, error) {
-	var user bson.M
-	filter := bson.M{config.DBConfigUserIDField: userID}
-	err := userDataManager.Collection.FindOne(userDataManager.Ctx, filter).Decode(&user)
-	if user == nil {
-		return nil, config.UserDoesNotExistError
+//GetUserData Returns User Data Based On UserID
+func (userDataManager UserDataManager) GetUserData(userID, collection string) (map[string]interface{}, error) {
+	data, err := readDocument(userDataManager.ctx, config.DBConfigUserIDField, userID, userDataManager.database.Collection((collection)))
+	if err != nil {
+		err = errors.Wrap(err, "Error While Reading Document")
+		return nil, err
 	}
-	delete(user, config.DBConfigPasswordField) //Removing The Password Field
-	return user, err
+	delete(data, config.DBConfigPasswordField) //Removing The Password Field
+	return data, err
 }
 
-//UpdateUser Updates A Field Of A User
-func (userDataManager UserDataManager) UpdateUser(userID, field, newValue string) error {
-	filter := bson.M{config.DBConfigUserIDField: userID}
-	update := bson.M{"$set": bson.M{field: newValue}}
-	_, err := userDataManager.Collection.UpdateOne(userDataManager.Ctx, filter, update)
-	return err
+//UpdateUserData Updates A Field Of A User
+func (userDataManager UserDataManager) UpdateUserData(userID, field, newValue, collection string) error {
+	return updateDocument(userDataManager.ctx, config.DBConfigUserIDField, userID, field, newValue, userDataManager.database.Collection(collection))
 }
 
 //DeleteUser Marks User's Account Status As Deleted
-func (userDataManager UserDataManager) DeleteUser(userID, username, password string) error {
-	valid, _, _ := userDataManager.AuthUser(username, "", password)
+func (userDataManager UserDataManager) DeleteUser(userID, username, password string) (string, error) {
+	valid, _, _, _ := userDataManager.AuthUser(username, "", password)
 	if valid {
-		return userDataManager.UpdateUser(userID, fmt.Sprintf("%s.%s", config.DBConfigUserExtraDataField, config.DBConfigAccountStatusField),
-			config.UserDataConfigAccountStatusDeleted)
+		return "", updateDocument(userDataManager.ctx, config.DBConfigUserIDField, userID, config.DBConfigAccountStatusField, config.UserDataConfigAccountStatusDeleted, userDataManager.userMetaDataCollection)
 	}
-	return config.InvalidAuthDataError
+	return config.InvalidAuthDataMsg, nil
 }

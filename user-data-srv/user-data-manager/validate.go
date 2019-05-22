@@ -1,71 +1,64 @@
 package userdatamanager
 
 import (
-	"strings"
+	"strconv"
 	"time"
 
 	"github.com/SonicRoshan/Velocity/global/config"
+	"github.com/asaskevich/govalidator"
 )
 
-func timeFromRequest(ts int64) time.Time {
-	return time.Unix(ts, 0)
-}
-
-func lenCheck(value int, lenRange [2]int) bool {
-	return lenRange[0] <= value && value <= lenRange[1]
-}
-
-func genderCheck(value string) bool {
+func isGender(genderInput string) bool {
 	for _, gender := range config.UserDataConfigGenderTypes {
-		if value == gender {
+		if gender == genderInput {
 			return true
 		}
 	}
 	return false
 }
 
-func validateUserData(userData map[string]interface{}) (valid bool) {
+func handlePanic() bool {
+	r := recover()
+	return r == nil
+}
 
-	defer func() {
-		if r := recover(); r != nil {
-			valid = false
-		}
-	}()
+func timeFromRequest(ts string) time.Time {
+	i, _ := strconv.ParseInt(ts, 10, 64)
+	return time.Unix(i, 0)
+}
 
-	//checking if username is lower case
-	username := userData[config.DBConfigUsernameField].(string)
-	if username != strings.ToLower(username) {
+func validateUserMainData(userMainData map[string]interface{}) (valid bool) {
+	defer func() { valid = handlePanic() }()
+	username := userMainData[config.DBConfigUsernameField].(string)
+	password := userMainData[config.DBConfigPasswordField].(string)
+	email := userMainData[config.DBConfigEmailField].(string)
+	if govalidator.HasUpperCase(username) {
+		return false
+	} else if !govalidator.InRange(len(username), config.UserDataConfigUsernameLengthRange[0], config.UserDataConfigUsernameLengthRange[1]) {
+		return false
+	} else if !govalidator.IsExistingEmail(email) {
+		return false
+	} else if !govalidator.InRange(len(password), config.UserDataConfigPasswordLengthRange[0], config.UserDataConfigPasswordLengthRange[1]) {
 		return false
 	}
+	return true
+}
 
-	//Len Checks
-	firstNameLen := len(userData[config.DBConfigUserExtraDataField].(map[string]interface{})[config.DBConfigFirstNameField].(string))
-	lastNameLen := len(userData[config.DBConfigUserExtraDataField].(map[string]interface{})[config.DBConfigLastNameField].(string))
-	gender := userData[config.DBConfigUserExtraDataField].(map[string]interface{})[config.DBConfigGenderField].(string)
+func validateUserExtraData(userExtraData map[string]interface{}) (valid bool) {
+	defer func() { valid = handlePanic() }()
+	firstname := userExtraData[config.DBConfigFirstNameField].(string)
+	lastname := userExtraData[config.DBConfigLastNameField].(string)
+	gender := userExtraData[config.DBConfigGenderField].(string)
+	birthday := timeFromRequest(userExtraData[config.DBConfigBirthdayUTCField].(string))
+	age := time.Now().Year() - birthday.Year()
 
-	if !lenCheck(len(username), config.UserDataConfigUsernameLengthRange) {
+	if !govalidator.InRange(len(firstname), config.UserDataConfigFirstNameLengthRange[0], config.UserDataConfigFirstNameLengthRange[1]) {
 		return false
-	} else if !lenCheck(len(userData[config.DBConfigPasswordField].(string)), config.UserDataConfigPasswordLengthRange) {
+	} else if !govalidator.InRange(len(lastname), config.UserDataConfigLastNameLengthRange[0], config.UserDataConfigLastNameLengthRange[1]) {
 		return false
-	} else if !lenCheck(len(userData[config.DBConfigEmailField].(string)), config.UserDataConfigEmailLengthRange) {
+	} else if !isGender(gender) {
 		return false
-	} else if !lenCheck(len(userData[config.DBConfigUsernameField].(string)), config.UserDataConfigUsernameLengthRange) {
-		return false
-	} else if !lenCheck(len(userData[config.DBConfigUsernameField].(string)), config.UserDataConfigUsernameLengthRange) {
-		return false
-	} else if !lenCheck(firstNameLen, config.UserDataConfigFirstNameLengthRange) {
-		return false
-	} else if !lenCheck(lastNameLen, config.UserDataConfigLastNameLengthRange) {
-		return false
-	}
-
-	//gender check
-	if !genderCheck(gender) {
-		return false
-	}
-
-	birthday := timeFromRequest(userData[config.DBConfigUserExtraDataField].(map[string]interface{})[config.DBConfigBirthdayUTCField].(int64))
-	if time.Now().Year()-birthday.Year() < config.UserDataConfigMinimumAge {
+	} else if age < config.UserDataConfigMinimumAge {
 		return false
 	}
 	return true

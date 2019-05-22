@@ -4,13 +4,13 @@ import (
 	"context"
 
 	"github.com/SonicRoshan/Velocity/global/config"
+	logger "github.com/SonicRoshan/Velocity/global/logs"
 	jwtmanager "github.com/SonicRoshan/Velocity/jwt-srv/jwt-manager"
 	proto "github.com/SonicRoshan/Velocity/jwt-srv/proto"
-	logger "github.com/jex-lin/golang-logger"
 )
 
 //loading a logger
-var log = logger.NewLogFile("logs/service.log")
+var log = logger.GetLogger("jwt_service.log")
 
 //Service is the main jwt service struct
 type Service struct {
@@ -25,8 +25,7 @@ func (service Service) GenerateFreshAccessToken(ctx context.Context, request *pr
 	log.Debugf("Generating Fresh Access Token With User Identity %s", request.UserIdentity)
 	token, err := service.manager.GenerateFreshAccesToken(request.UserIdentity)
 	if err != nil {
-		log.Warnf("Generating Fresh Token With User Identity %s Returned Error %s", request.UserIdentity, err.Error())
-		response.Error = err.Error()
+		log.Warnf("Generating Fresh Token With User Identity %s Returned Error %+v", request.UserIdentity, err)
 		return err
 	}
 	response.Token = token
@@ -41,8 +40,7 @@ func (service Service) GenerateAccessAndRefreshToken(ctx context.Context, reques
 		request.Scopes,
 	)
 	if err != nil {
-		log.Warnf("Generating Access And Refresh Token For User Identity %s Returned Error %s", request.UserIdentity, err.Error())
-		response.Error = err.Error()
+		log.Warnf("Generating Access And Refresh Token For User Identity %s Returned Error %+v", request.UserIdentity, err)
 		return err
 	}
 	response.AcccessToken = accessToken
@@ -53,12 +51,12 @@ func (service Service) GenerateAccessAndRefreshToken(ctx context.Context, reques
 //GenerateAccessAndRefreshTokenBasedOnRefreshToken generates access and refresh token based on previous refresh token
 func (service Service) GenerateAccessAndRefreshTokenBasedOnRefreshToken(ctx context.Context, request *proto.Token, response *proto.AccessAndRefreshToken) error {
 	log.Debugf("Generating Access And Refresh Token Based On Refresh Token %s", request.Token)
-	accessToken, refreshToken, err := service.manager.GenerateAccessAndRefreshTokenBasedOnRefreshToken(request.Token)
+	accessToken, refreshToken, msg, err := service.manager.GenerateAccessAndRefreshTokenBasedOnRefreshToken(request.Token)
 	if err != nil {
-		log.Warnf("Generating Access And Refresh Token Based On Refresh Token %s Returned Error %s", request.Token, err.Error())
-		response.Error = err.Error()
+		log.Warnf("Generating Access And Refresh Token Based On Refresh Token %s Returned Error %+v", request.Token, err)
 		return err
 	}
+	response.Message = msg
 	response.AcccessToken = accessToken
 	response.RefreshToken = refreshToken
 	return nil
@@ -67,12 +65,12 @@ func (service Service) GenerateAccessAndRefreshTokenBasedOnRefreshToken(ctx cont
 //ValidateFreshAccessToken validates fresh access token
 func (service Service) ValidateFreshAccessToken(ctx context.Context, request *proto.Token, response *proto.Claims) error {
 	log.Debugf("Validating Fresh Access Token %s", request.Token)
-	valid, err := service.manager.ValidateFreshAccessToken(request.Token)
+	valid, msg, err := service.manager.ValidateFreshAccessToken(request.Token)
 	if err != nil {
-		log.Warnf("Validating Fresh Access Token %s Returned Error %s", request.Token, err.Error())
-		response.Error = err.Error()
+		log.Warnf("Validating Fresh Access Token %s Returned Error %+v", request.Token, err)
 		return err
 	}
+	response.Message = msg
 	response.Valid = valid
 	return err
 }
@@ -80,10 +78,9 @@ func (service Service) ValidateFreshAccessToken(ctx context.Context, request *pr
 //ValidateToken validates access token and returnes its claims
 func (service Service) ValidateToken(ctx context.Context, request *proto.Token, response *proto.Claims) error {
 	log.Debugf("Validating Token %s", request.Token)
-	valid, claims, err := service.manager.ValidateToken(request.Token)
+	valid, claims, msg, err := service.manager.ValidateToken(request.Token)
 	if err != nil {
-		log.Warnf("Validating Token %s Returned Error %s", request.Token, err.Error())
-		response.Error = err.Error()
+		log.Warnf("Validating Token %s Returned Error %+v", request.Token, err)
 		return err
 	}
 	response.Valid = valid
@@ -91,6 +88,7 @@ func (service Service) ValidateToken(ctx context.Context, request *proto.Token, 
 		return nil
 	}
 
+	response.Message = msg
 	response.JwtData.UserIdentity = claims[config.JWTConfigUserIdentityField].(string)
 	response.JwtData.Scopes = jwtmanager.SliceInterfaceToString(claims[config.JWTConfigScopesField].([]interface{}))
 	response.CreationUTC = claims[config.JWTConfigCreationUTCField].(float64)

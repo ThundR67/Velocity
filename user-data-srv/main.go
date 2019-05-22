@@ -21,6 +21,7 @@ func main() {
 	//Creating Service
 	service := micro.NewService(
 		micro.Name("user-data-srv"),
+		micro.Broker()
 	)
 
 	service.Init()

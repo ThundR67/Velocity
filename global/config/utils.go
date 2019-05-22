@@ -59,6 +59,16 @@ func getIntConfig(name string, configManager goup.GoUp) int {
 	return value
 }
 
+//getBoolConfig gets a configuration with bool value
+func getBoolConfig(name string, configManager goup.GoUp) bool {
+	//TODO Add logging
+	value, err := configManager.GetBoolOrFail(name)
+	if err != nil {
+		panic(fmt.Sprintf("Cannot Load %s Config From Config File, With Error %s", name, err.Error()))
+	}
+	return value
+}
+
 //CustomError is custom error type
 type CustomError struct {
 	msg string

@@ -10,10 +10,8 @@ var (
 	AuthServerConfigIPAddress = getStringConfig("authServer.ipAddress", authServerConfigManager)
 	//AuthServerConfigPort is the port where auth server will run
 	AuthServerConfigPort = getIntConfig("authServer.port", authServerConfigManager)
-	//AuthServerConfigUsernameField Is username field in http request
-	AuthServerConfigUsernameField = getStringConfig("authServer.request.usernameField", authServerConfigManager)
-	//AuthServerConfigPasswordField Is password field in http request
-	AuthServerConfigPasswordField = getStringConfig("authServer.request.passwordField", authServerConfigManager)
+	//AuthServerConfigTokenField Is token field in request
+	AuthServerConfigTokenField = getStringConfig("authServer.request.tokenField", authServerConfigManager)
 	//AuthServerConfigScopesField Is scopes field in request
 	AuthServerConfigScopesField = getStringConfig("authServer.request.scopesField", authServerConfigManager)
 	//AuthServerConfigErrField is err field of response
@@ -22,6 +20,8 @@ var (
 	AuthServerConfigAccessTokenField = getStringConfig("authServer.response.accessTokenField", authServerConfigManager)
 	//AuthServerConfigRefreshTokenField is field of refresh token
 	AuthServerConfigRefreshTokenField = getStringConfig("authServer.response.refreshTokenField", authServerConfigManager)
+	//AuthServerConfigShowError should server show error
+	AuthServerConfigShowError = getBoolConfig("authServer.response.showError", authServerConfigManager)
 )
 
 const (
