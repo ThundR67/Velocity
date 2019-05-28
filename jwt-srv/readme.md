@@ -1,40 +1,44 @@
 # JWT Service
-#### This service will handle every tasks related to Json Web Token.
-#### This will create, authenticate, etc JWT.
-#### This will also be managing scopes.
+### This service will handle taks related to JSON Web Tokens. This service will create and validate JWTs.
 
 
-## Schemes
+## Token Types
 
-### Scheme Of Acces Token Claim
-```python
+### Access token
+##### This is the token which will allow the client to get data from resource server.
+
+### Fresh Access Token
+##### This is simiral to access token, but extremely short lived. Tasks such as changing the password, would client to have a fresh access token.
+
+### Refresh Token
+##### This token can be used to refresh access token (NOT FRESH ACCESS TOKEN).
+
+
+## Claims
+### These are the claims in every token, defined at global/config/types.go
+
+```javascript
 {
-    "userIdentity" : {User ID},
-    "fresh" : false,
-    "scopes" : [Array Of Scopes],
-    "creationUTC" : {UTC Of When This JWT Was Created},
-    "expirationUTC" : {UTC Of When This JWT Will Expire},
+    "UserIdentity" : "An identity of user"
+    "IsFresh" : "Boolean value saying if the token is fresh toke",      
+    "IsRefresh" : "Booleean value saying if the token is refresh token",
+    "Scopes" : "All the scopes",       
+    "CreationUTC"  : "Timestamp of when the token was created",
+    "ExpirationUTC" : "Timestamp of when the token will expire,
 }
 ```
 
-### Scheme Of Fresh Access Token
-##### A fresh acces token is extremely short lived access token. This can be used for example when the user wants to change their password. To confirm and prove their identity we can ask them to give their username and password again. We then issue them a fresh access token instead of regular access token, and only with the fresh acces token, they will be allowed to change their password. And fresh access token can't be refreshed with refresh token.
-```python
-{
-    "userIdentity" : {User ID},
-    "fresh" : true,
-    "creationUTC" : {UTC Of When This JWT Was Created},
-    "expirationUTC" : {UTC Of When This JWT Will Expire},
-}
-```
+## Service Functions
+### these are the functions of the service, also defined in proto/jwt-srv.proto
 
-### Scheme Of Refresh Token Claim
-```python
-{
-    "userIdentity" : {User ID},
-    "scopes" : [Array Of Scopes],
-    "creationUTC" : {UTC Of When This JWT Was Created},
-    "expirationUTC" : {UTC Of When This JWT Will Expire},
-}
-```
+### FreshToken
+#### Takes in user identity and returnes fresh access token.
 
+### AccessAndRefreshTokens
+#### Takes in user identity and scopes, then returnes access and refresh tokens.
+
+### RefreshTokens
+#### Takes in refresh token, validates it, then returned new access and refresh token.
+
+### ValidateToken
+#### Takes in token and token type, then validates it.

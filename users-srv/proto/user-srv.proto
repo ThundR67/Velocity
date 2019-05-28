@@ -1,0 +1,78 @@
+syntax = "proto3";
+
+service Users {
+    rpc Add(AddRequest) returns (AddResponse) {}
+    rpc Get(GetRequest) returns (User) {}
+    rpc GetByUsernameOrEmail(GetByUsernameOrEmailRequest) returns (User) {}
+    rpc Auth(AuthRequest) returns (AuthResponse) {}
+    rpc Update(UpdateRequest) returns (UpdateResponse) {}
+    rpc Delete(DeleteRequest) returns (DeleteResponse) {}
+}
+
+message UpdateRequest {
+    string userID = 1;
+    User update = 2;
+    string collection = 3;
+}
+
+message AddRequest {
+    User mainData = 1;
+    User extraData = 2;
+}
+
+
+message User {
+	string userID = 1;
+	string username = 2;
+	string email = 3;
+    string password = 4;
+    string message = 5;
+    string firstName = 6;
+	string lastName = 7;
+	string gender = 8;
+	int64 birthdayUTC = 9;
+}
+
+message AddResponse {
+    string userID = 1;
+    string message = 2;
+}
+
+message GetRequest {
+    string userID = 1;
+    string collection = 2;
+}
+
+
+message GetByUsernameOrEmailRequest {
+    string username = 1;
+    string email = 2;
+}
+
+
+message AuthRequest {
+    string username = 1;
+    string email = 2;
+    string password = 3;
+}
+
+message AuthResponse {
+    bool valid = 1;
+    string message = 2;
+    string userID = 3;
+}
+
+message UpdateResponse {
+    string message = 1;
+}
+
+//Delete Function
+message DeleteRequest {
+    string userID = 1;
+    string username = 2;
+    string password = 3;
+}
+
+message DeleteResponse {
+    string message = 1;
+}

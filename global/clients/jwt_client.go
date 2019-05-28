@@ -3,84 +3,92 @@ package clients
 import (
 	"context"
 
+	"github.com/SonicRoshan/Velocity/global/config"
 	proto "github.com/SonicRoshan/Velocity/jwt-srv/proto"
 	micro "github.com/micro/go-micro"
 	"github.com/pkg/errors"
 )
 
+//NewJWTClient is used to make a JWT Client
+func NewJWTClient(service micro.Service) JWTClient {
+	client := JWTClient{}
+	client.Init(service)
+	return client
+}
+
 //JWTClient is jwt service client
 type JWTClient struct {
-	client proto.JWTManagerService
+	client proto.JWTService
 }
 
 //Init initalizes cliet
 func (jwtClient *JWTClient) Init(service micro.Service) {
-	jwtClient.client = proto.NewJWTManagerService("jwt-srv", service.Client())
+	jwtClient.client = proto.NewJWTService(config.JWTService, service.Client())
 }
 
-//GenerateFreshAccessToken generates fresh access token
-func (jwtClient JWTClient) GenerateFreshAccessToken(userIdentity string) (string, error) {
+//FreshToken is used to create a fresh access token
+func (jwtClient JWTClient) FreshToken(userIdentity string) (string, error) {
 	request := proto.JWTData{
 		UserIdentity: userIdentity,
 	}
-	response, err := jwtClient.client.GenerateFreshAccessToken(context.TODO(), &request)
+	response, err := jwtClient.client.FreshToken(context.TODO(), &request)
 	if err != nil {
-		return "", errors.Wrap(err, "Error While Generating Fresh Access Token Through Client Through Client")
+		return "", errors.Wrap(
+			err, "Error While Generating Fresh Access Token Through Client Through Client")
 	}
 	return response.Token, err
 }
 
-//GenerateAccessAndRefreshToken generates access and refresh token based on userIdentity
-func (jwtClient JWTClient) GenerateAccessAndRefreshToken(userIdentity string, scopes []string) (string, string, string, error) {
+//AccessAndRefreshTokens is used create access and refresh tokens
+func (jwtClient JWTClient) AccessAndRefreshTokens(
+	userIdentity string, scopes []string) (string, string, string, error) {
+
 	request := proto.JWTData{
 		UserIdentity: userIdentity,
 		Scopes:       scopes,
 	}
-	response, err := jwtClient.client.GenerateAccessAndRefreshToken(context.TODO(), &request)
+	response, err := jwtClient.client.AccessAndRefreshTokens(context.TODO(), &request)
 	if err != nil {
-		err = errors.Wrap(err, "Error While Generating Access And Refresh Token Through Client")
+		err = errors.Wrap(
+			err, "Error While Generating Access And Refresh Token Through Client")
 		return "", "", "", err
 	}
-	return response.AcccessToken, response.RefreshToken, response.Message, err
+	return response.AcccessToken, response.RefreshToken, response.Message, nil
 }
 
-//GenerateAccessAndRefreshTokenBasedOnRefreshToken generates access and refresh token based on previous refresh token
-func (jwtClient JWTClient) GenerateAccessAndRefreshTokenBasedOnRefreshToken(refreshToken string) (string, string, string, error) {
+//RefreshTokens is used to create access and refresh token based on previous refresh token
+func (jwtClient JWTClient) RefreshTokens(
+	refreshToken string) (string, string, string, error) {
+
 	request := proto.Token{
 		Token: refreshToken,
 	}
-	response, err := jwtClient.client.GenerateAccessAndRefreshTokenBasedOnRefreshToken(context.TODO(), &request)
+	response, err := jwtClient.client.RefreshTokens(context.TODO(), &request)
 	if err != nil {
-		err = errors.Wrap(err, "Error While Generating Access And Refresh Token Bases On Refresh Token Through Client")
+		err = errors.Wrap(
+			err, `Error While Generating Access 
+				  And Refresh Token Bases On Refresh Token Through Client`)
+
 		return "", "", "", err
 	}
-	return response.AcccessToken, response.RefreshToken, response.Message, err
+	return response.AcccessToken, response.RefreshToken, response.Message, nil
 }
 
-//ValidateFreshAccessToken validates fresh access token
-func (jwtClient JWTClient) ValidateFreshAccessToken(freshAccessToken string) (bool, string, error) {
-	request := proto.Token{
-		Token: freshAccessToken,
-	}
-	response, err := jwtClient.client.ValidateFreshAccessToken(context.TODO(), &request)
-	if err != nil {
-		err = errors.Wrap(err, "Error While Validating Fresh Access Token Through Client")
-		return false, "", err
-	}
-	return response.Valid, response.Message, err
-}
+//ValidateToken is used to validate a token
+func (jwtClient JWTClient) ValidateToken(
+	token, tokenType string) (bool, string, []string, error) {
 
-//ValidateToken validates access token and returnes its claims
-func (jwtClient JWTClient) ValidateToken(token string) (bool, string, []string, error) {
 	request := proto.Token{
-		Token: token,
+		Token:     token,
+		TokenType: tokenType,
 	}
+
 	response, err := jwtClient.client.ValidateToken(context.TODO(), &request)
 	if err != nil {
 		err = errors.Wrap(err, "Error While Validating Token Through Client")
 		return false, "", nil, err
 	}
-	userIdentity := response.JwtData.UserIdentity
-	scopes := response.JwtData.Scopes
-	return response.Valid, userIdentity, scopes, err
+	userIdentity := response.UserIdentity
+	scopes := response.Scopes
+	return response.Valid, userIdentity, scopes, nil
 }

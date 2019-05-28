@@ -5,7 +5,7 @@ import (
 	"github.com/gorilla/mux"
 )
 
-//GetRouter returns all the routes
+//GetRouter is used to create all routes
 func GetRouter() *mux.Router {
 	handler := handler.Handler{}
 	handler.Init()

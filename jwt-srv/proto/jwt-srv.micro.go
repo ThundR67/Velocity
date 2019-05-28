@@ -31,36 +31,35 @@ var _ context.Context
 var _ client.Option
 var _ server.Option
 
-// Client API for JWTManager service
+// Client API for JWT service
 
-type JWTManagerService interface {
-	GenerateFreshAccessToken(ctx context.Context, in *JWTData, opts ...client.CallOption) (*Token, error)
-	GenerateAccessAndRefreshToken(ctx context.Context, in *JWTData, opts ...client.CallOption) (*AccessAndRefreshToken, error)
-	GenerateAccessAndRefreshTokenBasedOnRefreshToken(ctx context.Context, in *Token, opts ...client.CallOption) (*AccessAndRefreshToken, error)
-	ValidateFreshAccessToken(ctx context.Context, in *Token, opts ...client.CallOption) (*Claims, error)
+type JWTService interface {
+	FreshToken(ctx context.Context, in *JWTData, opts ...client.CallOption) (*Token, error)
+	AccessAndRefreshTokens(ctx context.Context, in *JWTData, opts ...client.CallOption) (*AccessAndRefreshToken, error)
+	RefreshTokens(ctx context.Context, in *Token, opts ...client.CallOption) (*AccessAndRefreshToken, error)
 	ValidateToken(ctx context.Context, in *Token, opts ...client.CallOption) (*Claims, error)
 }
 
-type jWTManagerService struct {
+type jWTService struct {
 	c    client.Client
 	name string
 }
 
-func NewJWTManagerService(name string, c client.Client) JWTManagerService {
+func NewJWTService(name string, c client.Client) JWTService {
 	if c == nil {
 		c = client.NewClient()
 	}
 	if len(name) == 0 {
-		name = "jwtmanager"
+		name = "jwt"
 	}
-	return &jWTManagerService{
+	return &jWTService{
 		c:    c,
 		name: name,
 	}
 }
 
-func (c *jWTManagerService) GenerateFreshAccessToken(ctx context.Context, in *JWTData, opts ...client.CallOption) (*Token, error) {
-	req := c.c.NewRequest(c.name, "JWTManager.GenerateFreshAccessToken", in)
+func (c *jWTService) FreshToken(ctx context.Context, in *JWTData, opts ...client.CallOption) (*Token, error) {
+	req := c.c.NewRequest(c.name, "JWT.FreshToken", in)
 	out := new(Token)
 	err := c.c.Call(ctx, req, out, opts...)
 	if err != nil {
@@ -69,8 +68,8 @@ func (c *jWTManagerService) GenerateFreshAccessToken(ctx context.Context, in *JW
 	return out, nil
 }
 
-func (c *jWTManagerService) GenerateAccessAndRefreshToken(ctx context.Context, in *JWTData, opts ...client.CallOption) (*AccessAndRefreshToken, error) {
-	req := c.c.NewRequest(c.name, "JWTManager.GenerateAccessAndRefreshToken", in)
+func (c *jWTService) AccessAndRefreshTokens(ctx context.Context, in *JWTData, opts ...client.CallOption) (*AccessAndRefreshToken, error) {
+	req := c.c.NewRequest(c.name, "JWT.AccessAndRefreshTokens", in)
 	out := new(AccessAndRefreshToken)
 	err := c.c.Call(ctx, req, out, opts...)
 	if err != nil {
@@ -79,8 +78,8 @@ func (c *jWTManagerService) GenerateAccessAndRefreshToken(ctx context.Context, i
 	return out, nil
 }
 
-func (c *jWTManagerService) GenerateAccessAndRefreshTokenBasedOnRefreshToken(ctx context.Context, in *Token, opts ...client.CallOption) (*AccessAndRefreshToken, error) {
-	req := c.c.NewRequest(c.name, "JWTManager.GenerateAccessAndRefreshTokenBasedOnRefreshToken", in)
+func (c *jWTService) RefreshTokens(ctx context.Context, in *Token, opts ...client.CallOption) (*AccessAndRefreshToken, error) {
+	req := c.c.NewRequest(c.name, "JWT.RefreshTokens", in)
 	out := new(AccessAndRefreshToken)
 	err := c.c.Call(ctx, req, out, opts...)
 	if err != nil {
@@ -89,8 +88,8 @@ func (c *jWTManagerService) GenerateAccessAndRefreshTokenBasedOnRefreshToken(ctx
 	return out, nil
 }
 
-func (c *jWTManagerService) ValidateFreshAccessToken(ctx context.Context, in *Token, opts ...client.CallOption) (*Claims, error) {
-	req := c.c.NewRequest(c.name, "JWTManager.ValidateFreshAccessToken", in)
+func (c *jWTService) ValidateToken(ctx context.Context, in *Token, opts ...client.CallOption) (*Claims, error) {
+	req := c.c.NewRequest(c.name, "JWT.ValidateToken", in)
 	out := new(Claims)
 	err := c.c.Call(ctx, req, out, opts...)
 	if err != nil {
@@ -99,61 +98,45 @@ func (c *jWTManagerService) ValidateFreshAccessToken(ctx context.Context, in *To
 	return out, nil
 }
 
-func (c *jWTManagerService) ValidateToken(ctx context.Context, in *Token, opts ...client.CallOption) (*Claims, error) {
-	req := c.c.NewRequest(c.name, "JWTManager.ValidateToken", in)
-	out := new(Claims)
-	err := c.c.Call(ctx, req, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
+// Server API for JWT service
 
-// Server API for JWTManager service
-
-type JWTManagerHandler interface {
-	GenerateFreshAccessToken(context.Context, *JWTData, *Token) error
-	GenerateAccessAndRefreshToken(context.Context, *JWTData, *AccessAndRefreshToken) error
-	GenerateAccessAndRefreshTokenBasedOnRefreshToken(context.Context, *Token, *AccessAndRefreshToken) error
-	ValidateFreshAccessToken(context.Context, *Token, *Claims) error
+type JWTHandler interface {
+	FreshToken(context.Context, *JWTData, *Token) error
+	AccessAndRefreshTokens(context.Context, *JWTData, *AccessAndRefreshToken) error
+	RefreshTokens(context.Context, *Token, *AccessAndRefreshToken) error
 	ValidateToken(context.Context, *Token, *Claims) error
 }
 
-func RegisterJWTManagerHandler(s server.Server, hdlr JWTManagerHandler, opts ...server.HandlerOption) error {
-	type jWTManager interface {
-		GenerateFreshAccessToken(ctx context.Context, in *JWTData, out *Token) error
-		GenerateAccessAndRefreshToken(ctx context.Context, in *JWTData, out *AccessAndRefreshToken) error
-		GenerateAccessAndRefreshTokenBasedOnRefreshToken(ctx context.Context, in *Token, out *AccessAndRefreshToken) error
-		ValidateFreshAccessToken(ctx context.Context, in *Token, out *Claims) error
+func RegisterJWTHandler(s server.Server, hdlr JWTHandler, opts ...server.HandlerOption) error {
+	type jWT interface {
+		FreshToken(ctx context.Context, in *JWTData, out *Token) error
+		AccessAndRefreshTokens(ctx context.Context, in *JWTData, out *AccessAndRefreshToken) error
+		RefreshTokens(ctx context.Context, in *Token, out *AccessAndRefreshToken) error
 		ValidateToken(ctx context.Context, in *Token, out *Claims) error
 	}
-	type JWTManager struct {
-		jWTManager
+	type JWT struct {
+		jWT
 	}
-	h := &jWTManagerHandler{hdlr}
-	return s.Handle(s.NewHandler(&JWTManager{h}, opts...))
+	h := &jWTHandler{hdlr}
+	return s.Handle(s.NewHandler(&JWT{h}, opts...))
 }
 
-type jWTManagerHandler struct {
-	JWTManagerHandler
+type jWTHandler struct {
+	JWTHandler
 }
 
-func (h *jWTManagerHandler) GenerateFreshAccessToken(ctx context.Context, in *JWTData, out *Token) error {
-	return h.JWTManagerHandler.GenerateFreshAccessToken(ctx, in, out)
+func (h *jWTHandler) FreshToken(ctx context.Context, in *JWTData, out *Token) error {
+	return h.JWTHandler.FreshToken(ctx, in, out)
 }
 
-func (h *jWTManagerHandler) GenerateAccessAndRefreshToken(ctx context.Context, in *JWTData, out *AccessAndRefreshToken) error {
-	return h.JWTManagerHandler.GenerateAccessAndRefreshToken(ctx, in, out)
+func (h *jWTHandler) AccessAndRefreshTokens(ctx context.Context, in *JWTData, out *AccessAndRefreshToken) error {
+	return h.JWTHandler.AccessAndRefreshTokens(ctx, in, out)
 }
 
-func (h *jWTManagerHandler) GenerateAccessAndRefreshTokenBasedOnRefreshToken(ctx context.Context, in *Token, out *AccessAndRefreshToken) error {
-	return h.JWTManagerHandler.GenerateAccessAndRefreshTokenBasedOnRefreshToken(ctx, in, out)
+func (h *jWTHandler) RefreshTokens(ctx context.Context, in *Token, out *AccessAndRefreshToken) error {
+	return h.JWTHandler.RefreshTokens(ctx, in, out)
 }
 
-func (h *jWTManagerHandler) ValidateFreshAccessToken(ctx context.Context, in *Token, out *Claims) error {
-	return h.JWTManagerHandler.ValidateFreshAccessToken(ctx, in, out)
-}
-
-func (h *jWTManagerHandler) ValidateToken(ctx context.Context, in *Token, out *Claims) error {
-	return h.JWTManagerHandler.ValidateToken(ctx, in, out)
+func (h *jWTHandler) ValidateToken(ctx context.Context, in *Token, out *Claims) error {
+	return h.JWTHandler.ValidateToken(ctx, in, out)
 }

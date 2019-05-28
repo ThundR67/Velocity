@@ -1,10 +1,9 @@
 syntax = "proto3";
 
-service JWTManager {
-    rpc GenerateFreshAccessToken(JWTData) returns (Token) {}
-    rpc GenerateAccessAndRefreshToken(JWTData) returns (AccessAndRefreshToken) {}
-    rpc GenerateAccessAndRefreshTokenBasedOnRefreshToken(Token) returns (AccessAndRefreshToken) {}
-    rpc ValidateFreshAccessToken(Token) returns (Claims) {}
+service JWT {
+    rpc FreshToken(JWTData) returns (Token) {}
+    rpc AccessAndRefreshTokens(JWTData) returns (AccessAndRefreshToken) {}
+    rpc RefreshTokens(Token) returns (AccessAndRefreshToken) {}
     rpc ValidateToken(Token) returns (Claims) {}
 }
 
@@ -14,24 +13,28 @@ message JWTData {
 }
 
 message Token {
-    string token = 3;
-    string message = 12;
+    string token = 1;
+    string tokenType = 2;
+    string message = 3;
 }
 
 message AccessAndRefreshToken {
-    string acccessToken = 4;
-    string refreshToken = 5;
-    string message = 6;
+    string acccessToken = 1;
+    string refreshToken = 2;
+    string message = 3;
 }
 
 message TokenValid {
-    bool valid = 7;
+    bool valid = 1;
 }
 
 message Claims {
-    JWTData jwtData = 8;
-    double creationUTC = 9;
-    double expirationUTC = 10;
-    bool valid = 11;
-    string message = 13;
+    string userIdentity = 1;
+    repeated string scopes = 2;
+    bool isFresh = 3;
+    bool isRefresh = 4;
+    int64 creationUTC = 5;
+    int64 expirationUTC = 6;
+    string message = 7;
+    bool valid = 8;
 }

@@ -8,22 +8,22 @@ import "time"
 var jWTConfigManager = getConfigManager("jwt.config")
 
 var (
-	//JWTConfigSigningSecret This will be used to sign JWT
-	JWTConfigSigningSecret = []byte("PrettySimpleAsOfNow")
-	//JWTConfigUserIdentityField provides the user identity
-	JWTConfigUserIdentityField = getStringConfig("jwt.userIdentityField", jWTConfigManager)
-	//JWTConfigIsFreshField provides if the token is type fresh
-	JWTConfigIsFreshField = getStringConfig("jwt.isFreshField", jWTConfigManager)
-	//JWTConfigScopesField provides all the scopes
-	JWTConfigScopesField = getStringConfig("jwt.scopesField", jWTConfigManager)
-	//JWTConfigCreationUTCField is UTC of when token was created
-	JWTConfigCreationUTCField = getStringConfig("jwt.creationUTCField", jWTConfigManager)
-	//JWTConfigExpirationUTCField is UTC of when token will expire
-	JWTConfigExpirationUTCField = getStringConfig("jwt.expirationUTCField", jWTConfigManager)
-	//JWTConfigAccessTokenExpirationTimeMinutes is expiration time of accces token in minutes
-	JWTConfigAccessTokenExpirationTimeMinutes = time.Duration(getIntConfig("jwt.accessTokenExpirationTimeMinutes", jWTConfigManager))
-	//JWTConfigFreshAccessTokenExpirationTimeMinutes is expiration time of fresh accces token in minutes
-	JWTConfigFreshAccessTokenExpirationTimeMinutes = time.Duration(getIntConfig("jwt.freshAccessTokenExpirationTimeMinutes", jWTConfigManager))
-	//JWTConfigRefreshTokenExpirationTimeDays is expiration time of refresh token in days
-	JWTConfigRefreshTokenExpirationTimeDays = time.Duration(getIntConfig("jwt.refreshTokenExpirationTimeDays", jWTConfigManager))
+	//JWTSecret is used sign jwts
+	JWTSecret = []byte("PrettySimpleAsOfNow")
+
+	//JWTAccessExpirationMinutes is used to add expiration time to access token
+	JWTAccessExpirationMinutes = time.Minute * time.Duration(getIntConfig("jwt.accessTokenExpirationTimeMinutes", jWTConfigManager))
+	//JWTFreshAccessExpirationMinutes is used to add expiration time to fresh token
+	JWTFreshAccessExpirationMinutes = time.Minute * time.Duration(getIntConfig("jwt.freshAccessTokenExpirationTimeMinutes", jWTConfigManager))
+	//JWTRefreshExpirationDays is used to add expiration time to refresh access token
+	JWTRefreshExpirationDays = time.Hour * 24 * time.Duration(getIntConfig("jwt.refreshTokenExpirationTimeDays", jWTConfigManager))
+)
+
+const (
+	//TokenTypeAccess is used to specify access token while validating token
+	TokenTypeAccess = "access"
+	//TokenTypeRefresh is used to specify refresh token while validating token
+	TokenTypeRefresh = "refresh"
+	//TokenTypeFresh is used to specify fresh token while validating token
+	TokenTypeFresh = "fresh"
 )

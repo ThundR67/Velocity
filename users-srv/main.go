@@ -1,15 +1,16 @@
 package main
 
 import (
+	"github.com/SonicRoshan/Velocity/global/config"
 	logger "github.com/SonicRoshan/Velocity/global/logs"
-	proto "github.com/SonicRoshan/Velocity/user-data-srv/proto"
-	userDataService "github.com/SonicRoshan/Velocity/user-data-srv/service"
+	"github.com/SonicRoshan/Velocity/users-srv/handler"
+	proto "github.com/SonicRoshan/Velocity/users-srv/proto"
 	micro "github.com/micro/go-micro"
 )
 
 func main() {
 	//Loading logger
-	log := logger.GetLogger("user_data_service_log.log")
+	log := logger.GetLogger("users_service.log")
 
 	//Handling a panic
 	defer func() {
@@ -18,28 +19,23 @@ func main() {
 		}
 	}()
 
-	//Creating Service
 	service := micro.NewService(
-		micro.Name("user-data-srv"),
-		micro.Broker()
+		micro.Name(config.UsersService),
 	)
 
 	service.Init()
 
-	//Initialising service handler
-	userDataService := userDataService.UserDataService{}
-	err := userDataService.Init()
+	usersService := handler.UsersService{}
+	err := usersService.Init()
+
 	if err != nil {
 		msg := "Not Able To Connect To MongoDB Server Due To Error " + err.Error()
 		log.Critical(msg)
-		//Panicing As Connection To MongoDB Failed
 		panic(msg)
 	}
 
-	//Registering Service
-	proto.RegisterUserDataManagerHandler(service.Server(), userDataService)
+	proto.RegisterUsersHandler(service.Server(), usersService)
 
-	// Run the server
 	if err := service.Run(); err != nil {
 		log.Criticalf("Service Failed With Error %s", err)
 	}
