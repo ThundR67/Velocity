@@ -20,8 +20,8 @@ func isGender(genderInput string) bool {
 	return false
 }
 
-func isValid(main, extra config.UserType) bool {
-	return validateUserMainData(main) && validateUserExtraData(extra)
+func isValid(main config.UserMain, extra config.UserExtra) bool {
+	return validateUserMainData(main, true) && validateUserExtraData(extra, true)
 }
 
 func panicOccured() bool {
@@ -29,9 +29,9 @@ func panicOccured() bool {
 	return r != nil
 }
 
-func validateUserMainData(userMainData config.UserType) (valid bool) {
+func validateUserMainData(userMainData config.UserMain, strict bool) (valid bool) {
 	defer func() {
-		if panicOccured() {
+		if panicOccured() && strict {
 			valid = false
 		}
 	}()
@@ -40,30 +40,37 @@ func validateUserMainData(userMainData config.UserType) (valid bool) {
 
 	if govalidator.HasUpperCase(userMainData.Username) {
 		validateLog.Debugf("Username %s Has UpperCase Characters In It", userMainData.Username)
-		return false
+		valid = false
+		return
 	} else if !govalidator.InRange(len(userMainData.Username), config.UserDataConfigUsernameLengthRange[0], config.UserDataConfigUsernameLengthRange[1]) {
 		validateLog.Debug("Username Has Invalid Length")
-		return false
+		valid = false
+		return
 	} else if !govalidator.IsEmail(userMainData.Email) {
 		validateLog.Debug("Email Is Invalid")
-		return false
+		valid = false
+		return
 	} else if !govalidator.InRange(len(userMainData.Password), config.UserDataConfigPasswordLengthRange[0], config.UserDataConfigPasswordLengthRange[1]) {
 		validateLog.Debug("Password Has Invalid Length")
-		return false
+		valid = false
+		return
 	} else if strings.Contains(userMainData.Username, " ") {
 		validateLog.Debug("Username Has Spaces")
-		return false
+		valid = false
+		return
 	} else if strings.Contains(userMainData.Email, " ") {
 		validateLog.Debug("Email Has Spaces")
-		return false
+		valid = false
+		return
 	}
 
-	return true
+	valid = true
+	return
 }
 
-func validateUserExtraData(userExtraData config.UserType) (valid bool) {
+func validateUserExtraData(userExtraData config.UserExtra, strict bool) (valid bool) {
 	defer func() {
-		if panicOccured() {
+		if panicOccured() && strict {
 			valid = false
 		}
 	}()
@@ -75,16 +82,22 @@ func validateUserExtraData(userExtraData config.UserType) (valid bool) {
 
 	if !govalidator.InRange(len(userExtraData.FirstName), config.UserDataConfigFirstNameLengthRange[0], config.UserDataConfigFirstNameLengthRange[1]) {
 		validateLog.Debug("Firstname Length Is Invalid")
-		return false
+		valid = false
+		return
 	} else if !govalidator.InRange(len(userExtraData.LastName), config.UserDataConfigLastNameLengthRange[0], config.UserDataConfigLastNameLengthRange[1]) {
 		validateLog.Debug("Lastname Length Is Invalid")
-		return false
+		valid = false
+		return
 	} else if !isGender(userExtraData.Gender) {
 		validateLog.Debug("Gender Is Invalid")
-		return false
+		valid = false
+		return
 	} else if age < config.UserDataConfigMinimumAge {
 		validateLog.Debug("Age Is Invalid")
-		return false
+		valid = false
+		return
 	}
-	return true
+
+	valid = true
+	return
 }

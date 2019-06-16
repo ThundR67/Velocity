@@ -37,10 +37,10 @@ func (usersClient *UsersClient) Init(service micro.Service) {
 
 //Add is used to add a user
 func (usersClient UsersClient) Add(
-	mainData, extraData config.UserType) (string, string, error) {
+	mainData config.UserMain, extraData config.UserExtra) (string, string, error) {
 
-	mainDataProto := proto.User{}
-	extraDataProto := proto.User{}
+	mainDataProto := proto.UserMain{}
+	extraDataProto := proto.UserExtra{}
 
 	err := copy(&mainDataProto, &mainData)
 	if err != nil {
@@ -65,39 +65,37 @@ func (usersClient UsersClient) Add(
 	return response.UserID, response.Message, nil
 }
 
-//Get is used to get user data inn a collection
-func (usersClient UsersClient) Get(userID, collection string) (config.UserType, string, error) {
+//Get is used to get user  main data
+func (usersClient UsersClient) Get(userID string) (config.UserMain, string, error) {
 	request := proto.GetRequest{
-		UserID:     userID,
-		Collection: collection,
+		UserID: userID,
 	}
 
 	response, err := usersClient.client.Get(context.TODO(), &request)
 	if err != nil {
-		err = errors.Wrap(err, "Error while getting user data through client")
-		return config.UserType{}, "", err
+		err = errors.Wrap(err, "Error while getting user main data through client")
+		return config.UserMain{}, "", err
 	} else if response.Message != "" {
-		return config.UserType{}, response.Message, nil
+		return config.UserMain{}, response.Message, nil
 	}
 
-	var data config.UserType
+	var data config.UserMain
 	err = copy(&data, &response)
 	return data, "", err
 }
 
 //Update is used to update user data
-func (usersClient UsersClient) Update(userID, collection string, update config.UserType) error {
-	var updateRequest proto.User
+func (usersClient UsersClient) Update(userID string, update config.UserMain) error {
+	var updateRequest proto.UserMain
 	err := copy(&updateRequest, &update)
 
 	if err != nil {
-		return nil
+		return err
 	}
 
 	request := proto.UpdateRequest{
-		UserID:     userID,
-		Collection: collection,
-		Update:     &updateRequest,
+		UserID: userID,
+		Update: &updateRequest,
 	}
 
 	_, err = usersClient.client.Update(context.TODO(), &request)

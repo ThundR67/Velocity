@@ -35,10 +35,12 @@ var _ server.Option
 
 type UsersService interface {
 	Add(ctx context.Context, in *AddRequest, opts ...client.CallOption) (*AddResponse, error)
-	Get(ctx context.Context, in *GetRequest, opts ...client.CallOption) (*User, error)
-	GetByUsernameOrEmail(ctx context.Context, in *GetByUsernameOrEmailRequest, opts ...client.CallOption) (*User, error)
+	Get(ctx context.Context, in *GetRequest, opts ...client.CallOption) (*UserMain, error)
+	GetExtra(ctx context.Context, in *GetRequest, opts ...client.CallOption) (*UserExtra, error)
+	GetByUsernameOrEmail(ctx context.Context, in *GetByUsernameOrEmailRequest, opts ...client.CallOption) (*UserMain, error)
 	Auth(ctx context.Context, in *AuthRequest, opts ...client.CallOption) (*AuthResponse, error)
 	Update(ctx context.Context, in *UpdateRequest, opts ...client.CallOption) (*UpdateResponse, error)
+	UpdateExtra(ctx context.Context, in *UpdateRequest, opts ...client.CallOption) (*UpdateResponse, error)
 	Delete(ctx context.Context, in *DeleteRequest, opts ...client.CallOption) (*DeleteResponse, error)
 }
 
@@ -70,9 +72,9 @@ func (c *usersService) Add(ctx context.Context, in *AddRequest, opts ...client.C
 	return out, nil
 }
 
-func (c *usersService) Get(ctx context.Context, in *GetRequest, opts ...client.CallOption) (*User, error) {
+func (c *usersService) Get(ctx context.Context, in *GetRequest, opts ...client.CallOption) (*UserMain, error) {
 	req := c.c.NewRequest(c.name, "Users.Get", in)
-	out := new(User)
+	out := new(UserMain)
 	err := c.c.Call(ctx, req, out, opts...)
 	if err != nil {
 		return nil, err
@@ -80,9 +82,19 @@ func (c *usersService) Get(ctx context.Context, in *GetRequest, opts ...client.C
 	return out, nil
 }
 
-func (c *usersService) GetByUsernameOrEmail(ctx context.Context, in *GetByUsernameOrEmailRequest, opts ...client.CallOption) (*User, error) {
+func (c *usersService) GetExtra(ctx context.Context, in *GetRequest, opts ...client.CallOption) (*UserExtra, error) {
+	req := c.c.NewRequest(c.name, "Users.GetExtra", in)
+	out := new(UserExtra)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *usersService) GetByUsernameOrEmail(ctx context.Context, in *GetByUsernameOrEmailRequest, opts ...client.CallOption) (*UserMain, error) {
 	req := c.c.NewRequest(c.name, "Users.GetByUsernameOrEmail", in)
-	out := new(User)
+	out := new(UserMain)
 	err := c.c.Call(ctx, req, out, opts...)
 	if err != nil {
 		return nil, err
@@ -110,6 +122,16 @@ func (c *usersService) Update(ctx context.Context, in *UpdateRequest, opts ...cl
 	return out, nil
 }
 
+func (c *usersService) UpdateExtra(ctx context.Context, in *UpdateRequest, opts ...client.CallOption) (*UpdateResponse, error) {
+	req := c.c.NewRequest(c.name, "Users.UpdateExtra", in)
+	out := new(UpdateResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *usersService) Delete(ctx context.Context, in *DeleteRequest, opts ...client.CallOption) (*DeleteResponse, error) {
 	req := c.c.NewRequest(c.name, "Users.Delete", in)
 	out := new(DeleteResponse)
@@ -124,20 +146,24 @@ func (c *usersService) Delete(ctx context.Context, in *DeleteRequest, opts ...cl
 
 type UsersHandler interface {
 	Add(context.Context, *AddRequest, *AddResponse) error
-	Get(context.Context, *GetRequest, *User) error
-	GetByUsernameOrEmail(context.Context, *GetByUsernameOrEmailRequest, *User) error
+	Get(context.Context, *GetRequest, *UserMain) error
+	GetExtra(context.Context, *GetRequest, *UserExtra) error
+	GetByUsernameOrEmail(context.Context, *GetByUsernameOrEmailRequest, *UserMain) error
 	Auth(context.Context, *AuthRequest, *AuthResponse) error
 	Update(context.Context, *UpdateRequest, *UpdateResponse) error
+	UpdateExtra(context.Context, *UpdateRequest, *UpdateResponse) error
 	Delete(context.Context, *DeleteRequest, *DeleteResponse) error
 }
 
 func RegisterUsersHandler(s server.Server, hdlr UsersHandler, opts ...server.HandlerOption) error {
 	type users interface {
 		Add(ctx context.Context, in *AddRequest, out *AddResponse) error
-		Get(ctx context.Context, in *GetRequest, out *User) error
-		GetByUsernameOrEmail(ctx context.Context, in *GetByUsernameOrEmailRequest, out *User) error
+		Get(ctx context.Context, in *GetRequest, out *UserMain) error
+		GetExtra(ctx context.Context, in *GetRequest, out *UserExtra) error
+		GetByUsernameOrEmail(ctx context.Context, in *GetByUsernameOrEmailRequest, out *UserMain) error
 		Auth(ctx context.Context, in *AuthRequest, out *AuthResponse) error
 		Update(ctx context.Context, in *UpdateRequest, out *UpdateResponse) error
+		UpdateExtra(ctx context.Context, in *UpdateRequest, out *UpdateResponse) error
 		Delete(ctx context.Context, in *DeleteRequest, out *DeleteResponse) error
 	}
 	type Users struct {
@@ -155,11 +181,15 @@ func (h *usersHandler) Add(ctx context.Context, in *AddRequest, out *AddResponse
 	return h.UsersHandler.Add(ctx, in, out)
 }
 
-func (h *usersHandler) Get(ctx context.Context, in *GetRequest, out *User) error {
+func (h *usersHandler) Get(ctx context.Context, in *GetRequest, out *UserMain) error {
 	return h.UsersHandler.Get(ctx, in, out)
 }
 
-func (h *usersHandler) GetByUsernameOrEmail(ctx context.Context, in *GetByUsernameOrEmailRequest, out *User) error {
+func (h *usersHandler) GetExtra(ctx context.Context, in *GetRequest, out *UserExtra) error {
+	return h.UsersHandler.GetExtra(ctx, in, out)
+}
+
+func (h *usersHandler) GetByUsernameOrEmail(ctx context.Context, in *GetByUsernameOrEmailRequest, out *UserMain) error {
 	return h.UsersHandler.GetByUsernameOrEmail(ctx, in, out)
 }
 
@@ -169,6 +199,10 @@ func (h *usersHandler) Auth(ctx context.Context, in *AuthRequest, out *AuthRespo
 
 func (h *usersHandler) Update(ctx context.Context, in *UpdateRequest, out *UpdateResponse) error {
 	return h.UsersHandler.Update(ctx, in, out)
+}
+
+func (h *usersHandler) UpdateExtra(ctx context.Context, in *UpdateRequest, out *UpdateResponse) error {
+	return h.UsersHandler.UpdateExtra(ctx, in, out)
 }
 
 func (h *usersHandler) Delete(ctx context.Context, in *DeleteRequest, out *DeleteResponse) error {

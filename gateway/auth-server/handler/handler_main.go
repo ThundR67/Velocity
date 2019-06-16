@@ -36,16 +36,22 @@ func (handler Handler) getFromURL(
 	return r.URL.Query()[key][0]
 }
 
-//getUserFromUrl is used to get url data from url query
+//getUserFromUrl is used to get user main and extra data from url
 func (handler Handler) getUserFromURL(
-	w http.ResponseWriter, r *http.Request) config.UserType {
+	w http.ResponseWriter,
+	r *http.Request) (mainData config.UserMain, extraData config.UserExtra) {
 
-	var user config.UserType
-	err := decoder.Decode(&user, r.URL.Query())
+	err := decoder.Decode(&mainData, r.URL.Query())
 	if err != nil {
 		handler.respond(w, nil, "", err)
+		return
 	}
-	return user
+	err = decoder.Decode(&extraData, r.URL.Query())
+	if err != nil {
+		handler.respond(w, nil, "", err)
+		return
+	}
+	return
 }
 
 //Respond is used to respond to client with json

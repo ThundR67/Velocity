@@ -6,14 +6,14 @@ import (
 )
 
 //GetByUsernameOrEmail is used to get user based on username or email
-func (users Users) GetByUsernameOrEmail(username, email string) (config.UserType, string) {
+func (users Users) GetByUsernameOrEmail(username, email string) (config.UserMain, string) {
 	log.Debugf("Getting User By Username %s Email %s", username, email)
 	filter := users.getFilterByUsernameOrEmail(username, email)
-	var user config.UserType
+	var user config.UserMain
 	err := users.mainCollection.FindOne(users.ctx, filter).Decode(&user)
 
 	if err != nil {
-		return config.UserType{}, config.InvalidUsernameOrEmailMsg
+		return config.UserMain{}, config.InvalidUsernameOrEmailMsg
 	}
 
 	log.Infof("Got User By Username %s Email %s", username, email)
@@ -26,7 +26,7 @@ func (users Users) Auth(username, email, password string) (bool, string, string,
 
 	user, msg := users.GetByUsernameOrEmail(username, email)
 
-	if msg != "" || user == (config.UserType{}) {
+	if msg != "" || user == (config.UserMain{}) {
 		return false, "", msg, nil
 	}
 
@@ -42,8 +42,13 @@ func (users Users) Auth(username, email, password string) (bool, string, string,
 }
 
 //Add is used to add user to database
-func (users Users) Add(mainData, extraData config.UserType) (string, string, error) {
-	log.Debugf("Adding User With Main Data %+v\n Extra %+v", mainData, extraData)
+func (users Users) Add(
+	mainData config.UserMain, extraData config.UserExtra) (string, string, error) {
+
+	log.Debugf(`Adding User With 
+				Main Data %+v
+				Extra Data %+v`, mainData, extraData)
+
 	if !isValid(mainData, extraData) {
 		log.Info("Invalid User Data")
 		return "", config.InvalidUserDataMsg, nil
@@ -57,9 +62,13 @@ func (users Users) Add(mainData, extraData config.UserType) (string, string, err
 	metaData := generateUserMetaData()
 	userID, err := users.generateID()
 	if err != nil {
-		log.Errorf("Adding User Data %+v User Extra Data %+v User Meta Data %+v Returned Error %+v",
+		log.Errorf(`Adding User With
+					Main Data %+v
+					User Extra Data %+v
+					User Meta Data %+v
+					Returned Error %+v`,
 			mainData, extraData, metaData, err)
-		err = errors.Wrap(err, "Error While Generating ID")
+		err = errors.Wrap(err, "Error While Adding User")
 		return "", "", err
 	}
 
@@ -70,38 +79,41 @@ func (users Users) Add(mainData, extraData config.UserType) (string, string, err
 	users.mainCollection.InsertOne(users.ctx, mainData)
 	users.extraCollection.InsertOne(users.ctx, extraData)
 	users.metaCollection.InsertOne(users.ctx, metaData)
-	log.Debugf("Added User With Main Data %+v\n Extra %+v", mainData, extraData)
+	log.Infof(`Added User With
+					Main Data %+v
+					User Extra Data %+v
+					User Meta Data %+v`,
+		mainData, extraData, metaData)
 	return userID, "", nil
 }
 
-//Get is used to get user data in any of the collection based on user id
-func (users Users) Get(userID, collectionName string) (config.UserType, error) {
-	log.Debugf("Getting User Data In Collection %s With UserID %v", collectionName, userID)
+//Get is used to decoded user data into data interface
+func (users Users) Get(userID, collectionName string, data interface{}) error {
+	log.Debugf("Getting User Data In Collection %s With UserID %s", collectionName, userID)
 
-	var data config.UserType
 	collection := users.database.Collection(collectionName)
-	err := collection.FindOne(users.ctx, config.UserType{UserID: userID}).Decode(&data)
+	err := collection.FindOne(users.ctx, config.UserMain{UserID: userID}).Decode(data)
 
-	if err != nil || data == (config.UserType{}) {
+	if err != nil {
 		log.Errorf("Getting User In Collection %s With UserID %s Returned Error %+v",
 			collectionName, userID, err)
 		err = errors.Wrap(err, "Error While Getting User Data")
-		return config.UserType{}, err
+		return err
 	}
 
-	log.Infof("Got Users Data In Collection %s", collectionName)
-	return data, nil
+	log.Infof("Got Users Data In Collection %s With UserID %s", collectionName, userID)
+	return nil
 }
 
 //Update is used to update users data in any collection
-func (users Users) Update(userID string, update config.UserType, collectionName string) error {
+func (users Users) Update(userID string, update interface{}, collectionName string) error {
 	log.Debugf("Updating User %s Data In Collection %s With Update %+v",
 		userID, collectionName, update)
 
 	collection := users.database.Collection(collectionName)
 
 	_, err := collection.UpdateOne(users.ctx,
-		config.UserType{UserID: userID}, map[string]config.UserType{"$set": update})
+		config.UserMain{UserID: userID}, map[string]interface{}{"$set": update})
 
 	if err != nil {
 		log.Errorf("Updating User %s Data In Collection %s With Update %+v Returned Error %+v",
@@ -120,10 +132,10 @@ func (users Users) Delete(userID, username, password string) (string, error) {
 
 	valid, _, _, _ := users.Auth(username, "", password)
 
-	update := config.UserType{AccountStatus: config.UserDataConfigAccountStatusDeleted}
+	update := config.UserMeta{AccountStatus: config.UserDataConfigAccountStatusDeleted}
 
 	if !valid {
-		log.Infof("Invaling Auth Data While Deleting User %s", username)
+		log.Infof("Invalid Auth Data While Deleting Username %s", username)
 		return config.InvalidAuthDataMsg, nil
 	}
 

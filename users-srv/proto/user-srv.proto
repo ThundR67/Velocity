@@ -2,35 +2,42 @@ syntax = "proto3";
 
 service Users {
     rpc Add(AddRequest) returns (AddResponse) {}
-    rpc Get(GetRequest) returns (User) {}
-    rpc GetByUsernameOrEmail(GetByUsernameOrEmailRequest) returns (User) {}
+    rpc Get(GetRequest) returns (UserMain) {}
+    rpc GetExtra(GetRequest) returns (UserExtra) {}
+    rpc GetByUsernameOrEmail(GetByUsernameOrEmailRequest) returns (UserMain) {}
     rpc Auth(AuthRequest) returns (AuthResponse) {}
     rpc Update(UpdateRequest) returns (UpdateResponse) {}
+    rpc UpdateExtra(UpdateRequest) returns (UpdateResponse) {}
     rpc Delete(DeleteRequest) returns (DeleteResponse) {}
 }
 
 message UpdateRequest {
     string userID = 1;
-    User update = 2;
+    UserMain update = 2;
     string collection = 3;
 }
 
 message AddRequest {
-    User mainData = 1;
-    User extraData = 2;
+    UserMain mainData = 1;
+    UserExtra extraData = 2;
 }
 
 
-message User {
+message UserMain {
 	string userID = 1;
 	string username = 2;
 	string email = 3;
     string password = 4;
     string message = 5;
-    string firstName = 6;
-	string lastName = 7;
-	string gender = 8;
-	int64 birthdayUTC = 9;
+}
+
+message UserExtra {
+    string userId = 1;
+    string firstName = 2;
+	string lastName = 3;
+	string gender = 4;
+    int64 birthdayUTC = 5;
+    string message = 6;
 }
 
 message AddResponse {
@@ -40,7 +47,6 @@ message AddResponse {
 
 message GetRequest {
     string userID = 1;
-    string collection = 2;
 }
 
 

@@ -39,11 +39,14 @@
 ## Service Functions
 ### These are all the functions of this service, defined in proto/users-srv.proto
 
-### ADD
+### Add
 #### Add function takes in user data, validates it, adds it to db, and then returnes user id.
 
-### GET
-#### Get function takes in user id and collection, then returnes users data in that collection
+### Get
+#### Get function takes in user id and returnes user's main data
+
+### GetExtra
+#### GetExtra function takes in user id and returns user's extra data
 
 ### GetByUsernameOrEmail
 #### Returned users main data based on either username or email
@@ -52,7 +55,10 @@
 #### Takes in username and password, then authenticates and returnes user id
 
 ### Update
-#### Update takes in user id, collection and the update data, then updates that users data.
+#### Update takes in user id and the update. Then updates user's main data
+
+### UpdateExtra
+#### UpdateExtra takes in user id and the update. Then updates user's extra data
 
 ### Delete
 #### Delete takes user id and marks that user as deleted.

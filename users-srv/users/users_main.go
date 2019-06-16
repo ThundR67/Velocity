@@ -16,6 +16,9 @@ var log = logger.GetLogger("users_low_level_manager.log")
 //Generates A Version 4 UUID
 func generateUUID() (string, error) {
 	id, err := uuid.NewRandom()
+	if err != nil {
+		err = errors.Wrap(err, "Error While Generating UUID")
+	}
 	return id.String(), err
 }
 
@@ -70,17 +73,17 @@ func (users *Users) connectToCollections() {
 }
 
 //doesUsernameOrEmailExists is used  to check if username or email exist
-func (users Users) doesUsernameOrEmailExists(mainData config.UserType) (bool, string, error) {
+func (users Users) doesUsernameOrEmailExists(mainData config.UserMain) (bool, string, error) {
 	log.Debugf("Checking if username %s or email %s exists",
 		mainData.Email,
 		mainData.Username)
 
 	usernameExist, _ := fieldExist(users.ctx,
-		config.UserType{Username: mainData.Username},
+		config.UserMain{Username: mainData.Username},
 		users.mainCollection)
 
 	emailExist, _ := fieldExist(users.ctx,
-		config.UserType{Email: mainData.Email},
+		config.UserMain{Email: mainData.Email},
 		users.mainCollection)
 
 	if usernameExist {
@@ -96,13 +99,13 @@ func (users Users) doesUsernameOrEmailExists(mainData config.UserType) (bool, st
 }
 
 //getFilterByUsernameOrEmail is used to get a mongodb filter based on either username or email
-func (users Users) getFilterByUsernameOrEmail(username, email string) config.UserType {
+func (users Users) getFilterByUsernameOrEmail(username, email string) config.UserMain {
 	if username != "" {
-		return config.UserType{Username: username}
+		return config.UserMain{Username: username}
 	} else if email != "" {
-		return config.UserType{Username: username}
+		return config.UserMain{Username: username}
 	}
-	return config.UserType{}
+	return config.UserMain{}
 }
 
 //generateID is used to generate a v4 UUID
@@ -120,9 +123,10 @@ func (users Users) generateID() (string, error) {
 			return "", err
 		}
 		userIDExists, _ = fieldExist(users.ctx,
-			config.UserType{UserID: userID},
+			config.UserMain{UserID: userID},
 			users.mainCollection)
 	}
+
 	log.Infof("Generated UUID %s", userID)
 	return userID, nil
 }

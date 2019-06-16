@@ -9,7 +9,7 @@ import (
 
 //SignInHandler is used to handle sign in route
 func (handler Handler) SignInHandler(w http.ResponseWriter, r *http.Request) {
-	user := handler.getUserFromURL(w, r)
+	user, _ := handler.getUserFromURL(w, r)
 	if user.Username == "" || user.Password == "" {
 		handler.respond(w, nil, "Username Or Password Not Provided", nil)
 		return
@@ -41,8 +41,9 @@ func (handler Handler) SignInHandler(w http.ResponseWriter, r *http.Request) {
 
 //SignInFreshHandler is used handle sign in fresh route where fresh access token is returned
 func (handler Handler) SignInFreshHandler(w http.ResponseWriter, r *http.Request) {
-	user := handler.getUserFromURL(w, r)
-	if user == (config.UserType{}) {
+	user, _ := handler.getUserFromURL(w, r)
+	if user.Username == "" || user.Password == "" {
+		handler.respond(w, nil, "Username Or Password Not Provided", nil)
 		return
 	}
 

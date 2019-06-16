@@ -41,7 +41,7 @@ func (usersService *UsersService) Init() error {
 func (usersService UsersService) GetByUsernameOrEmail(
 	ctx context.Context,
 	request *proto.GetByUsernameOrEmailRequest,
-	response *proto.User) error {
+	response *proto.UserMain) error {
 
 	log.Debugf("Getting User By Username %s Email %s", request.Username, request.Email)
 	userData, msg := usersService.users.GetByUsernameOrEmail(

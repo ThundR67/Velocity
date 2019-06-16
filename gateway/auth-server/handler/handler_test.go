@@ -41,9 +41,12 @@ func testForAccessAndRefresh(body []byte, assert *assert.Assertions) (string, st
 }
 
 //used to test sign up handler
-func testSignUp(user config.UserType, handler Handler, assert *assert.Assertions) {
-	query, _ := query.Values(user)
-	url := "/sign-up?" + query.Encode() + "&scopes=read"
+func testSignUp(
+	main config.UserMain, extra config.UserExtra, handler Handler, assert *assert.Assertions) {
+
+	mainQuery, _ := query.Values(main)
+	extraQuery, _ := query.Values(extra)
+	url := "/sign-up?" + mainQuery.Encode() + "&" + extraQuery.Encode() + "&scopes=read"
 	fmt.Println(url)
 
 	req, err := http.NewRequest("POST", url, nil)
@@ -61,7 +64,7 @@ func testSignUp(user config.UserType, handler Handler, assert *assert.Assertions
 func testSignIn(
 	username, password string, handler Handler, assert *assert.Assertions) (string, string) {
 
-	user := config.UserType{Username: username, Password: password}
+	user := config.UserMain{Username: username, Password: password}
 	query, _ := query.Values(user)
 	url := "/sign-in?" + query.Encode() + "&scopes=read"
 
@@ -92,7 +95,7 @@ func testRefreshTokens(refreshToken string, handler Handler, assert *assert.Asse
 func testSignInFresh(
 	username, password string, handler Handler, assert *assert.Assertions) {
 
-	user := config.UserType{Username: username, Password: password}
+	user := config.UserMain{Username: username, Password: password}
 	query, _ := query.Values(user)
 	url := "/sign-in-fresh?" + query.Encode()
 
@@ -118,18 +121,21 @@ func TestHandler(t *testing.T) {
 	mockUsername := strings.ToLower(generateRandomString(10))
 	mockPassword := generateRandomString(10)
 
-	data := config.UserType{
-		Username:    mockUsername,
-		Password:    mockPassword,
-		Email:       mockUsername + "@gmail.com",
+	main := config.UserMain{
+		Username: mockUsername,
+		Password: mockPassword,
+		Email:    mockUsername + "@gmail.com",
+	}
+
+	extra := config.UserExtra{
 		Gender:      "male",
 		FirstName:   mockUsername,
 		LastName:    mockUsername,
 		BirthdayUTC: int64(864466669), //A Timestamp of year 1997
 	}
 
-	testSignUp(data, handler, assert)
-	_, refresh := testSignIn(data.Username, data.Password, handler, assert)
+	testSignUp(main, extra, handler, assert)
+	_, refresh := testSignIn(main.Username, main.Password, handler, assert)
 	testRefreshTokens(refresh, handler, assert)
-	testSignInFresh(data.Username, data.Password, handler, assert)
+	testSignInFresh(main.Username, main.Password, handler, assert)
 }
