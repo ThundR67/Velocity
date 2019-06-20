@@ -6,6 +6,7 @@ import (
 	"github.com/SonicRoshan/Velocity/users-srv/handler"
 	proto "github.com/SonicRoshan/Velocity/users-srv/proto"
 	micro "github.com/micro/go-micro"
+	"go.uber.org/zap"
 )
 
 func main() {
@@ -15,7 +16,7 @@ func main() {
 	//Handling a panic
 	defer func() {
 		if r := recover(); r != nil {
-			log.Criticalf("Service Paniced Due To Reason %s", r)
+			log.Fatal("Service Paniced Due", zap.Any("Panic", r))
 		}
 	}()
 
@@ -30,13 +31,13 @@ func main() {
 
 	if err != nil {
 		msg := "Not Able To Connect To MongoDB Server Due To Error " + err.Error()
-		log.Critical(msg)
+		log.Fatal(msg)
 		panic(msg)
 	}
 
 	proto.RegisterUsersHandler(service.Server(), usersService)
 
 	if err := service.Run(); err != nil {
-		log.Criticalf("Service Failed With Error %s", err)
+		log.Fatal("Service Failed With Error", zap.Error(err))
 	}
 }

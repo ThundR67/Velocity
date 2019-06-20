@@ -8,6 +8,7 @@ import (
 	proto "github.com/SonicRoshan/Velocity/jwt-srv/proto"
 	"github.com/jinzhu/copier"
 	"github.com/pkg/errors"
+	"go.uber.org/zap"
 )
 
 //loading a logger
@@ -27,14 +28,19 @@ func (serviceHandler ServiceHandler) Init() {
 func (serviceHandler ServiceHandler) FreshToken(
 	ctx context.Context, request *proto.JWTData, response *proto.Token) error {
 
-	log.Debugf("Generating Fresh Token With ID %s", request.UserIdentity)
+	log.Debug("Generating Fresh Token", zap.String("ID", request.UserIdentity))
+
 	token, err := serviceHandler.jwt.FreshToken(request.UserIdentity)
 	if err != nil {
-		log.Errorf("Generating Fresh Token Returned Error %+v", err)
+		log.Error(
+			"Generating Fresh Token Returned Error",
+			zap.String("ID", request.UserIdentity),
+			zap.Error(err),
+		)
 		return errors.Wrap(err, "Error while generating fresh access token")
 	}
 
-	log.Infof("Generated Fresh Token With ID %s", request.UserIdentity)
+	log.Info("Generated Fresh Token", zap.String("ID", request.UserIdentity))
 	response.Token = token
 	return nil
 }
@@ -43,17 +49,22 @@ func (serviceHandler ServiceHandler) FreshToken(
 func (serviceHandler ServiceHandler) AccessAndRefreshTokens(
 	ctx context.Context, request *proto.JWTData, response *proto.AccessAndRefreshToken) error {
 
-	log.Debugf("Generation Access And Refresh Token With ID %s", request.UserIdentity)
+	log.Debug("Generating Access And Refresh Token", zap.String("ID", request.UserIdentity))
+
 	accessToken, refreshToken, err := serviceHandler.jwt.AccessAndRefreshTokens(
 		request.UserIdentity,
 		request.Scopes,
 	)
 	if err != nil {
-		log.Errorf("Generating Access And Refresh Token With ID %s Returned Error %+v",
-			request.UserIdentity, err)
+		log.Error(
+			"Generating Access And Refresh Token Returned Error",
+			zap.String("ID", request.UserIdentity),
+			zap.Error(err),
+		)
 		return errors.Wrap(err, "Error while generating access and refresh token")
 	}
-	log.Infof("Generated Access And Refresh Token With ID %s", request.UserIdentity)
+
+	log.Info("Generated Access And Refresh Token", zap.String("ID", request.UserIdentity))
 	response.AcccessToken = accessToken
 	response.RefreshToken = refreshToken
 	return nil
@@ -63,23 +74,23 @@ func (serviceHandler ServiceHandler) AccessAndRefreshTokens(
 func (serviceHandler ServiceHandler) RefreshTokens(
 	ctx context.Context, request *proto.Token, response *proto.AccessAndRefreshToken) error {
 
-	log.Debugf("Generating Access And Refresh Token Based On Refresh Token %s",
-		request.Token)
+	log.Debug("Refreshing Token", zap.String("Token", request.Token))
 
 	accessToken, refreshToken, msg, err := serviceHandler.jwt.RefreshTokens(
 		request.Token)
 
 	if err != nil {
-		log.Errorf(`Generating Access And Refresh Token 
-		            Based On Refresh Token %s Returned Error %+v`,
-			request.Token, err)
+		log.Error(
+			"Refreshing Token Returned Error",
+			zap.String("Token", request.Token),
+			zap.Error(err),
+		)
 		err = errors.Wrap(
 			err, "Error while generating access and refresh token bason on refresh token")
 		return err
 	}
 
-	log.Infof("Generated Access And Refresh Token Based On Refresh Token %s",
-		request.Token)
+	log.Info("Refreshed Token", zap.String("Token", request.Token))
 
 	response.Message = msg
 	response.AcccessToken = accessToken
@@ -91,11 +102,20 @@ func (serviceHandler ServiceHandler) RefreshTokens(
 func (serviceHandler ServiceHandler) ValidateToken(
 	ctx context.Context, request *proto.Token, response *proto.Claims) error {
 
-	log.Debugf("Validating Token %s Of Type %s", request.Token, request.TokenType)
+	log.Debug(
+		"Validating Token",
+		zap.String("Token", request.Token),
+		zap.String("Token Type", request.TokenType),
+	)
 
 	valid, claims, msg, err := serviceHandler.jwt.ValidateToken(request.Token, request.TokenType)
 	if err != nil {
-		log.Errorf("Validating Fresh Access Token %s Returned Error %+v", request.Token, err)
+		log.Error(
+			"Validating Token Returned Error",
+			zap.String("Token", request.Token),
+			zap.String("Token Type", request.TokenType),
+			zap.Error(err),
+		)
 		return errors.Wrapf(err, "Error while validating token with type %s", request.TokenType)
 	}
 
@@ -105,6 +125,10 @@ func (serviceHandler ServiceHandler) ValidateToken(
 	if err != nil {
 		return errors.Wrap(err, "Error while copying")
 	}
-	log.Infof("Validated Token %s Of Type %s", request.Token, request.TokenType)
+	log.Info(
+		"Validated Token",
+		zap.String("Token", request.Token),
+		zap.String("Token Type", request.TokenType),
+	)
 	return err
 }

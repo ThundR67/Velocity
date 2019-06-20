@@ -6,6 +6,7 @@ import (
 	proto "github.com/SonicRoshan/Velocity/jwt-srv/proto"
 	handler "github.com/SonicRoshan/Velocity/jwt-srv/service-handler"
 	micro "github.com/micro/go-micro"
+	"go.uber.org/zap"
 )
 
 func main() {
@@ -13,7 +14,7 @@ func main() {
 
 	defer func() {
 		if r := recover(); r != nil {
-			log.Criticalf("Service Paniced Due To Reason %s", r)
+			log.Fatal("Service Paniced", zap.Any("Panic", r))
 		}
 	}()
 
@@ -29,6 +30,6 @@ func main() {
 	proto.RegisterJWTHandler(service.Server(), serviceHandler)
 
 	if err := service.Run(); err != nil {
-		log.Criticalf("Service Failed With Error %s", err)
+		log.Fatal("Service Failed With Error", zap.Error(err))
 	}
 }

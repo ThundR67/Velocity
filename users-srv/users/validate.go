@@ -7,6 +7,7 @@ import (
 	"github.com/SonicRoshan/Velocity/global/config"
 	logger "github.com/SonicRoshan/Velocity/global/logs"
 	"github.com/asaskevich/govalidator"
+	"go.uber.org/zap"
 )
 
 var validateLog = logger.GetLogger("users_data_validater.log")
@@ -36,10 +37,13 @@ func validateUserMainData(userMainData config.UserMain, strict bool) (valid bool
 		}
 	}()
 
-	validateLog.Debugf("Got User Main Data %+v", userMainData)
+	validateLog.Debug("Got User Main Data", zap.Any("Main Data", userMainData))
 
 	if govalidator.HasUpperCase(userMainData.Username) {
-		validateLog.Debugf("Username %s Has UpperCase Characters In It", userMainData.Username)
+		validateLog.Debug(
+			"Username Has UpperCase Characters In It",
+			zap.String("Username", userMainData.Username),
+		)
 		valid = false
 		return
 	} else if !govalidator.InRange(len(userMainData.Username), config.UserDataConfigUsernameLengthRange[0], config.UserDataConfigUsernameLengthRange[1]) {
@@ -75,7 +79,7 @@ func validateUserExtraData(userExtraData config.UserExtra, strict bool) (valid b
 		}
 	}()
 
-	validateLog.Debugf("Got User Extra Data %+v", userExtraData)
+	validateLog.Debug("Got User Extra Data", zap.Any("Extra Data", userExtraData))
 
 	birthday := time.Unix(userExtraData.BirthdayUTC, 0)
 	age := time.Now().Year() - birthday.Year()

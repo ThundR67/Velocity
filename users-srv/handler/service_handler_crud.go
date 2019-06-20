@@ -7,12 +7,17 @@ import (
 	proto "github.com/SonicRoshan/Velocity/users-srv/proto"
 	"github.com/jinzhu/copier"
 	"github.com/pkg/errors"
+	"go.uber.org/zap"
 )
 
 //Add is used to handle Add function
 func (usersService UsersService) Add(
 	ctx context.Context, request *proto.AddRequest, response *proto.AddResponse) error {
-	log.Debugf("Adding User With Request %+v", request)
+
+	log.Debug(
+		"Adding User",
+		zap.Any("Request", request),
+	)
 
 	var mainData config.UserMain
 	var extraData config.UserExtra
@@ -26,18 +31,28 @@ func (usersService UsersService) Add(
 		return err
 	}
 
-	log.Debugf("Adding User With Main Data %+v \n  Extra Data %v",
-		mainData, extraData)
+	log.Debug(
+		"Adding User",
+		zap.Any("Main Data", mainData),
+		zap.Any("Extra Data", extraData),
+	)
 
 	userID, msg, err := usersService.users.Add(mainData, extraData)
 	if err != nil {
-		log.Errorf("Adding User With Main Data %+v\n  Extra Data %v\n Returned Error %+v",
-			mainData, extraData, err)
+		log.Error(
+			"Adding User Returned Error",
+			zap.Any("Main Data", mainData),
+			zap.Any("Extra Data", extraData),
+			zap.Error(err),
+		)
 		return errors.Wrap(err, "Error While Adding User")
 	}
 
-	log.Infof("Added User With Main Data %+v  \n Extra Data %+v",
-		mainData, extraData)
+	log.Info(
+		"Added User",
+		zap.Any("Main Data", mainData),
+		zap.Any("Extra Data", extraData),
+	)
 	response.Message = msg
 	response.UserID = userID
 
@@ -48,14 +63,17 @@ func (usersService UsersService) Add(
 func (usersService UsersService) Get(
 	ctx context.Context, request *proto.GetRequest, response *proto.UserMain) error {
 
-	log.Debugf("Getting User Main Data With User ID %s", request.UserID)
+	log.Debug("Getting User's  Main Data", zap.String("UserID", request.UserID))
 
 	var data config.UserMain
 	err := usersService.users.Get(request.UserID, config.DBConfigUserMainDataCollection, &data)
 
 	if err != nil {
-		log.Errorf("Getting User Main Data With User ID %s Returned Error %+v",
-			request.UserID, err)
+		log.Error(
+			"Getting User's Main Data Returned Error",
+			zap.String("UserID", request.UserID),
+			zap.Error(err),
+		)
 		return errors.Wrap(err, "Error While Getting User Data")
 	}
 
@@ -64,7 +82,11 @@ func (usersService UsersService) Get(
 		return err
 	}
 
-	log.Infof("Got User Data With Data %+v", response)
+	log.Debug(
+		"Got User's Main Data",
+		zap.String("UserID", request.UserID),
+		zap.Any("Data", response),
+	)
 	return nil
 }
 
@@ -72,14 +94,17 @@ func (usersService UsersService) Get(
 func (usersService UsersService) GetExtra(
 	ctx context.Context, request *proto.GetRequest, response *proto.UserExtra) error {
 
-	log.Debugf("Getting User Main Data With User ID %s", request.UserID)
+	log.Debug("Getting User's Extra Data", zap.String("UserID", request.UserID))
 
 	var data config.UserMain
 	err := usersService.users.Get(request.UserID, config.DBConfigUserMainDataCollection, &data)
 
 	if err != nil {
-		log.Errorf("Getting User Main Data With User ID %s Returned Error %+v",
-			request.UserID, err)
+		log.Error(
+			"Getting User's Extra Data Returned Error",
+			zap.String("UserID", request.UserID),
+			zap.Error(err),
+		)
 		return errors.Wrap(err, "Error While Getting User Data")
 	}
 
@@ -88,7 +113,11 @@ func (usersService UsersService) GetExtra(
 		return err
 	}
 
-	log.Infof("Got User Data With Data %+v", response)
+	log.Debug(
+		"Got User's Extra Data",
+		zap.String("UserID", request.UserID),
+		zap.Any("Data", response),
+	)
 	return nil
 }
 
@@ -106,20 +135,31 @@ func (usersService UsersService) Update(
 		return err
 	}
 
-	log.Debugf("Updating User Main Data With ID %s With Update %+v",
-		request.UserID, update)
+	log.Debug(
+		"Updating User Main Data",
+		zap.String("UserID", request.UserID),
+		zap.Any("Update", request.Update),
+	)
 
 	err = usersService.users.Update(request.UserID,
 		update,
 		config.DBConfigUserMainDataCollection)
 
 	if err != nil {
-		log.Debugf("Updating User Main Data With ID %s With Update %+v Returned Error %+v",
-			request.UserID, update, err)
+		log.Error(
+			"Updating User Main Data Returned Error",
+			zap.String("UserID", request.UserID),
+			zap.Any("Update", request.Update),
+			zap.Error(err),
+		)
 		return errors.Wrap(err, "Error While Updating Data")
 	}
-	log.Infof("Updated User Main Data With ID %s With Update %+v",
-		request.UserID, update)
+
+	log.Info(
+		"Updated User Main Data",
+		zap.String("UserID", request.UserID),
+		zap.Any("Update", request.Update),
+	)
 
 	return nil
 }
@@ -138,21 +178,31 @@ func (usersService UsersService) UpdateExtra(
 		return err
 	}
 
-	log.Debugf("Updating User Extra Data With ID %s With Update %+v",
-		request.UserID, update)
+	log.Debug(
+		"Updating User Extra Data",
+		zap.String("UserID", request.UserID),
+		zap.Any("Update", request.Update),
+	)
 
 	err = usersService.users.Update(request.UserID,
 		update,
 		config.DBConfigUserExtraDataCollection)
 
 	if err != nil {
-		log.Debugf("Updating User Extra Data With ID %s With Update %+v Returned Error %+v",
-			request.UserID, update, err)
+		log.Error(
+			"Updating User Extra Data Returned Error",
+			zap.String("UserID", request.UserID),
+			zap.Any("Update", request.Update),
+			zap.Error(err),
+		)
 		return errors.Wrap(err, "Error While Updating Data")
 	}
 
-	log.Infof("Updated User Extra Data With ID %s With Update %+v",
-		request.UserID, update)
+	log.Info(
+		"Updated User Extra Data",
+		zap.String("UserID", request.UserID),
+		zap.Any("Update", request.Update),
+	)
 
 	return nil
 }
@@ -163,15 +213,20 @@ func (usersService UsersService) Delete(
 	request *proto.DeleteRequest,
 	response *proto.DeleteResponse) error {
 
-	log.Debugf("Deleting User %s", request.Username)
+	log.Debug("Deleting User", zap.String("Username", request.Username))
+
 	msg, err := usersService.users.Delete(request.UserID, request.Username, request.Password)
 
 	if err != nil {
-		log.Errorf("Delete User %s Returned Error %+v", request.Username, err)
+		log.Error(
+			"Deleting User Returned Error",
+			zap.String("Username", request.Username),
+			zap.Error(err),
+		)
 		return errors.Wrap(err, "Error While Deleting User")
 	}
 
-	log.Infof("Deleted User %s", request.Username)
+	log.Info("Deleted User", zap.String("Username", request.Username))
 	response.Message = msg
 	return err
 }

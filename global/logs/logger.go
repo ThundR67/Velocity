@@ -1,18 +1,36 @@
 package logger
 
 import (
-	"github.com/SonicRoshan/Velocity/global/config"
-	log "github.com/jex-lin/golang-logger"
+	"fmt"
+	"net/url"
+	"os"
+
+	"go.uber.org/zap"
 )
 
-//getLogFilePath returnes relative path of log file
+func newWinFileSink(u *url.URL) (zap.Sink, error) {
+	// Remove leading slash left by url.Parse()
+	return os.OpenFile(u.Path[1:], os.O_WRONLY|os.O_APPEND|os.O_CREATE, 0644)
+}
+
+//getLogFilePath is used to get file directory based on filename
 func getLogFilePath(fileName string) string {
-	return "D:/VelocityLogs/" + fileName
+	zap.RegisterSink("winfile", newWinFileSink)
+	return "winfile:/D:/VelocityLogs/" + fileName
 }
 
 //GetLogger returns a logger
-func GetLogger(fileName string) *log.Log {
-	output := log.NewLogFile(getLogFilePath(fileName))
-	output.SetLevel(config.LogConfigLogLevel)
-	return output
+func GetLogger(fileName string) *zap.Logger {
+
+	cfg := zap.NewProductionConfig()
+	cfg.OutputPaths = []string{
+		getLogFilePath(fileName),
+	}
+
+	logger, err := cfg.Build()
+	defer logger.Sync()
+	if err != nil {
+		panic(fmt.Sprintf("Cant Load Logger Because Of Error %+v", err))
+	}
+	return logger
 }

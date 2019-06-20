@@ -9,6 +9,7 @@ import (
 	"github.com/pkg/errors"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"go.uber.org/zap"
 )
 
 var log = logger.GetLogger("users_low_level_manager.log")
@@ -53,15 +54,28 @@ func (users *Users) createClient() error {
 
 //connect is used to connect to MongoDB
 func (users *Users) connect() error {
-	log.Debugf("Connecting To MongoDB With DB Name %s", users.DBName)
+
+	log.Debug(
+		"Connecting To MongoDB",
+		zap.String("DB Name", users.DBName),
+	)
+
 	users.ctx = context.TODO()
 	err := users.client.Connect(users.ctx)
 	if err != nil {
+		log.Debug(
+			"Connecting To MongoDB Returned Error",
+			zap.String("DB Name", users.DBName),
+			zap.Error(err),
+		)
 		err = errors.Wrap(err, "Error While Connecting To MongoDB")
 		return err
 	}
 	users.database = users.client.Database(users.DBName)
-	log.Info("Connected To MongoDB And DB")
+	log.Info(
+		"Connected To MongoDB",
+		zap.String("DB Name", users.DBName),
+	)
 	return nil
 }
 
@@ -74,9 +88,12 @@ func (users *Users) connectToCollections() {
 
 //doesUsernameOrEmailExists is used  to check if username or email exist
 func (users Users) doesUsernameOrEmailExists(mainData config.UserMain) (bool, string, error) {
-	log.Debugf("Checking if username %s or email %s exists",
-		mainData.Email,
-		mainData.Username)
+
+	log.Debug(
+		"Checking if username %s or email %s exists",
+		zap.String("Email", mainData.Email),
+		zap.String("Username", mainData.Username),
+	)
 
 	usernameExist, _ := fieldExist(users.ctx,
 		config.UserMain{Username: mainData.Username},
@@ -118,7 +135,7 @@ func (users Users) generateID() (string, error) {
 	for userIDExists {
 		userID, err = generateUUID()
 		if err != nil {
-			log.Errorf("Generating UUID Returned Error %+v", err)
+			log.Error("Generating UUID Returned Error", zap.Error(err))
 			err = errors.Wrap(err, "Error While Generating UUID v4")
 			return "", err
 		}
@@ -127,7 +144,7 @@ func (users Users) generateID() (string, error) {
 			users.mainCollection)
 	}
 
-	log.Infof("Generated UUID %s", userID)
+	log.Info("Generated UUID", zap.String("UUID", userID))
 	return userID, nil
 }
 

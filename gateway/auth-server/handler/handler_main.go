@@ -1,9 +1,11 @@
 package handler
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
+
+	jsoniter "github.com/json-iterator/go"
+	"go.uber.org/zap"
 
 	"github.com/SonicRoshan/Velocity/global/clients"
 	"github.com/SonicRoshan/Velocity/global/config"
@@ -12,6 +14,7 @@ import (
 	micro "github.com/micro/go-micro"
 )
 
+var json = jsoniter.ConfigCompatibleWithStandardLibrary
 var log = logger.GetLogger("auth_server.log")
 var decoder = schema.NewDecoder()
 
@@ -60,7 +63,7 @@ func (handler Handler) respond(
 
 	w.Header().Set("Content-Type", "application/json")
 	if err != nil {
-		log.Errorf("Error While Reponding %+v", err)
+		log.Error("Error While Reponding", zap.Error(err))
 
 		output := config.InternalServerError
 		if config.AuthServerConfigShowError {

@@ -3,11 +3,18 @@ package users
 import (
 	"github.com/SonicRoshan/Velocity/global/config"
 	"github.com/pkg/errors"
+	"go.uber.org/zap"
 )
 
 //GetByUsernameOrEmail is used to get user based on username or email
 func (users Users) GetByUsernameOrEmail(username, email string) (config.UserMain, string) {
-	log.Debugf("Getting User By Username %s Email %s", username, email)
+
+	log.Debug(
+		"Getting User By Username Or Email",
+		zap.String("Username", username),
+		zap.String("Email", email),
+	)
+
 	filter := users.getFilterByUsernameOrEmail(username, email)
 	var user config.UserMain
 	err := users.mainCollection.FindOne(users.ctx, filter).Decode(&user)
@@ -16,13 +23,24 @@ func (users Users) GetByUsernameOrEmail(username, email string) (config.UserMain
 		return config.UserMain{}, config.InvalidUsernameOrEmailMsg
 	}
 
-	log.Infof("Got User By Username %s Email %s", username, email)
+	log.Info(
+		"Got User By Username Or Email",
+		zap.String("Username", username),
+		zap.String("Email", email),
+	)
+
 	return user, ""
 }
 
 //Auth is used to authenticate a user
 func (users Users) Auth(username, email, password string) (bool, string, string, error) {
-	log.Debugf("Authenticating With Username %s Email %s", username, email)
+
+	log.Debug(
+		"Authenticating User",
+		zap.String("Username", username),
+		zap.String("Email", email),
+		zap.String("password", password),
+	)
 
 	user, msg := users.GetByUsernameOrEmail(username, email)
 
@@ -33,7 +51,12 @@ func (users Users) Auth(username, email, password string) (bool, string, string,
 	//Checking password (TODO Add hashing)
 	valid := user.Password == password
 
-	log.Infof("Authenticated With Username %s Email %s", username, email)
+	log.Info(
+		"Authenticated User",
+		zap.String("Username", username),
+		zap.String("Email", email),
+		zap.String("password", password),
+	)
 
 	if !valid {
 		return false, "", config.InvalidPasswordMsg, nil
@@ -45,9 +68,11 @@ func (users Users) Auth(username, email, password string) (bool, string, string,
 func (users Users) Add(
 	mainData config.UserMain, extraData config.UserExtra) (string, string, error) {
 
-	log.Debugf(`Adding User With 
-				Main Data %+v
-				Extra Data %+v`, mainData, extraData)
+	log.Debug(
+		"Adding User",
+		zap.Any("Main Data", mainData),
+		zap.Any("Extra Data", extraData),
+	)
 
 	if !isValid(mainData, extraData) {
 		log.Info("Invalid User Data")
@@ -62,12 +87,13 @@ func (users Users) Add(
 	metaData := generateUserMetaData()
 	userID, err := users.generateID()
 	if err != nil {
-		log.Errorf(`Adding User With
-					Main Data %+v
-					User Extra Data %+v
-					User Meta Data %+v
-					Returned Error %+v`,
-			mainData, extraData, metaData, err)
+		log.Error(
+			"Adding User Returned Error",
+			zap.Any("Main Data", mainData),
+			zap.Any("Extra Data", extraData),
+			zap.Any("Meta Data", metaData),
+			zap.Error(err),
+		)
 		err = errors.Wrap(err, "Error While Adding User")
 		return "", "", err
 	}
@@ -79,36 +105,60 @@ func (users Users) Add(
 	users.mainCollection.InsertOne(users.ctx, mainData)
 	users.extraCollection.InsertOne(users.ctx, extraData)
 	users.metaCollection.InsertOne(users.ctx, metaData)
-	log.Infof(`Added User With
-					Main Data %+v
-					User Extra Data %+v
-					User Meta Data %+v`,
-		mainData, extraData, metaData)
+
+	log.Info(
+		"Added User",
+		zap.Any("Main Data", mainData),
+		zap.Any("Extra Data", extraData),
+		zap.Any("Meta Data", metaData),
+	)
+
 	return userID, "", nil
 }
 
-//Get is used to decoded user data into data interface
+//Get is used to get user's data
 func (users Users) Get(userID, collectionName string, data interface{}) error {
-	log.Debugf("Getting User Data In Collection %s With UserID %s", collectionName, userID)
+
+	log.Debug(
+		"Getting User's Data",
+		zap.String("UserID", userID),
+		zap.String("Collection", collectionName),
+	)
 
 	collection := users.database.Collection(collectionName)
 	err := collection.FindOne(users.ctx, config.UserMain{UserID: userID}).Decode(data)
 
 	if err != nil {
-		log.Errorf("Getting User In Collection %s With UserID %s Returned Error %+v",
-			collectionName, userID, err)
+		log.Error(
+			"Getting User's Data Returned Error",
+			zap.String("UserID", userID),
+			zap.String("Collection", collectionName),
+			zap.Error(err),
+		)
 		err = errors.Wrap(err, "Error While Getting User Data")
 		return err
 	}
 
-	log.Infof("Got Users Data In Collection %s With UserID %s", collectionName, userID)
+	log.Info(
+		"Got User's Data",
+		zap.String("UserID", userID),
+		zap.String("Collection", collectionName),
+	)
+
 	return nil
 }
 
 //Update is used to update users data in any collection
 func (users Users) Update(userID string, update interface{}, collectionName string) error {
-	log.Debugf("Updating User %s Data In Collection %s With Update %+v",
-		userID, collectionName, update)
+
+	log.Debug(
+		"Updating User's Data",
+		zap.String("UserID", userID),
+		zap.String("Collection", collectionName),
+		zap.Any("Update", update),
+	)
+
+	//Todo Validate The Update
 
 	collection := users.database.Collection(collectionName)
 
@@ -116,35 +166,70 @@ func (users Users) Update(userID string, update interface{}, collectionName stri
 		config.UserMain{UserID: userID}, map[string]interface{}{"$set": update})
 
 	if err != nil {
-		log.Errorf("Updating User %s Data In Collection %s With Update %+v Returned Error %+v",
-			userID, collectionName, update, err)
+		log.Error(
+			"Updating User's Data Returned Error",
+			zap.String("UserID", userID),
+			zap.String("Collection", collectionName),
+			zap.Any("Update", update),
+			zap.Error(err),
+		)
 		err = errors.Wrap(err, "Error While Updating User Data")
 		return err
 	}
-	log.Infof("Updated User %s Data In Collection %s",
-		userID, collectionName)
+
+	log.Info(
+		"Updated User's Data",
+		zap.String("UserID", userID),
+		zap.String("Collection", collectionName),
+		zap.Any("Update", update),
+	)
+
 	return nil
 }
 
 //Delete is used to mark a user as deleted
 func (users Users) Delete(userID, username, password string) (string, error) {
-	log.Debugf("Deleting User %s", username)
+
+	log.Debug(
+		"Deleting User",
+		zap.String("UserID", userID),
+		zap.String("Username", username),
+		zap.String("Password", password),
+	)
 
 	valid, _, _, _ := users.Auth(username, "", password)
 
 	update := config.UserMeta{AccountStatus: config.UserDataConfigAccountStatusDeleted}
 
 	if !valid {
-		log.Infof("Invalid Auth Data While Deleting Username %s", username)
+		log.Info(
+			"Invalid Auth Info",
+			zap.String("UserID", userID),
+			zap.String("Username", username),
+			zap.String("Password", password),
+		)
 		return config.InvalidAuthDataMsg, nil
 	}
 
 	err := users.Update(userID, update, config.DBConfigUserMetaDataCollection)
 	if err != nil {
-		log.Errorf("Deleting User %s Returned Error %+v", username, err)
+		log.Error(
+			"Deleting User Returned Error",
+			zap.String("UserID", userID),
+			zap.String("Username", username),
+			zap.String("Password", password),
+			zap.Error(err),
+		)
 		err = errors.Wrap(err, "Error While Deleting User")
 		return "", err
 	}
-	log.Infof("Deleted User %s", username)
+
+	log.Info(
+		"Deleted User",
+		zap.String("UserID", userID),
+		zap.String("Username", username),
+		zap.String("Password", password),
+	)
+
 	return "", err
 }

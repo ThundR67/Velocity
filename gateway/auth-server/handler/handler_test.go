@@ -1,8 +1,6 @@
 package handler
 
 import (
-	"encoding/json"
-	"fmt"
 	"math/rand"
 	"net/http"
 	"net/http/httptest"
@@ -47,7 +45,6 @@ func testSignUp(
 	mainQuery, _ := query.Values(main)
 	extraQuery, _ := query.Values(extra)
 	url := "/sign-up?" + mainQuery.Encode() + "&" + extraQuery.Encode() + "&scopes=read"
-	fmt.Println(url)
 
 	req, err := http.NewRequest("POST", url, nil)
 	assert.NoError(err, "Http new request returned error")
