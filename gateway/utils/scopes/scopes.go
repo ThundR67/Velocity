@@ -46,44 +46,12 @@ func MatchScopes(scopeA, scopeB string) bool {
 
 var wg sync.WaitGroup
 
-/*ScopeInAllowedScopes checks if a scope is in a list of allowed scopes
-then adds the result to a channel */
-func ScopeInAllowedScopes(channel chan bool, scope string, allowedScopes []string) {
+/*ScopeInAllowed is used to check if scope is allowed based on allowed scopes list */
+func ScopeInAllowed(scope string, allowedScopes []string) bool {
 	for _, allowedScope := range allowedScopes {
 		if MatchScopes(scope, allowedScope) {
-			channel <- true
-			wg.Done()
-			return
+			return true
 		}
 	}
-	channel <- false
-	wg.Done()
-}
-
-//MatchScopesRequestedToScopesAllowed Checks if scopes requested are allowed (concurrently)
-func MatchScopesRequestedToScopesAllowed(scopesRequested, scopesAllowed []string) bool {
-	matchedChan := make(chan bool)
-	wg.Add(len(scopesRequested))
-
-	/*for each scope requested it will run a goroutine where
-	that scope is checked against the list of allowed scopes
-	each goroutine will then add their results to the matchedChan*/
-	for _, scopeRequested := range scopesRequested {
-		go ScopeInAllowedScopes(matchedChan, scopeRequested, scopesAllowed)
-	}
-
-	//If the matchedChan channel has false message, the program will return false
-	for i := 0; i < len(scopesRequested); i++ {
-		select {
-		case match := <-matchedChan:
-			if !match {
-				return false
-			}
-		}
-	}
-
-	//Return true if all goroutines are finished and matchedChan didn't contain false
-	wg.Wait()
-	close(matchedChan)
-	return true
+	return false
 }

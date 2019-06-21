@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/SonicRoshan/Velocity/global/config"
-	proto "github.com/SonicRoshan/Velocity/users-srv/proto"
+	proto "github.com/SonicRoshan/Velocity/services/users-srv/proto"
 	"github.com/jinzhu/copier"
 	"github.com/pkg/errors"
 	"go.uber.org/zap"

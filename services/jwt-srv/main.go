@@ -3,8 +3,8 @@ package main
 import (
 	"github.com/SonicRoshan/Velocity/global/config"
 	logger "github.com/SonicRoshan/Velocity/global/logs"
-	proto "github.com/SonicRoshan/Velocity/jwt-srv/proto"
-	handler "github.com/SonicRoshan/Velocity/jwt-srv/service-handler"
+	proto "github.com/SonicRoshan/Velocity/services/jwt-srv/proto"
+	handler "github.com/SonicRoshan/Velocity/services/jwt-srv/service-handler"
 	micro "github.com/micro/go-micro"
 	"go.uber.org/zap"
 )

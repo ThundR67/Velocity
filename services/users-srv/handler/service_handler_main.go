@@ -4,8 +4,8 @@ import (
 	"context"
 
 	logger "github.com/SonicRoshan/Velocity/global/logs"
-	proto "github.com/SonicRoshan/Velocity/users-srv/proto"
-	"github.com/SonicRoshan/Velocity/users-srv/users"
+	proto "github.com/SonicRoshan/Velocity/services/users-srv/proto"
+	"github.com/SonicRoshan/Velocity/services/users-srv/users"
 	"github.com/jinzhu/copier"
 	"github.com/pkg/errors"
 	"go.uber.org/zap"
