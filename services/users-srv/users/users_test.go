@@ -59,9 +59,9 @@ func TestUtils(t *testing.T) {
 	assert := assert.New(t)
 
 	metaData := generateUserMetaData()
-	assert.Equal(config.UserDataConfigAccountStatusActive,
+	assert.Equal(config.UserDataConfigAccountStatusUnactivated,
 		metaData.AccountStatus,
-		"GenerateMetaData Should Return Data With Account Status Active")
+		"GenerateMetaData Should Return Data With Account Status Unactivated")
 	assert.WithinDuration(time.Unix(metaData.AccountCreationUTC, 0),
 		time.Now(),
 		time.Second*5,
@@ -97,11 +97,14 @@ func TestLowLevelUsers(t *testing.T) {
 	assert.NoError(err, "Add Returned Error")
 	assert.Equal(msg, "", "Message Should Be Blank")
 
+	
+
 	//testing get
 	var mainData config.UserMain
 	err = dataManager.Get(userID, config.DBConfigUserMainDataCollection, &mainData)
 	assert.NoError(err, "Get Returned Error For Getting Main Data")
 	assert.True(mainData != (config.UserMain{}))
+
 
 	var extraData config.UserExtra
 	err = dataManager.Get(userID, config.DBConfigUserExtraDataCollection, &extraData)
@@ -112,6 +115,25 @@ func TestLowLevelUsers(t *testing.T) {
 	err = dataManager.Get(userID, config.DBConfigUserMetaDataCollection, &metaData)
 	assert.NoError(err, "Get Returned Error For Getting Meta Data")
 	assert.True(metaData != (config.UserMeta{}))
+	if !config.DebugMode {
+		assert.Equal(
+			config.UserDataConfigAccountStatusUnactivated, 
+			metaData.AccountStatus, 
+			"Account Status Should Be Unactive",
+		)
+    }
+
+	//Testing activate
+	msg, err = dataManager.Activate(mockUsername + "@gmail.com")
+	assert.NoError(err, "Add Returned Error")
+	assert.Equal(msg, "", "Message Should Be Blank")
+
+	dataManager.Get(userID, config.DBConfigUserMetaDataCollection, &metaData)
+	assert.Equal(
+		config.UserDataConfigAccountStatusActive, 
+		metaData.AccountStatus, 
+		"Account Status Should Be Activate",
+	)
 
 	//testing get with field names
 	err = dataManager.Get(userID, config.DBConfigUserMetaDataCollection, &metaData)

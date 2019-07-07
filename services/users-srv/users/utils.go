@@ -11,7 +11,7 @@ import (
 
 func generateUserMetaData() config.UserMeta {
 	return config.UserMeta{
-		AccountStatus:      config.UserDataConfigAccountStatusActive,
+		AccountStatus:      config.UserDataConfigAccountStatusUnactivated,
 		AccountCreationUTC: time.Now().Unix(),
 	}
 }

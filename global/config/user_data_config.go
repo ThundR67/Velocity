@@ -8,6 +8,8 @@ var userDataConfigManager = getConfigManager("user_data.config")
 var (
 	//UserDataConfigAccountStatusActive Is Active Status
 	UserDataConfigAccountStatusActive = getStringConfig("userData.userExtraData.accountStatus.Active", userDataConfigManager)
+	//UserDataConfigAccountStatusUnactivated Is Unactivated Status
+	UserDataConfigAccountStatusUnactivated = getStringConfig("userData.userExtraData.accountStatus.Unactivated", userDataConfigManager)
 	//UserDataConfigAccountStatusDeleted Is Deleted Status
 	UserDataConfigAccountStatusDeleted = getStringConfig("userData.userExtraData.accountStatus.Deleted", userDataConfigManager)
 

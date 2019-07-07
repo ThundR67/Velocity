@@ -42,6 +42,7 @@ type UsersService interface {
 	Update(ctx context.Context, in *UpdateRequest, opts ...client.CallOption) (*UpdateResponse, error)
 	UpdateExtra(ctx context.Context, in *UpdateRequest, opts ...client.CallOption) (*UpdateResponse, error)
 	Delete(ctx context.Context, in *DeleteRequest, opts ...client.CallOption) (*DeleteResponse, error)
+	Activate(ctx context.Context, in *ActivateRequest, opts ...client.CallOption) (*ActivateResponse, error)
 }
 
 type usersService struct {
@@ -142,6 +143,16 @@ func (c *usersService) Delete(ctx context.Context, in *DeleteRequest, opts ...cl
 	return out, nil
 }
 
+func (c *usersService) Activate(ctx context.Context, in *ActivateRequest, opts ...client.CallOption) (*ActivateResponse, error) {
+	req := c.c.NewRequest(c.name, "Users.Activate", in)
+	out := new(ActivateResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // Server API for Users service
 
 type UsersHandler interface {
@@ -153,6 +164,7 @@ type UsersHandler interface {
 	Update(context.Context, *UpdateRequest, *UpdateResponse) error
 	UpdateExtra(context.Context, *UpdateRequest, *UpdateResponse) error
 	Delete(context.Context, *DeleteRequest, *DeleteResponse) error
+	Activate(context.Context, *ActivateRequest, *ActivateResponse) error
 }
 
 func RegisterUsersHandler(s server.Server, hdlr UsersHandler, opts ...server.HandlerOption) error {
@@ -165,6 +177,7 @@ func RegisterUsersHandler(s server.Server, hdlr UsersHandler, opts ...server.Han
 		Update(ctx context.Context, in *UpdateRequest, out *UpdateResponse) error
 		UpdateExtra(ctx context.Context, in *UpdateRequest, out *UpdateResponse) error
 		Delete(ctx context.Context, in *DeleteRequest, out *DeleteResponse) error
+		Activate(ctx context.Context, in *ActivateRequest, out *ActivateResponse) error
 	}
 	type Users struct {
 		users
@@ -207,4 +220,8 @@ func (h *usersHandler) UpdateExtra(ctx context.Context, in *UpdateRequest, out *
 
 func (h *usersHandler) Delete(ctx context.Context, in *DeleteRequest, out *DeleteResponse) error {
 	return h.UsersHandler.Delete(ctx, in, out)
+}
+
+func (h *usersHandler) Activate(ctx context.Context, in *ActivateRequest, out *ActivateResponse) error {
+	return h.UsersHandler.Activate(ctx, in, out)
 }

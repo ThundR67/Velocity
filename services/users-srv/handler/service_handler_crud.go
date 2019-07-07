@@ -228,5 +228,29 @@ func (usersService UsersService) Delete(
 
 	log.Info("Deleted User", zap.String("Username", request.Username))
 	response.Message = msg
-	return err
+	return nil
+}
+
+//Activate is used handle Activate function
+func (usersService UsersService) Activate(
+	ctx context.Context,
+	request proto.ActivateRequest,
+	response proto.ActivateResponse) error {
+
+	log.Debug("Activating Account", zap.String("Email", request.Email))
+
+	msg, err := usersService.users.Activate(request.Email)
+
+	if err != nil {
+		log.Error(
+			"Activating User Returned Error",
+			zap.String("Email", request.Email),
+			zap.Error(err),
+		)
+		return errors.Wrap(err, "Error While Activating User")
+	}
+
+	log.Info("Activated Account", zap.String("Email", request.Email))
+	response.Message = msg
+	return nil
 }

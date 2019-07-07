@@ -120,7 +120,7 @@ func (users Users) getFilterByUsernameOrEmail(username, email string) config.Use
 	if username != "" {
 		return config.UserMain{Username: username}
 	} else if email != "" {
-		return config.UserMain{Username: username}
+		return config.UserMain{Email: email}
 	}
 	return config.UserMain{}
 }

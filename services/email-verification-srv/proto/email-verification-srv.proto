@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+service EmailVerification {
+    rpc SendVerification(SendVerificationRequest) returns (SendVerificationResponse) {};
+    rpc Verify(VerifyRequest) returns (VerifyResponse) {};
+}
+
+message SendVerificationRequest {
+    string email = 1;
+}
+
+message SendVerificationResponse {
+    string message = 1;
+}
+
+message VerifyRequest {
+    string verificationCode = 1;
+}
+
+message VerifyResponse {
+    string email = 1;
+}

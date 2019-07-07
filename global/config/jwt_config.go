@@ -9,7 +9,7 @@ var jWTConfigManager = getConfigManager("jwt.config")
 
 var (
 	//JWTSecret is used sign jwts
-	JWTSecret = []byte("PrettySimpleAsOfNow")
+	JWTSecret = []byte("Cause I am not listening")
 
 	//JWTAccessExpirationMinutes is used to add expiration time to access token
 	JWTAccessExpirationMinutes = time.Minute * time.Duration(getIntConfig("jwt.accessTokenExpirationTimeMinutes", jWTConfigManager))

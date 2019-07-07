@@ -27,6 +27,7 @@ func (users Users) GetByUsernameOrEmail(username, email string) (config.UserMain
 		"Got User By Username Or Email",
 		zap.String("Username", username),
 		zap.String("Email", email),
+		zap.Any("User", user),
 	)
 
 	return user, ""
@@ -105,6 +106,10 @@ func (users Users) Add(
 	users.mainCollection.InsertOne(users.ctx, mainData)
 	users.extraCollection.InsertOne(users.ctx, extraData)
 	users.metaCollection.InsertOne(users.ctx, metaData)
+
+	if config.DebugMode {
+		users.Activate(mainData.Email)
+	}
 
 	log.Info(
 		"Added User",
@@ -232,4 +237,45 @@ func (users Users) Delete(userID, username, password string) (string, error) {
 	)
 
 	return "", err
+}
+
+//Activate is used to mark an account as active
+func (users Users) Activate(email string) (string, error) {
+
+	log.Debug(
+		"Activating User With Email",
+		zap.String("Email", email),
+	)
+
+	userData, msg := users.GetByUsernameOrEmail("", email)
+	if msg != "" {
+		return msg, nil
+	}
+	userID := userData.UserID
+
+	log.Debug(
+		"Activating User With ID",
+		zap.String("UserID", userID),
+	)
+
+	update := config.UserMeta{AccountStatus: config.UserDataConfigAccountStatusActive}
+	err := users.Update(userID, update, config.DBConfigUserMetaDataCollection)
+
+	if err != nil {
+		log.Info(
+			"Activating User Returned Error",
+			zap.String("UserID", userID),
+			zap.String("Email", email),
+			zap.Error(err),
+		)
+		return "", errors.Wrap(err, "Error While Setting Account Status To Active")
+	}
+
+	log.Info(
+		"Activated User",
+		zap.String("UserID", userID),
+		zap.String("Email", email),
+	)
+
+	return "", nil
 }

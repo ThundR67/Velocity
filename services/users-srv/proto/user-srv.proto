@@ -9,6 +9,8 @@ service Users {
     rpc Update(UpdateRequest) returns (UpdateResponse) {}
     rpc UpdateExtra(UpdateRequest) returns (UpdateResponse) {}
     rpc Delete(DeleteRequest) returns (DeleteResponse) {}
+
+    rpc Activate(ActivateRequest) returns (ActivateResponse) {}
 }
 
 message UpdateRequest {
@@ -80,5 +82,13 @@ message DeleteRequest {
 }
 
 message DeleteResponse {
+    string message = 1;
+}
+
+message ActivateRequest {
+    string email = 1;
+}
+
+message ActivateResponse {
     string message = 1;
 }

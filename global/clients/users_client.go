@@ -118,3 +118,15 @@ func (usersClient UsersClient) Auth(username, password string) (string, string, 
 	}
 	return response.UserID, response.Message, nil
 }
+
+//Activate is used to mark an account active
+func (usersClient UsersClient) Activate(email string) (string, error) {
+	request := proto.ActivateRequest{
+		Email: email
+	}
+	response, err := usersClient.client.Activate(context.TODO(), &request)
+	if err != nil {
+		return "", errors.Wrap(err, "Error While Activating User Through Client")
+	}
+	return response.Message, nil
+}

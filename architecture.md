@@ -3,7 +3,7 @@
 ## Gateway
 ---
 #### This is the main part of velocity
-#### This is a Oauth2 server which will talk with the client, Only gateway will talk to clients.
+#### This is an Oauth2 server which will talk with the client, Only gateway will talk to clients.
 #### The gateway will also provide resources
 
 ## user-data-srv
