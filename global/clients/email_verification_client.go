@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/SonicRoshan/Velocity/global/config"
-	proto "github.com/SonicRoshan/Velocity/email-verification-srv/proto"
+	proto "github.com/SonicRoshan/Velocity/services/email-verification-srv/proto"
 	micro "github.com/micro/go-micro"
 	"github.com/pkg/errors"
 )
@@ -18,12 +18,12 @@ func NewEmailVerificationClient(service micro.Service) EmailVerificationClient {
 
 //EmailVerificationClient is jwt service client
 type EmailVerificationClient struct {
-	client proto.EmailVerificationClient
+	client proto.EmailVerificationService
 }
 
 //Init initalizes cliet
 func (emailVerificationClient *EmailVerificationClient) Init(service micro.Service) {
-	emailVerificationClient.client = proto.NewJWTService(config.EmailVerificationSrv, service.Client())
+	emailVerificationClient.client = proto.NewEmailVerificationService(config.EmailVerificationSrv, service.Client())
 }
 
 //SendVerification is used to send verification email to a user
@@ -41,7 +41,7 @@ func (emailVerificationClient EmailVerificationClient) SendVerification(email st
 }
 
 //Verify is used to verify verification code
-func(emailVerificationClient EmailVerificationClient) Verify(code string) (string, error) {
+func (emailVerificationClient EmailVerificationClient) Verify(code string) (string, error) {
 	request := proto.VerifyRequest{
 		VerificationCode: code,
 	}
@@ -53,5 +53,3 @@ func(emailVerificationClient EmailVerificationClient) Verify(code string) (strin
 
 	return response.Email, nil
 }
-
-

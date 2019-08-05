@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/SonicRoshan/Velocity/global/config"
-	proto "github.com/SonicRoshan/Velocity/jwt-srv/proto"
+	proto "github.com/SonicRoshan/Velocity/services/jwt-srv/proto"
 	micro "github.com/micro/go-micro"
 	"github.com/pkg/errors"
 )

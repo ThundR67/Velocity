@@ -234,8 +234,8 @@ func (usersService UsersService) Delete(
 //Activate is used handle Activate function
 func (usersService UsersService) Activate(
 	ctx context.Context,
-	request proto.ActivateRequest,
-	response proto.ActivateResponse) error {
+	request *proto.ActivateRequest,
+	response *proto.ActivateResponse) error {
 
 	log.Debug("Activating Account", zap.String("Email", request.Email))
 

@@ -97,14 +97,11 @@ func TestLowLevelUsers(t *testing.T) {
 	assert.NoError(err, "Add Returned Error")
 	assert.Equal(msg, "", "Message Should Be Blank")
 
-	
-
 	//testing get
 	var mainData config.UserMain
 	err = dataManager.Get(userID, config.DBConfigUserMainDataCollection, &mainData)
 	assert.NoError(err, "Get Returned Error For Getting Main Data")
 	assert.True(mainData != (config.UserMain{}))
-
 
 	var extraData config.UserExtra
 	err = dataManager.Get(userID, config.DBConfigUserExtraDataCollection, &extraData)
@@ -117,11 +114,11 @@ func TestLowLevelUsers(t *testing.T) {
 	assert.True(metaData != (config.UserMeta{}))
 	if !config.DebugMode {
 		assert.Equal(
-			config.UserDataConfigAccountStatusUnactivated, 
-			metaData.AccountStatus, 
+			config.UserDataConfigAccountStatusUnactivated,
+			metaData.AccountStatus,
 			"Account Status Should Be Unactive",
 		)
-    }
+	}
 
 	//Testing activate
 	msg, err = dataManager.Activate(mockUsername + "@gmail.com")
@@ -130,8 +127,8 @@ func TestLowLevelUsers(t *testing.T) {
 
 	dataManager.Get(userID, config.DBConfigUserMetaDataCollection, &metaData)
 	assert.Equal(
-		config.UserDataConfigAccountStatusActive, 
-		metaData.AccountStatus, 
+		config.UserDataConfigAccountStatusActive,
+		metaData.AccountStatus,
 		"Account Status Should Be Activate",
 	)
 

@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/SonicRoshan/Velocity/global/config"
-	proto "github.com/SonicRoshan/Velocity/users-srv/proto"
+	proto "github.com/SonicRoshan/Velocity/services/users-srv/proto"
 	"github.com/jinzhu/copier"
 	micro "github.com/micro/go-micro"
 	"github.com/pkg/errors"
@@ -122,7 +122,7 @@ func (usersClient UsersClient) Auth(username, password string) (string, string, 
 //Activate is used to mark an account active
 func (usersClient UsersClient) Activate(email string) (string, error) {
 	request := proto.ActivateRequest{
-		Email: email
+		Email: email,
 	}
 	response, err := usersClient.client.Activate(context.TODO(), &request)
 	if err != nil {
