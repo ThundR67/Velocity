@@ -49,6 +49,15 @@ func getStringConfig(name string, configManager goup.GoUp) string {
 	return value
 }
 
+//getStringSliceConfig gets a configuration with string slice value
+func getStringSliceConfig(name string, configManager goup.GoUp) []string {
+	value, err := configManager.GetStringSliceOrFail(name, ",")
+	if err != nil {
+		panic(fmt.Sprintf("Cannot Load %s Config From Config File, With Error %s", name, err.Error()))
+	}
+	return value
+}
+
 //getIntConfig gets a configuration with int value
 func getIntConfig(name string, configManager goup.GoUp) int {
 	//TODO Add logging

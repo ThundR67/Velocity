@@ -6,8 +6,8 @@ package config
 var authServerConfigManager = getConfigManager("auth_server.config")
 
 var (
-	//AuthServerConfigIPAddress the ip where auth server will run
-	AuthServerConfigIPAddress = getStringConfig("authServer.ipAddress", authServerConfigManager)
+	//AuthServerConfigIPAddresses the ips where auth server will run
+	AuthServerConfigIPAddresses = getStringSliceConfig("authServer.ipAddresses", authServerConfigManager)
 	//AuthServerConfigPort is the port where auth server will run
 	AuthServerConfigPort = getIntConfig("authServer.port", authServerConfigManager)
 	//AuthServerConfigTokenField Is token field in request
