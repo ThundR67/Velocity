@@ -1,6 +1,8 @@
 package main
 
 import (
+	"time"
+
 	"github.com/SonicRoshan/Velocity/global/config"
 	logger "github.com/SonicRoshan/Velocity/global/logs"
 	"github.com/SonicRoshan/Velocity/services/email-verification-srv/handler"
@@ -22,6 +24,8 @@ func main() {
 
 	service := micro.NewService(
 		micro.Name(config.EmailVerificationSrv),
+		micro.RegisterTTL(time.Second*30),
+		micro.RegisterInterval(time.Second*15),
 	)
 
 	service.Init()

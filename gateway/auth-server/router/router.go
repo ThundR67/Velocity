@@ -15,7 +15,8 @@ func GetRouter() *mux.Router {
 	router.HandleFunc("/sign-in", handler.SignInHandler).Methods("GET")
 	router.HandleFunc("/sign-in-fresh", handler.SignInFreshHandler).Methods("GET")
 	router.HandleFunc("/refresh", handler.RefreshHandler).Methods("GET")
-	router.HandleFunc("/sign-up", handler.SignUpHandler).Methods("POST")
+	router.HandleFunc("/sign-up", handler.SignUpHandler).Methods("GET")
+	router.HandleFunc("/verify-email", handler.EmailVerificationHandler).Methods("GET")
 
 	return router
 }

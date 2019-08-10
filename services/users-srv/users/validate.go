@@ -5,12 +5,9 @@ import (
 	"time"
 
 	"github.com/SonicRoshan/Velocity/global/config"
-	logger "github.com/SonicRoshan/Velocity/global/logs"
 	"github.com/asaskevich/govalidator"
 	"go.uber.org/zap"
 )
-
-var validateLog = logger.GetLogger("users_data_validater.log")
 
 func isGender(genderInput string) bool {
 	for _, gender := range config.UserDataConfigGenderTypes {

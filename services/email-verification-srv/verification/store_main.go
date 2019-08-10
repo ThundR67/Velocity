@@ -66,11 +66,6 @@ func (codeStore *CodeStore) connect() error {
 	return nil
 }
 
-//connectToCollections is used to connect to all required collections
-func (codeStore *CodeStore) connectToCollections() {
-	codeStore.mainCollection = codeStore.database.Collection(config.VerificationMainCollection)
-}
-
 //Init is used to initialize codeStore struct
 func (codeStore *CodeStore) Init() error {
 	err := codeStore.createClient()
@@ -81,7 +76,11 @@ func (codeStore *CodeStore) Init() error {
 	if err != nil {
 		return err
 	}
-	codeStore.connectToCollections()
+
+	codeStore.mainCollection = codeStore.database.Collection(config.VerificationMainCollection)
+	if codeStore.mainCollection == nil {
+		panic("THIS WILL NEVER HAPPEND")
+	}
 	return nil
 }
 

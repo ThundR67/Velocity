@@ -1,2 +1,2 @@
 # Velocity
-A High Performance Server
+A High Performance REST Api Server.

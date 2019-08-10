@@ -10,7 +10,7 @@ import (
 	proto "github.com/SonicRoshan/Velocity/services/email-verification-srv/proto"
 	"github.com/SonicRoshan/Velocity/services/email-verification-srv/verification"
 	"github.com/pkg/errors"
-	"github.com/uber-go/zap"
+	"go.uber.org/zap"
 )
 
 var log = logger.GetLogger("email_verification_service.log")
@@ -21,7 +21,7 @@ type EmailVerification struct {
 }
 
 //Init is used to initialize the handler
-func (emailVerification EmailVerification) Init() error {
+func (emailVerification *EmailVerification) Init() error {
 	emailVerification.codeStore = verification.CodeStore{}
 	err := emailVerification.codeStore.Init()
 	if err != nil {
@@ -66,7 +66,7 @@ func (emailVerification EmailVerification) SendVerification(
 		zap.String("Code", code),
 	)
 
-	err = email.SendSimpleEmail(code)
+	err = email.SendSimpleEmail(code, request.Email)
 	if err != nil {
 		msg := "Error While Emailing Verification Code"
 		log.Error(msg, zap.Error(err))

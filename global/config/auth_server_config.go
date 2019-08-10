@@ -14,6 +14,8 @@ var (
 	AuthServerConfigTokenField = getStringConfig("authServer.request.tokenField", authServerConfigManager)
 	//AuthServerConfigScopesField Is scopes field in request
 	AuthServerConfigScopesField = getStringConfig("authServer.request.scopesField", authServerConfigManager)
+	//AuthServerConfigVerificationCodeField is verification code's field name
+	AuthServerConfigVerificationCodeField = getStringConfig("authServer.request.verificationCodeField", authServerConfigManager)
 	//AuthServerConfigErrField is err field of response
 	AuthServerConfigErrField = getStringConfig("authServer.response.errField", authServerConfigManager)
 	//AuthServerConfigAccessTokenField is field of access token

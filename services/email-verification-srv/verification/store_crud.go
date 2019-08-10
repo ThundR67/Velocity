@@ -16,7 +16,7 @@ func (codeStore CodeStore) doesCodeWithIDExist(ID string) (bool, error) {
 
 	err := codeStore.mainCollection.FindOne(codeStore.ctx, filter).Decode(&code)
 	if err != nil {
-		return false, errors.Wrap(err, "Error while finding code with id")
+		return false, nil
 	}
 
 	return code != config.VerificationCode{}, nil

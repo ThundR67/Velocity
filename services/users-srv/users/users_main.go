@@ -13,6 +13,7 @@ import (
 )
 
 var log = logger.GetLogger("users_low_level_manager.log")
+var validateLog = logger.GetLogger("users_data_validater.log")
 
 //Generates A Version 4 UUID
 func generateUUID() (string, error) {
@@ -45,9 +46,14 @@ func (users *Users) createClient() error {
 	)
 
 	if err != nil {
-		err = errors.Wrap(err, "Error While Creating Client To MongoDB")
-		return err
+		log.Fatal(
+			"Creating Client To MongoDB Returned Error",
+			zap.String("DB Name", users.DBName),
+			zap.Error(err),
+		)
+		panic(err)
 	}
+
 	log.Info("Created A Client To MongoDB")
 	return nil
 }
@@ -63,13 +69,12 @@ func (users *Users) connect() error {
 	users.ctx = context.TODO()
 	err := users.client.Connect(users.ctx)
 	if err != nil {
-		log.Debug(
+		log.Fatal(
 			"Connecting To MongoDB Returned Error",
 			zap.String("DB Name", users.DBName),
 			zap.Error(err),
 		)
-		err = errors.Wrap(err, "Error While Connecting To MongoDB")
-		return err
+		panic(err)
 	}
 	users.database = users.client.Database(users.DBName)
 	log.Info(

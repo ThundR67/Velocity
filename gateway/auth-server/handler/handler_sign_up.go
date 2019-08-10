@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/SonicRoshan/Velocity/global/config"
+	"go.uber.org/zap"
 )
 
 //SignUpHandler is used to handle sign up
@@ -20,6 +21,13 @@ func (handler Handler) SignUpHandler(w http.ResponseWriter, r *http.Request) {
 		handler.respond(w, nil, msg, err)
 		return
 	}
+
+	go func() {
+		err = handler.emailVerification.SendVerification(main.Email)
+		if err != nil {
+			log.Error("Sending Email Verification Returned Error", zap.Error(err))
+		}
+	}()
 
 	accessToken, refreshToken, msg, err := handler.jwt.AccessAndRefreshTokens(
 		userID, strings.Split(scopes, ","))

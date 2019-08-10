@@ -1,4 +1,6 @@
 # Auth Server
+
+
 ### Auth server will authorize the client and provide them with JWT
 
 
@@ -15,3 +17,6 @@
 
 ### /refresh
 #### This takes refresh token, validates it, then returns new access and refresh token.
+
+### /verify-email
+####  Takes in verification code and verfies the email.

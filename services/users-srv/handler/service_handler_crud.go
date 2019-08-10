@@ -46,6 +46,10 @@ func (usersService UsersService) Add(
 			zap.Error(err),
 		)
 		return errors.Wrap(err, "Error While Adding User")
+
+	} else if msg != "" {
+		response.Message = msg
+		return nil
 	}
 
 	log.Info(

@@ -1,6 +1,8 @@
 package main
 
 import (
+	"time"
+
 	"github.com/SonicRoshan/Velocity/global/config"
 	logger "github.com/SonicRoshan/Velocity/global/logs"
 	proto "github.com/SonicRoshan/Velocity/services/jwt-srv/proto"
@@ -20,6 +22,8 @@ func main() {
 
 	service := micro.NewService(
 		micro.Name(config.JWTService),
+		micro.RegisterTTL(time.Second*30),
+		micro.RegisterInterval(time.Second*15),
 	)
 
 	service.Init()

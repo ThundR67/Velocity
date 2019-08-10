@@ -5,6 +5,7 @@ import (
 	"net/url"
 	"os"
 
+	"github.com/SonicRoshan/Velocity/global/config"
 	"go.uber.org/zap"
 )
 
@@ -22,7 +23,14 @@ func getLogFilePath(fileName string) string {
 //GetLogger returns a logger
 func GetLogger(fileName string) *zap.Logger {
 
-	cfg := zap.NewProductionConfig()
+	var cfg zap.Config
+
+	if config.DebugMode {
+		cfg = zap.NewDevelopmentConfig()
+	} else {
+		cfg = zap.NewProductionConfig()
+	}
+
 	cfg.OutputPaths = []string{
 		getLogFilePath(fileName),
 	}

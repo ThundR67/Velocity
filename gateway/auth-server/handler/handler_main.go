@@ -20,8 +20,9 @@ var decoder = schema.NewDecoder()
 
 //Handler is used to handle all routes of auth server
 type Handler struct {
-	jwt   clients.JWTClient
-	users clients.UsersClient
+	jwt               clients.JWTClient
+	users             clients.UsersClient
+	emailVerification clients.EmailVerificationClient
 }
 
 //getFromURL is used to get data from url query
@@ -87,5 +88,6 @@ func (handler *Handler) Init() {
 	authSrv := micro.NewService(micro.Name(config.AuthServerService))
 	handler.jwt = clients.NewJWTClient(authSrv)
 	handler.users = clients.NewUsersClient(authSrv)
+	handler.emailVerification = clients.NewEmailVerificationClient(authSrv)
 	decoder.IgnoreUnknownKeys(true)
 }
