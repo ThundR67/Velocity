@@ -13,7 +13,7 @@ func getConfigFilePath(fileName string) string {
 	workingDir, _ := os.Getwd()
 	workingDirSplit := strings.Split(workingDir, "\\")
 	filepath := ""
-	velocityCame := false
+	var velocityCame bool
 	for _, path := range workingDirSplit {
 		velocityCame = path == "Velocity"
 		if velocityCame {

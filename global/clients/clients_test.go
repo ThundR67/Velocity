@@ -36,8 +36,6 @@ func testToken(
 	assert.Equal(scopes, scopesInToken, "Scopes Should Match")
 }
 
-
-
 func TestJWTClient(t *testing.T) {
 	assert := assert.New(t)
 	service := micro.NewService(micro.Name("TestService"))
@@ -65,7 +63,6 @@ func TestJWTClient(t *testing.T) {
 
 	testToken(fresh, config.TokenTypeFresh, id, nil, assert, jwtClient)
 }
-
 
 func TestUsersClient(t *testing.T) {
 	assert := assert.New(t)

@@ -21,7 +21,7 @@ type JWTClient struct {
 	client proto.JWTService
 }
 
-//Init initalizes cliet
+//Init initializes cliet
 func (jwtClient *JWTClient) Init(service micro.Service) {
 	jwtClient.client = proto.NewJWTService(config.JWTService, service.Client())
 }

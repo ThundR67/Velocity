@@ -78,9 +78,6 @@ func (codeStore *CodeStore) Init() error {
 	}
 
 	codeStore.mainCollection = codeStore.database.Collection(config.VerificationMainCollection)
-	if codeStore.mainCollection == nil {
-		panic("THIS WILL NEVER HAPPEND")
-	}
 	return nil
 }
 

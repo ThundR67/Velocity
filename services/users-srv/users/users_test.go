@@ -134,6 +134,7 @@ func TestLowLevelUsers(t *testing.T) {
 
 	//testing get with field names
 	err = dataManager.Get(userID, config.DBConfigUserMetaDataCollection, &metaData)
+	assert.NoError(err, "Get Returned Error")
 
 	//Testing auth user
 	valid, _, _, err := dataManager.Auth(mockUsername, "", mockPassword)

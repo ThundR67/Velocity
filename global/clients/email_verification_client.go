@@ -21,7 +21,7 @@ type EmailVerificationClient struct {
 	client proto.EmailVerificationService
 }
 
-//Init initalizes cliet
+//Init initializes cliet
 func (emailVerificationClient *EmailVerificationClient) Init(service micro.Service) {
 	emailVerificationClient.client = proto.NewEmailVerificationService(config.EmailVerificationSrv, service.Client())
 }
