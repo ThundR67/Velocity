@@ -173,15 +173,15 @@ func TestValidators(t *testing.T) {
 	assert := assert.New(t)
 
 	mainData := map[string][2]string{
-		"Username": [2]string{"testing", "ta"}, //where first is valid and second is not
-		"Password": [2]string{"testingPassword", "ta"},
-		"Email":    [2]string{"sonicroshan122@gmail.com", "thisemailisnotvalid"},
+		"Username": {"testing", "ta"}, //where first is valid and second is not
+		"Password": {"testingPassword", "ta"},
+		"Email":    {"sonicroshan122@gmail.com", "thisemailisnotvalid"},
 	}
 
 	extraData := map[string][2]string{
-		"FirstName": [2]string{"testing", "ta"},
-		"LastName":  [2]string{"testing", "ta"},
-		"Gender":    [2]string{"male", "notvalidgender"},
+		"FirstName": {"testing", "ta"},
+		"LastName":  {"testing", "ta"},
+		"Gender":    {"male", "notvalidgender"},
 	}
 
 	var valid, invalid string
