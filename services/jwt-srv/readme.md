@@ -1,21 +1,19 @@
 # JWT Service
-### This service will handle taks related to JSON Web Tokens. This service will create and validate JWTs.
-
+This service will handle taks related to JSON Web Tokens. This service will create and validate JWTs.
 
 ## Token Types
 
 ### Access token
-##### This is the token which will allow the client to get data from resource server.
+This is the token which will allow the client to get data from resource server.
 
 ### Fresh Access Token
-##### This is simiral to access token, but extremely short lived. Tasks such as changing the password, would client to have a fresh access token.
+This is simiral to access token, but extremely short lived. Tasks such as changing the password, would client to have a fresh access token.
 
 ### Refresh Token
-##### This token can be used to refresh access token (NOT FRESH ACCESS TOKEN).
-
+This token can be used to refresh access token (NOT FRESH ACCESS TOKEN).
 
 ## Claims
-### These are the claims in every token, defined at global/config/types.go
+These are the claims in every token, defined at global/config/types.go
 
 ```javascript
 {
