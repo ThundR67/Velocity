@@ -16,23 +16,25 @@ var log = logger.GetLogger("auth_server.log")
 var waitGroup sync.WaitGroup
 
 func main() {
-	router := router.GetRouter()
-
-	http.Handle("/", router)
-
-	//Running Auth Server On All Addresses Provided
 	for _, ipAddress := range config.AuthServerConfigIPAddresses {
 		waitGroup.Add(1)
-		go func(address string) {
-			log.Fatal(
-				"Auth Server Returned Error While Listening And Serving",
-				zap.String("IpAddress", address),
-				zap.Error(http.ListenAndServe(address, nil)),
-			)
-			waitGroup.Done()
+		go func(addr string) {
+			runServer(addr)
 		}(ipAddress)
 	}
-
 	waitGroup.Wait()
+}
 
+//runServer runs a single instance of the auth server
+func runServer(address string) {
+	router := router.GetRouter()
+	http.Handle("/", router)
+	err := http.ListenAndServe(address, nil)
+	if err != nil {
+		log.Fatal(
+			"Auth Server Returned Error While Listening And Serving",
+			zap.String("IpAddress", address),
+			zap.Error(err),
+		)
+	}
 }

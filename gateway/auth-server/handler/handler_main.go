@@ -67,7 +67,7 @@ func (handler Handler) respond(
 		log.Error("Error While Reponding", zap.Error(err))
 
 		output := config.InternalServerError
-		if config.AuthServerConfigShowError {
+		if config.DebugMode {
 			output = err.Error()
 		}
 
