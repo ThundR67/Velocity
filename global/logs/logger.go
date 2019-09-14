@@ -41,9 +41,6 @@ func GetLogger(fileName string) *zap.Logger {
 		getLogFilePath("errors.log"),
 	}
 
-	cfg.DisableCaller = true
-	cfg.DisableStacktrace = true
-
 	logger, err := cfg.Build()
 	defer logger.Sync()
 	if err != nil {
