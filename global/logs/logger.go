@@ -31,14 +31,24 @@ func GetLogger(fileName string) *zap.Logger {
 		cfg = zap.NewProductionConfig()
 	}
 
+	cfg.Encoding = "json"
+
 	cfg.OutputPaths = []string{
 		getLogFilePath(fileName),
 	}
+
+	cfg.ErrorOutputPaths = []string{
+		getLogFilePath("errors.log"),
+	}
+
+	cfg.DisableCaller = true
+	cfg.DisableStacktrace = true
 
 	logger, err := cfg.Build()
 	defer logger.Sync()
 	if err != nil {
 		panic(fmt.Sprintf("Cant Load Logger Because Of Error %+v", err))
 	}
+
 	return logger
 }
