@@ -3,9 +3,11 @@ package handler
 import (
 	"context"
 
+	"github.com/SonicRoshan/Velocity/global/config"
 	logger "github.com/SonicRoshan/Velocity/global/logs"
 	"github.com/SonicRoshan/Velocity/services/jwt-srv/jwt"
 	proto "github.com/SonicRoshan/Velocity/services/jwt-srv/proto"
+	"github.com/SonicRoshan/falcon"
 	"github.com/jinzhu/copier"
 	"github.com/pkg/errors"
 	"go.uber.org/zap"
@@ -16,12 +18,15 @@ var log = logger.GetLogger("jwt_service.log")
 
 //ServiceHandler is used to handle all the jwt service functions
 type ServiceHandler struct {
-	jwt jwt.JWT
+	jwt        jwt.JWT
+	errHandler *falcon.ErrorHandler
 }
 
 //Init is used to initialize
-func (serviceHandler ServiceHandler) Init() {
+func (serviceHandler *ServiceHandler) Init() {
 	serviceHandler.jwt = jwt.JWT{}
+	serviceHandler.errHandler = falcon.NewErrorHandler()
+	serviceHandler.errHandler.AddHandler(config.DefaultErrorHandler)
 }
 
 //FreshToken is used to generate fresh token
@@ -32,12 +37,12 @@ func (serviceHandler ServiceHandler) FreshToken(
 
 	token, err := serviceHandler.jwt.FreshToken(request.UserIdentity)
 	if err != nil {
-		log.Error(
-			"Generating Fresh Token Returned Error",
+		return serviceHandler.errHandler.Check(
+			err,
+			"Error While Generating Fresh Access Token",
+			log,
 			zap.String("ID", request.UserIdentity),
-			zap.Error(err),
-		)
-		return errors.Wrap(err, "Error while generating fresh access token")
+		).(error)
 	}
 
 	log.Info("Generated Fresh Token", zap.String("ID", request.UserIdentity))
@@ -56,12 +61,12 @@ func (serviceHandler ServiceHandler) AccessAndRefreshTokens(
 		request.Scopes,
 	)
 	if err != nil {
-		log.Error(
+		return serviceHandler.errHandler.Check(
+			err,
 			"Generating Access And Refresh Token Returned Error",
+			log,
 			zap.String("ID", request.UserIdentity),
-			zap.Error(err),
-		)
-		return errors.Wrap(err, "Error while generating access and refresh token")
+		).(error)
 	}
 
 	log.Info("Generated Access And Refresh Token", zap.String("ID", request.UserIdentity))
@@ -80,14 +85,12 @@ func (serviceHandler ServiceHandler) RefreshTokens(
 		request.Token)
 
 	if err != nil {
-		log.Error(
+		return serviceHandler.errHandler.Check(
+			err,
 			"Refreshing Token Returned Error",
+			log,
 			zap.String("Token", request.Token),
-			zap.Error(err),
-		)
-		err = errors.Wrap(
-			err, "Error while generating access and refresh token bason on refresh token")
-		return err
+		).(error)
 	}
 
 	log.Info("Refreshed Token", zap.String("Token", request.Token))
@@ -110,13 +113,13 @@ func (serviceHandler ServiceHandler) ValidateToken(
 
 	valid, claims, msg, err := serviceHandler.jwt.ValidateToken(request.Token, request.TokenType)
 	if err != nil {
-		log.Error(
+		return serviceHandler.errHandler.Check(
+			err,
 			"Validating Token Returned Error",
+			log,
 			zap.String("Token", request.Token),
 			zap.String("Token Type", request.TokenType),
-			zap.Error(err),
-		)
-		return errors.Wrapf(err, "Error while validating token with type %s", request.TokenType)
+		).(error)
 	}
 
 	response.Message = msg
