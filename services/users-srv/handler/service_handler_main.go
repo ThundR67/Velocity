@@ -3,11 +3,12 @@ package handler
 import (
 	"context"
 
+	"github.com/SonicRoshan/Velocity/global/config"
 	logger "github.com/SonicRoshan/Velocity/global/logs"
 	proto "github.com/SonicRoshan/Velocity/services/users-srv/proto"
 	"github.com/SonicRoshan/Velocity/services/users-srv/users"
+	"github.com/SonicRoshan/falcon"
 	"github.com/jinzhu/copier"
-	"github.com/pkg/errors"
 	"go.uber.org/zap"
 )
 
@@ -15,19 +16,19 @@ var log = logger.GetLogger("users_service.log")
 
 //UsersService is to used to handle user service
 type UsersService struct {
-	users users.Users
+	users      users.Users
+	errHandler *falcon.ErrorHandler
 }
 
 func (usersService *UsersService) copy(toValue interface{}, fromValue interface{}) error {
 	err := copier.Copy(toValue, fromValue)
 	if err != nil {
-		log.Error(
+		return usersService.errHandler.Check(
+			err,
 			"Error While Copying",
 			zap.Any("From", fromValue),
 			zap.Any("To", toValue),
-			zap.Error(err),
-		)
-		return errors.Wrap(err, "Error While Copying")
+		).(error)
 	}
 	return nil
 }
@@ -37,9 +38,10 @@ func (usersService *UsersService) Init() error {
 	log.Debug("Service Initializing")
 	err := usersService.users.Init()
 	if err != nil {
-		log.Error("Initializing Returned Error", zap.Error(err))
-		return errors.Wrap(err, "Error While Initializing Service")
+		return usersService.errHandler.Check(err, "Initializing Returned Error").(error)
 	}
+	usersService.errHandler = falcon.NewErrorHandler()
+	usersService.errHandler.AddHandler(config.DefaultErrorHandler)
 	return nil
 }
 
@@ -87,13 +89,12 @@ func (usersService UsersService) Auth(
 		request.Username, request.Email, request.Password)
 
 	if err != nil {
-		log.Error(
+		return usersService.errHandler.Check(
+			err,
 			"Authenticating User Returned Error",
 			zap.String("Username", request.Username),
 			zap.String("Email", request.Email),
-			zap.Error(err),
-		)
-		return errors.Wrap(err, "Error While Authenticating User")
+		).(error)
 	}
 
 	log.Info(

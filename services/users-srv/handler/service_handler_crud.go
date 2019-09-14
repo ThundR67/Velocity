@@ -6,7 +6,6 @@ import (
 	"github.com/SonicRoshan/Velocity/global/config"
 	proto "github.com/SonicRoshan/Velocity/services/users-srv/proto"
 	"github.com/jinzhu/copier"
-	"github.com/pkg/errors"
 	"go.uber.org/zap"
 )
 
@@ -39,13 +38,12 @@ func (usersService UsersService) Add(
 
 	userID, msg, err := usersService.users.Add(mainData, extraData)
 	if err != nil {
-		log.Error(
+		return usersService.errHandler.Check(
+			err,
 			"Adding User Returned Error",
 			zap.Any("Main Data", mainData),
 			zap.Any("Extra Data", extraData),
-			zap.Error(err),
-		)
-		return errors.Wrap(err, "Error While Adding User")
+		).(error)
 
 	} else if msg != "" {
 		response.Message = msg
@@ -73,12 +71,11 @@ func (usersService UsersService) Get(
 	err := usersService.users.Get(request.UserID, config.DBConfigUserMainDataCollection, &data)
 
 	if err != nil {
-		log.Error(
+		return usersService.errHandler.Check(
+			err,
 			"Getting User's Main Data Returned Error",
 			zap.String("UserID", request.UserID),
-			zap.Error(err),
-		)
-		return errors.Wrap(err, "Error While Getting User Data")
+		).(error)
 	}
 
 	err = usersService.copy(&response, &data)
@@ -104,12 +101,11 @@ func (usersService UsersService) GetExtra(
 	err := usersService.users.Get(request.UserID, config.DBConfigUserMainDataCollection, &data)
 
 	if err != nil {
-		log.Error(
+		return usersService.errHandler.Check(
+			err,
 			"Getting User's Extra Data Returned Error",
 			zap.String("UserID", request.UserID),
-			zap.Error(err),
-		)
-		return errors.Wrap(err, "Error While Getting User Data")
+		).(error)
 	}
 
 	err = usersService.copy(&response, &data)
@@ -150,13 +146,12 @@ func (usersService UsersService) Update(
 		config.DBConfigUserMainDataCollection)
 
 	if err != nil {
-		log.Error(
+		return usersService.errHandler.Check(
+			err,
 			"Updating User Main Data Returned Error",
 			zap.String("UserID", request.UserID),
 			zap.Any("Update", request.Update),
-			zap.Error(err),
-		)
-		return errors.Wrap(err, "Error While Updating Data")
+		).(error)
 	}
 
 	log.Info(
@@ -193,13 +188,12 @@ func (usersService UsersService) UpdateExtra(
 		config.DBConfigUserExtraDataCollection)
 
 	if err != nil {
-		log.Error(
+		return usersService.errHandler.Check(
+			err,
 			"Updating User Extra Data Returned Error",
 			zap.String("UserID", request.UserID),
 			zap.Any("Update", request.Update),
-			zap.Error(err),
-		)
-		return errors.Wrap(err, "Error While Updating Data")
+		).(error)
 	}
 
 	log.Info(
@@ -222,12 +216,11 @@ func (usersService UsersService) Delete(
 	msg, err := usersService.users.Delete(request.UserID, request.Username, request.Password)
 
 	if err != nil {
-		log.Error(
+		return usersService.errHandler.Check(
+			err,
 			"Deleting User Returned Error",
 			zap.String("Username", request.Username),
-			zap.Error(err),
-		)
-		return errors.Wrap(err, "Error While Deleting User")
+		).(error)
 	}
 
 	log.Info("Deleted User", zap.String("Username", request.Username))
@@ -246,12 +239,11 @@ func (usersService UsersService) Activate(
 	msg, err := usersService.users.Activate(request.Email)
 
 	if err != nil {
-		log.Error(
+		return usersService.errHandler.Check(
+			err,
 			"Activating User Returned Error",
 			zap.String("Email", request.Email),
-			zap.Error(err),
-		)
-		return errors.Wrap(err, "Error While Activating User")
+		).(error)
 	}
 
 	log.Info("Activated Account", zap.String("Email", request.Email))
