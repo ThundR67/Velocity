@@ -17,20 +17,16 @@ func (jwt JWT) isExpired(expirationTime time.Time) bool {
 }
 
 //FreshToken is used to generate a fresh access token
-func (jwt JWT) FreshToken(userIdentity string) (string, error) {
+func (jwt JWT) FreshToken(userIdentity string) string {
 	freshTokenClaims := freshTokenClaims(userIdentity)
 	freshToken := goJwt.NewWithClaims(goJwt.SigningMethodHS256, freshTokenClaims)
-	freshTokenString, err := freshToken.SignedString(config.JWTSecret)
-	if err != nil {
-		err = errors.Wrap(err, "Error In Generating Fresh Token During Signing Fresh Token")
-		return "", err
-	}
-	return freshTokenString, nil
+	freshTokenString, _ := freshToken.SignedString(config.JWTSecret)
+	return freshTokenString
 }
 
 //AccessAndRefreshTokens is used to create access and refresh token
 func (jwt JWT) AccessAndRefreshTokens(
-	userIdentity string, scopesRequested []string) (string, string, error) {
+	userIdentity string, scopesRequested []string) (string, string) {
 
 	accessClaims := accessTokenClaims(userIdentity, scopesRequested)
 	refreshClaims := refreshTokenClaims(userIdentity, scopesRequested)
@@ -38,17 +34,10 @@ func (jwt JWT) AccessAndRefreshTokens(
 	accessToken := goJwt.NewWithClaims(goJwt.SigningMethodHS256, accessClaims)
 	refreshToken := goJwt.NewWithClaims(goJwt.SigningMethodHS256, refreshClaims)
 
-	accessTokenString, err := accessToken.SignedString(config.JWTSecret)
-	if err != nil {
-		err = errors.Wrap(err, "Error While Signing Access Token")
-		return "", "", err
-	}
-	refreshTokenString, err := refreshToken.SignedString(config.JWTSecret)
-	if err != nil {
-		err = errors.Wrap(err, "Error While Signing Refresh Token")
-		return "", "", err
-	}
-	return accessTokenString, refreshTokenString, nil
+	accessTokenString, _ := accessToken.SignedString(config.JWTSecret)
+	refreshTokenString, _ := refreshToken.SignedString(config.JWTSecret)
+
+	return accessTokenString, refreshTokenString
 }
 
 //RefreshTokens is used to generate new access and refresh token based on refresh token
@@ -64,11 +53,8 @@ func (jwt JWT) RefreshTokens(refreshTokenString string) (string, string, string,
 
 	userIdentity := claims.UserIdentity
 	scopes := claims.Scopes
-	accessToken, refreshToken, err := jwt.AccessAndRefreshTokens(userIdentity, scopes)
-	if err != nil {
-		err = errors.Wrap(err, "Error While Generating Access And Refresh Token")
-		return "", "", msg, err
-	}
+	accessToken, refreshToken := jwt.AccessAndRefreshTokens(userIdentity, scopes)
+
 	return accessToken, refreshToken, msg, nil
 }
 
@@ -83,9 +69,7 @@ func (jwt JWT) ValidateToken(tokenString, tokenType string) (bool, config.JWTCla
 	}
 
 	expirationTime := time.Unix(claims.ExpirationUTC, 0)
-	if !token.Valid {
-		return false, config.JWTClaims{}, config.InvalidTokenMsg, nil
-	} else if jwt.isExpired(expirationTime) {
+	if !token.Valid || jwt.isExpired(expirationTime) {
 		return false, config.JWTClaims{}, config.TokenExpiredMsg, nil
 	}
 
@@ -98,5 +82,5 @@ func (jwt JWT) ValidateToken(tokenString, tokenType string) (bool, config.JWTCla
 		return claims.IsRefresh, claims, "", nil
 	}
 
-	return false, config.JWTClaims{}, "", errors.New("Invalid Token Type")
+	return false, config.JWTClaims{}, "", errors.New(config.InvalidTokenMsg)
 }
