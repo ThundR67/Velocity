@@ -27,16 +27,12 @@ func (jwtClient *JWTClient) Init(service micro.Service) {
 }
 
 //FreshToken is used to create a fresh access token
-func (jwtClient JWTClient) FreshToken(userIdentity string) (string, error) {
+func (jwtClient JWTClient) FreshToken(userIdentity string) string {
 	request := proto.JWTData{
 		UserIdentity: userIdentity,
 	}
-	response, err := jwtClient.client.FreshToken(context.TODO(), &request)
-	if err != nil {
-		return "", errors.Wrap(
-			err, "Error While Generating Fresh Access Token Through Client Through Client")
-	}
-	return response.Token, err
+	response, _ := jwtClient.client.FreshToken(context.TODO(), &request)
+	return response.Token
 }
 
 //AccessAndRefreshTokens is used create access and refresh tokens
@@ -47,12 +43,7 @@ func (jwtClient JWTClient) AccessAndRefreshTokens(
 		UserIdentity: userIdentity,
 		Scopes:       scopes,
 	}
-	response, err := jwtClient.client.AccessAndRefreshTokens(context.TODO(), &request)
-	if err != nil {
-		err = errors.Wrap(
-			err, "Error While Generating Access And Refresh Token Through Client")
-		return "", "", "", err
-	}
+	response, _ := jwtClient.client.AccessAndRefreshTokens(context.TODO(), &request)
 	return response.AcccessToken, response.RefreshToken, response.Message, nil
 }
 

@@ -42,14 +42,8 @@ func (usersClient UsersClient) Add(
 	mainDataProto := proto.UserMain{}
 	extraDataProto := proto.UserExtra{}
 
-	err := copy(&mainDataProto, &mainData)
-	if err != nil {
-		return "", "", err
-	}
-	err = copy(&extraDataProto, &extraData)
-	if err != nil {
-		return "", "", err
-	}
+	copy(&mainDataProto, &mainData)
+	copy(&extraDataProto, &extraData)
 
 	request := proto.AddRequest{
 		MainData:  &mainDataProto,
