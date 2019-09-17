@@ -37,29 +37,18 @@ type Users struct {
 }
 
 //createClient is used to create a client to MongoDB
-func (users *Users) createClient() error {
+func (users *Users) createClient() {
 	log.Debug("Creating A Client To MongoDB")
-	var err error
 
-	users.client, err = mongo.NewClient(
+	users.client, _ = mongo.NewClient(
 		options.Client().ApplyURI(config.DBConfigMongoDBAddress),
 	)
 
-	if err != nil {
-		log.Fatal(
-			"Creating Client To MongoDB Returned Error",
-			zap.String("DB Name", users.DBName),
-			zap.Error(err),
-		)
-		panic(err)
-	}
-
 	log.Info("Created A Client To MongoDB")
-	return nil
 }
 
 //connect is used to connect to MongoDB
-func (users *Users) connect() error {
+func (users *Users) connect() {
 
 	log.Debug(
 		"Connecting To MongoDB",
@@ -67,21 +56,14 @@ func (users *Users) connect() error {
 	)
 
 	users.ctx = context.TODO()
-	err := users.client.Connect(users.ctx)
-	if err != nil {
-		log.Fatal(
-			"Connecting To MongoDB Returned Error",
-			zap.String("DB Name", users.DBName),
-			zap.Error(err),
-		)
-		panic(err)
-	}
+	users.client.Connect(users.ctx)
 	users.database = users.client.Database(users.DBName)
+
 	log.Info(
 		"Connected To MongoDB",
 		zap.String("DB Name", users.DBName),
 	)
-	return nil
+
 }
 
 //connectToCollections is used to connect to all required collections
@@ -154,24 +136,16 @@ func (users Users) generateID() (string, error) {
 }
 
 //Init is used to initialize users struct
-func (users *Users) Init() error {
+func (users *Users) Init() {
 	if users.DBName == "" {
 		users.DBName = config.DBConfigMainDB
 	}
-	err := users.createClient()
-	if err != nil {
-		return err
-	}
-	err = users.connect()
-	if err != nil {
-		return err
-	}
+	users.createClient()
+	users.connect()
 	users.connectToCollections()
-	return nil
 }
 
 //Disconnect is used to disconnect from the mongodb
 func (users Users) Disconnect() {
 	users.client.Disconnect(users.ctx)
-	users.contextCancel()
 }

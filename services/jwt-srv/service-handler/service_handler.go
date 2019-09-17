@@ -35,15 +35,7 @@ func (serviceHandler ServiceHandler) FreshToken(
 
 	log.Debug("Generating Fresh Token", zap.String("ID", request.UserIdentity))
 
-	token, err := serviceHandler.jwt.FreshToken(request.UserIdentity)
-	if err != nil {
-		return serviceHandler.errHandler.Check(
-			err,
-			"Error While Generating Fresh Access Token",
-			log,
-			zap.String("ID", request.UserIdentity),
-		).(error)
-	}
+	token := serviceHandler.jwt.FreshToken(request.UserIdentity)
 
 	log.Info("Generated Fresh Token", zap.String("ID", request.UserIdentity))
 	response.Token = token
@@ -56,18 +48,10 @@ func (serviceHandler ServiceHandler) AccessAndRefreshTokens(
 
 	log.Debug("Generating Access And Refresh Token", zap.String("ID", request.UserIdentity))
 
-	accessToken, refreshToken, err := serviceHandler.jwt.AccessAndRefreshTokens(
+	accessToken, refreshToken := serviceHandler.jwt.AccessAndRefreshTokens(
 		request.UserIdentity,
 		request.Scopes,
 	)
-	if err != nil {
-		return serviceHandler.errHandler.Check(
-			err,
-			"Generating Access And Refresh Token Returned Error",
-			log,
-			zap.String("ID", request.UserIdentity),
-		).(error)
-	}
 
 	log.Info("Generated Access And Refresh Token", zap.String("ID", request.UserIdentity))
 	response.AcccessToken = accessToken
@@ -128,6 +112,7 @@ func (serviceHandler ServiceHandler) ValidateToken(
 	if err != nil {
 		return errors.Wrap(err, "Error while copying")
 	}
+
 	log.Info(
 		"Validated Token",
 		zap.String("Token", request.Token),
