@@ -36,10 +36,8 @@ func (usersService *UsersService) copy(toValue interface{}, fromValue interface{
 //Init is used to initialize
 func (usersService *UsersService) Init() error {
 	log.Debug("Service Initializing")
-	err := usersService.users.Init()
-	if err != nil {
-		return usersService.errHandler.Check(err, "Initializing Returned Error").(error)
-	}
+	usersService.users.Init()
+
 	usersService.errHandler = falcon.NewErrorHandler()
 	usersService.errHandler.AddHandler(config.DefaultErrorHandler)
 	return nil
