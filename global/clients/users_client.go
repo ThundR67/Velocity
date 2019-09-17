@@ -81,18 +81,14 @@ func (usersClient UsersClient) Get(userID string) (config.UserMain, string, erro
 //Update is used to update user data
 func (usersClient UsersClient) Update(userID string, update config.UserMain) error {
 	var updateRequest proto.UserMain
-	err := copy(&updateRequest, &update)
-
-	if err != nil {
-		return err
-	}
+	copy(&updateRequest, &update)
 
 	request := proto.UpdateRequest{
 		UserID: userID,
 		Update: &updateRequest,
 	}
 
-	_, err = usersClient.client.Update(context.TODO(), &request)
+	_, err := usersClient.client.Update(context.TODO(), &request)
 	if err != nil {
 		return errors.Wrap(err, "Error while updating through client")
 	}

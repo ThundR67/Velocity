@@ -1,25 +1,13 @@
 package clients
 
 import (
-	"math/rand"
-	"strings"
 	"testing"
-	"time"
 
 	"github.com/SonicRoshan/Velocity/global/config"
+	"github.com/SonicRoshan/Velocity/global/utils"
 	micro "github.com/micro/go-micro"
 	"github.com/stretchr/testify/assert"
 )
-
-func generateRandomString(length int) string {
-	seededRand := rand.New(
-		rand.NewSource(time.Now().UnixNano()))
-	b := make([]byte, length)
-	for i := range b {
-		b[i] = config.UserDataConfigUserIDCharset[seededRand.Intn(len(config.UserDataConfigUserIDCharset))]
-	}
-	return string(b)
-}
 
 func TestCopy(t *testing.T) {
 	assert := assert.New(t)
@@ -31,21 +19,7 @@ func TestUsersClient(t *testing.T) {
 	service := micro.NewService(micro.Name("test"))
 	client := NewUsersClient(service)
 
-	mockUsername := strings.ToLower(generateRandomString(10))
-	mockPassword := generateRandomString(10)
-
-	mockUserData := config.UserMain{
-		Username: mockUsername,
-		Password: mockPassword,
-		Email:    mockUsername + "@gmail.com",
-	}
-
-	mockUserExtraData := config.UserExtra{
-		Gender:      "male",
-		FirstName:   mockUsername,
-		LastName:    mockUsername,
-		BirthdayUTC: int64(864466669), //A Timestamp of year 1997
-	}
+	mockUserData, mockUserExtraData := utils.GetMockUserData()
 
 	//Testing Add
 	userID, msg, err := client.Add(mockUserData, mockUserExtraData)
@@ -56,10 +30,10 @@ func TestUsersClient(t *testing.T) {
 	data, msg, err := client.Get(userID)
 	assert.NoError(err, "Getting User Returned Error")
 	assert.Equal("", msg, "Message By Get Should Be Blank")
-	assert.Equal(mockUsername, data.Username, "Username Should Match")
+	assert.Equal(mockUserData.Username, data.Username, "Username Should Match")
 
 	//Testing Update
-	updatedEmail := generateRandomString(10) + "@gmail.com"
+	updatedEmail := "sonicroshan122@gmail.com"
 	update := config.UserMain{
 		Email: updatedEmail,
 	}
@@ -69,9 +43,13 @@ func TestUsersClient(t *testing.T) {
 	assert.Equal(updatedEmail, data.Email, "Updated Email Should Match Email In DB")
 
 	//Testing Auth
-	id, msg, err := client.Auth(mockUsername, mockPassword)
+	id, msg, err := client.Auth(mockUserData.Username, mockUserData.Password)
 	assert.NoError(err, "Auth User Returned Error")
 	assert.Equal("", msg, "Message By Auth Should Be Blank")
 	assert.Equal(userID, id, "Ids should match")
+
+	msg, err = client.Activate(updatedEmail)
+	assert.NoError(err)
+	assert.Zero(msg)
 
 }
