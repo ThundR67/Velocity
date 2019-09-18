@@ -31,6 +31,17 @@ func TestUsersClient(t *testing.T) {
 	assert.NoError(err, "Getting User Returned Error")
 	assert.Equal("", msg, "Message By Get Should Be Blank")
 	assert.Equal(mockUserData.Username, data.Username, "Username Should Match")
+	assert.NotZero(data)
+
+	data, msg, err = client.GetByUsernameOrEmail(mockUserData.Username, "")
+	assert.NoError(err)
+	assert.Zero(msg)
+	assert.NotZero(data)
+
+	data, msg, err = client.GetByUsernameOrEmail("", mockUserData.Email)
+	assert.NoError(err)
+	assert.Zero(msg)
+	assert.NotZero(data)
 
 	//Testing Update
 	updatedEmail := "sonicroshan122@gmail.com"

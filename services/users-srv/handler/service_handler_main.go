@@ -59,7 +59,12 @@ func (usersService UsersService) GetByUsernameOrEmail(
 		request.Username, request.Email)
 	response.Message = msg
 
-	err := usersService.copy(&userData, &response)
+	log.Debug("Got Data From Low Level",
+		zap.Any("UserData", userData),
+		zap.String("message", msg),
+	)
+
+	err := usersService.copy(&response, &userData)
 	if err != nil {
 		return err
 	}
@@ -68,6 +73,8 @@ func (usersService UsersService) GetByUsernameOrEmail(
 		"Got User By Username Or Email",
 		zap.String("Username", request.Username),
 		zap.String("Email", request.Email),
+		zap.Any("UserData", userData),
+		zap.Any("Response", response),
 	)
 
 	return nil

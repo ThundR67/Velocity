@@ -78,6 +78,26 @@ func (usersClient UsersClient) Get(userID string) (config.UserMain, string, erro
 	return data, "", err
 }
 
+//GetByUsernameOrEmail is used to get a user based on username or email
+func (usersClient UsersClient) GetByUsernameOrEmail(
+	username, email string) (config.UserMain, string, error) {
+
+	request := proto.GetByUsernameOrEmailRequest{
+		Username: username,
+		Email:    email,
+	}
+
+	response, err := usersClient.client.GetByUsernameOrEmail(context.TODO(), &request)
+	if err != nil {
+		err = errors.Wrap(err, "GetByUsernameOrEmail Returned Error Through Client")
+		return config.UserMain{}, "", err
+	}
+
+	var data config.UserMain
+	err = copy(&data, &response)
+	return data, response.Message, err
+}
+
 //Update is used to update user data
 func (usersClient UsersClient) Update(userID string, update config.UserMain) error {
 	var updateRequest proto.UserMain
