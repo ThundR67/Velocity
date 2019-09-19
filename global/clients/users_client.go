@@ -78,6 +78,25 @@ func (usersClient UsersClient) Get(userID string) (config.UserMain, string, erro
 	return data, "", err
 }
 
+//GetExtra is used to get user extra data
+func (usersClient UsersClient) GetExtra(userID string) (config.UserExtra, string, error) {
+	request := proto.GetRequest{
+		UserID: userID,
+	}
+
+	response, err := usersClient.client.GetExtra(context.TODO(), &request)
+	if err != nil {
+		err = errors.Wrap(err, "Error while getting user extra data through client")
+		return config.UserExtra{}, "", err
+	} else if response.Message != "" {
+		return config.UserExtra{}, response.Message, nil
+	}
+
+	var data config.UserExtra
+	err = copy(&data, &response)
+	return data, "", err
+}
+
 //GetByUsernameOrEmail is used to get a user based on username or email
 func (usersClient UsersClient) GetByUsernameOrEmail(
 	username, email string) (config.UserMain, string, error) {
