@@ -22,45 +22,61 @@ func TestUsersClient(t *testing.T) {
 	mockUserData, mockUserExtraData := utils.GetMockUserData()
 
 	//Testing Add
-	userID, msg, err := client.Add(mockUserData, mockUserExtraData)
-	assert.NoError(err, "Adding User Returned Error")
-	assert.Equal("", msg, "Message By Add Should Be Blank")
+	userID, msg := client.Add(mockUserData, mockUserExtraData)
+	assert.Zero(msg)
 
 	//Testing Get
-	data, msg, err := client.Get(userID)
-	assert.NoError(err, "Getting User Returned Error")
-	assert.Equal("", msg, "Message By Get Should Be Blank")
-	assert.Equal(mockUserData.Username, data.Username, "Username Should Match")
+	data, err := client.Get("InvalidUserID")
+	assert.Zero(data)
+	assert.Error(err)
+
+	data, err = client.Get(userID)
+	assert.NoError(err)
+	assert.Equal(mockUserData.Username, data.Username)
 	assert.NotZero(data)
 
-	data, msg, err = client.GetByUsernameOrEmail(mockUserData.Username, "")
-	assert.NoError(err)
+	data, msg = client.GetByUsernameOrEmail(mockUserData.Username, "")
 	assert.Zero(msg)
 	assert.NotZero(data)
 
-	data, msg, err = client.GetByUsernameOrEmail("", mockUserData.Email)
-	assert.NoError(err)
+	data, msg = client.GetByUsernameOrEmail("", mockUserData.Email)
 	assert.Zero(msg)
 	assert.NotZero(data)
+
+	//Testing GetExtra
+	extra, err := client.GetExtra("InvalidUserID")
+	assert.Zero(extra)
+	assert.Error(err)
+
+	extra, err = client.GetExtra(userID)
+	assert.NoError(err)
+	assert.Equal(mockUserExtraData.LastName, extra.LastName)
+	assert.NotZero(extra)
 
 	//Testing Update
 	updatedEmail := "sonicroshan122@gmail.com"
 	update := config.UserMain{
 		Email: updatedEmail,
 	}
-	err = client.Update(userID, update)
-	assert.NoError(err, "UpdateUser Returned Error")
-	data, _, _ = client.Get(userID)
-	assert.Equal(updatedEmail, data.Email, "Updated Email Should Match Email In DB")
+	client.Update(userID, update)
+	data, _ = client.Get(userID)
+	assert.Equal(updatedEmail, data.Email)
+
+	updatedFirstName := "NewName"
+	updateExtra := config.UserExtra{
+		FirstName: updatedFirstName,
+	}
+	client.UpdateExtra(userID, updateExtra)
+	extra, _ = client.GetExtra(userID)
+	assert.Equal(updatedFirstName, extra.FirstName)
 
 	//Testing Auth
 	id, msg, err := client.Auth(mockUserData.Username, mockUserData.Password)
-	assert.NoError(err, "Auth User Returned Error")
-	assert.Equal("", msg, "Message By Auth Should Be Blank")
-	assert.Equal(userID, id, "Ids should match")
-
-	msg, err = client.Activate(updatedEmail)
 	assert.NoError(err)
+	assert.Equal("", msg)
+	assert.Equal(userID, id)
+
+	msg = client.Activate(updatedEmail)
 	assert.Zero(msg)
 
 }

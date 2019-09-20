@@ -59,15 +59,12 @@ func (usersService UsersService) GetByUsernameOrEmail(
 		request.Username, request.Email)
 	response.Message = msg
 
-	log.Debug("Got Data From Low Level",
+	log.Info("Got Data From Low Level",
 		zap.Any("UserData", userData),
 		zap.String("message", msg),
 	)
 
-	err := usersService.copy(&response, &userData)
-	if err != nil {
-		return err
-	}
+	usersService.copy(&response, &userData)
 
 	log.Info(
 		"Got User By Username Or Email",
@@ -90,17 +87,8 @@ func (usersService UsersService) Auth(
 		zap.String("Email", request.Email),
 	)
 
-	valid, userID, msg, err := usersService.users.Auth(
+	valid, userID, msg := usersService.users.Auth(
 		request.Username, request.Email, request.Password)
-
-	if err != nil {
-		return usersService.errHandler.Check(
-			err,
-			"Authenticating User Returned Error",
-			zap.String("Username", request.Username),
-			zap.String("Email", request.Email),
-		).(error)
-	}
 
 	log.Info(
 		"Authenticated User",
@@ -111,7 +99,7 @@ func (usersService UsersService) Auth(
 	response.Message = msg
 	response.Valid = valid
 	response.UserID = userID
-	return err
+	return nil
 }
 
 //Disconnect is used to disconnect

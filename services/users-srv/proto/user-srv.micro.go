@@ -40,7 +40,7 @@ type UsersService interface {
 	GetByUsernameOrEmail(ctx context.Context, in *GetByUsernameOrEmailRequest, opts ...client.CallOption) (*UserMain, error)
 	Auth(ctx context.Context, in *AuthRequest, opts ...client.CallOption) (*AuthResponse, error)
 	Update(ctx context.Context, in *UpdateRequest, opts ...client.CallOption) (*UpdateResponse, error)
-	UpdateExtra(ctx context.Context, in *UpdateRequest, opts ...client.CallOption) (*UpdateResponse, error)
+	UpdateExtra(ctx context.Context, in *UpdateExtraRequest, opts ...client.CallOption) (*UpdateResponse, error)
 	Delete(ctx context.Context, in *DeleteRequest, opts ...client.CallOption) (*DeleteResponse, error)
 	Activate(ctx context.Context, in *ActivateRequest, opts ...client.CallOption) (*ActivateResponse, error)
 }
@@ -123,7 +123,7 @@ func (c *usersService) Update(ctx context.Context, in *UpdateRequest, opts ...cl
 	return out, nil
 }
 
-func (c *usersService) UpdateExtra(ctx context.Context, in *UpdateRequest, opts ...client.CallOption) (*UpdateResponse, error) {
+func (c *usersService) UpdateExtra(ctx context.Context, in *UpdateExtraRequest, opts ...client.CallOption) (*UpdateResponse, error) {
 	req := c.c.NewRequest(c.name, "Users.UpdateExtra", in)
 	out := new(UpdateResponse)
 	err := c.c.Call(ctx, req, out, opts...)
@@ -162,7 +162,7 @@ type UsersHandler interface {
 	GetByUsernameOrEmail(context.Context, *GetByUsernameOrEmailRequest, *UserMain) error
 	Auth(context.Context, *AuthRequest, *AuthResponse) error
 	Update(context.Context, *UpdateRequest, *UpdateResponse) error
-	UpdateExtra(context.Context, *UpdateRequest, *UpdateResponse) error
+	UpdateExtra(context.Context, *UpdateExtraRequest, *UpdateResponse) error
 	Delete(context.Context, *DeleteRequest, *DeleteResponse) error
 	Activate(context.Context, *ActivateRequest, *ActivateResponse) error
 }
@@ -175,7 +175,7 @@ func RegisterUsersHandler(s server.Server, hdlr UsersHandler, opts ...server.Han
 		GetByUsernameOrEmail(ctx context.Context, in *GetByUsernameOrEmailRequest, out *UserMain) error
 		Auth(ctx context.Context, in *AuthRequest, out *AuthResponse) error
 		Update(ctx context.Context, in *UpdateRequest, out *UpdateResponse) error
-		UpdateExtra(ctx context.Context, in *UpdateRequest, out *UpdateResponse) error
+		UpdateExtra(ctx context.Context, in *UpdateExtraRequest, out *UpdateResponse) error
 		Delete(ctx context.Context, in *DeleteRequest, out *DeleteResponse) error
 		Activate(ctx context.Context, in *ActivateRequest, out *ActivateResponse) error
 	}
@@ -214,7 +214,7 @@ func (h *usersHandler) Update(ctx context.Context, in *UpdateRequest, out *Updat
 	return h.UsersHandler.Update(ctx, in, out)
 }
 
-func (h *usersHandler) UpdateExtra(ctx context.Context, in *UpdateRequest, out *UpdateResponse) error {
+func (h *usersHandler) UpdateExtra(ctx context.Context, in *UpdateExtraRequest, out *UpdateResponse) error {
 	return h.UsersHandler.UpdateExtra(ctx, in, out)
 }
 

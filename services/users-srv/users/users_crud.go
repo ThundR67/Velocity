@@ -34,7 +34,7 @@ func (users Users) GetByUsernameOrEmail(username, email string) (config.UserMain
 }
 
 //Auth is used to authenticate a user
-func (users Users) Auth(username, email, password string) (bool, string, string, error) {
+func (users Users) Auth(username, email, password string) (bool, string, string) {
 
 	log.Debug(
 		"Authenticating User",
@@ -46,7 +46,7 @@ func (users Users) Auth(username, email, password string) (bool, string, string,
 	user, msg := users.GetByUsernameOrEmail(username, email)
 
 	if msg != "" || user == (config.UserMain{}) {
-		return false, "", msg, nil
+		return false, "", msg
 	}
 
 	//Checking password (TODO Add hashing)
@@ -60,14 +60,14 @@ func (users Users) Auth(username, email, password string) (bool, string, string,
 	)
 
 	if !valid {
-		return false, "", config.InvalidPasswordMsg, nil
+		return false, "", config.InvalidPasswordMsg
 	}
-	return valid, user.UserID, "", nil
+	return valid, user.UserID, ""
 }
 
 //Add is used to add user to database
 func (users Users) Add(
-	mainData config.UserMain, extraData config.UserExtra) (string, string, error) {
+	mainData config.UserMain, extraData config.UserExtra) (string, string) {
 
 	log.Debug(
 		"Adding User",
@@ -77,12 +77,12 @@ func (users Users) Add(
 
 	if !isValid(mainData, extraData) {
 		log.Info("Invalid User Data")
-		return "", config.InvalidUserDataMsg, nil
+		return "", config.InvalidUserDataMsg
 	}
 
-	exists, msg, err := users.doesUsernameOrEmailExists(mainData)
+	exists, msg := users.doesUsernameOrEmailExists(mainData)
 	if exists {
-		return "", msg, err
+		return "", msg
 	}
 
 	metaData := generateUserMetaData()
@@ -96,7 +96,7 @@ func (users Users) Add(
 			zap.Error(err),
 		)
 		err = errors.Wrap(err, "Error While Adding User")
-		return "", "", err
+		return "", ""
 	}
 
 	mainData.UserID = userID
@@ -118,7 +118,7 @@ func (users Users) Add(
 		zap.Any("Meta Data", metaData),
 	)
 
-	return userID, "", nil
+	return userID, ""
 }
 
 //Get is used to get user's data
@@ -154,7 +154,7 @@ func (users Users) Get(userID, collectionName string, data interface{}) error {
 }
 
 //Update is used to update users data in any collection
-func (users Users) Update(userID string, update interface{}, collectionName string) error {
+func (users Users) Update(userID string, update interface{}, collectionName string) {
 
 	log.Debug(
 		"Updating User's Data",
@@ -167,20 +167,8 @@ func (users Users) Update(userID string, update interface{}, collectionName stri
 
 	collection := users.database.Collection(collectionName)
 
-	_, err := collection.UpdateOne(users.ctx,
+	collection.UpdateOne(users.ctx,
 		config.UserMain{UserID: userID}, map[string]interface{}{"$set": update})
-
-	if err != nil {
-		log.Error(
-			"Updating User's Data Returned Error",
-			zap.String("UserID", userID),
-			zap.String("Collection", collectionName),
-			zap.Any("Update", update),
-			zap.Error(err),
-		)
-		err = errors.Wrap(err, "Error While Updating User Data")
-		return err
-	}
 
 	log.Info(
 		"Updated User's Data",
@@ -188,12 +176,10 @@ func (users Users) Update(userID string, update interface{}, collectionName stri
 		zap.String("Collection", collectionName),
 		zap.Any("Update", update),
 	)
-
-	return nil
 }
 
 //Delete is used to mark a user as deleted
-func (users Users) Delete(userID, username, password string) (string, error) {
+func (users Users) Delete(userID, username, password string) string {
 
 	log.Debug(
 		"Deleting User",
@@ -202,7 +188,7 @@ func (users Users) Delete(userID, username, password string) (string, error) {
 		zap.String("Password", password),
 	)
 
-	valid, _, _, _ := users.Auth(username, "", password)
+	valid, _, _ := users.Auth(username, "", password)
 
 	update := config.UserMeta{AccountStatus: config.UserDataConfigAccountStatusDeleted}
 
@@ -213,21 +199,10 @@ func (users Users) Delete(userID, username, password string) (string, error) {
 			zap.String("Username", username),
 			zap.String("Password", password),
 		)
-		return config.InvalidAuthDataMsg, nil
+		return config.InvalidAuthDataMsg
 	}
 
-	err := users.Update(userID, update, config.DBConfigUserMetaDataCollection)
-	if err != nil {
-		log.Error(
-			"Deleting User Returned Error",
-			zap.String("UserID", userID),
-			zap.String("Username", username),
-			zap.String("Password", password),
-			zap.Error(err),
-		)
-		err = errors.Wrap(err, "Error While Deleting User")
-		return "", err
-	}
+	users.Update(userID, update, config.DBConfigUserMetaDataCollection)
 
 	log.Info(
 		"Deleted User",
@@ -236,11 +211,11 @@ func (users Users) Delete(userID, username, password string) (string, error) {
 		zap.String("Password", password),
 	)
 
-	return "", err
+	return ""
 }
 
 //Activate is used to mark an account as active
-func (users Users) Activate(email string) (string, error) {
+func (users Users) Activate(email string) string {
 
 	log.Debug(
 		"Activating User With Email",
@@ -249,7 +224,7 @@ func (users Users) Activate(email string) (string, error) {
 
 	userData, msg := users.GetByUsernameOrEmail("", email)
 	if msg != "" {
-		return msg, nil
+		return msg
 	}
 	userID := userData.UserID
 
@@ -259,17 +234,7 @@ func (users Users) Activate(email string) (string, error) {
 	)
 
 	update := config.UserMeta{AccountStatus: config.UserDataConfigAccountStatusActive}
-	err := users.Update(userID, update, config.DBConfigUserMetaDataCollection)
-
-	if err != nil {
-		log.Info(
-			"Activating User Returned Error",
-			zap.String("UserID", userID),
-			zap.String("Email", email),
-			zap.Error(err),
-		)
-		return "", errors.Wrap(err, "Error While Setting Account Status To Active")
-	}
+	users.Update(userID, update, config.DBConfigUserMetaDataCollection)
 
 	log.Info(
 		"Activated User",
@@ -277,5 +242,5 @@ func (users Users) Activate(email string) (string, error) {
 		zap.String("Email", email),
 	)
 
-	return "", nil
+	return ""
 }

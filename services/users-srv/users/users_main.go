@@ -74,7 +74,7 @@ func (users *Users) connectToCollections() {
 }
 
 //doesUsernameOrEmailExists is used  to check if username or email exist
-func (users Users) doesUsernameOrEmailExists(mainData config.UserMain) (bool, string, error) {
+func (users Users) doesUsernameOrEmailExists(mainData config.UserMain) (bool, string) {
 
 	log.Debug(
 		"Checking if username %s or email %s exists",
@@ -92,14 +92,14 @@ func (users Users) doesUsernameOrEmailExists(mainData config.UserMain) (bool, st
 
 	if usernameExist {
 		log.Info("Username Does Exist")
-		return true, config.UsernameExistMsg, nil
+		return true, config.UsernameExistMsg
 	} else if emailExist {
 		log.Info("Email Does Exist")
-		return true, config.EmailExistMsg, nil
+		return true, config.EmailExistMsg
 	}
 
 	log.Info("Username And Email Dont Exists")
-	return false, "", nil
+	return false, ""
 }
 
 //getFilterByUsernameOrEmail is used to get a mongodb filter based on either username or email

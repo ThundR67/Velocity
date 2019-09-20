@@ -7,16 +7,20 @@ service Users {
     rpc GetByUsernameOrEmail(GetByUsernameOrEmailRequest) returns (UserMain) {}
     rpc Auth(AuthRequest) returns (AuthResponse) {}
     rpc Update(UpdateRequest) returns (UpdateResponse) {}
-    rpc UpdateExtra(UpdateRequest) returns (UpdateResponse) {}
+    rpc UpdateExtra(UpdateExtraRequest) returns (UpdateResponse) {}
     rpc Delete(DeleteRequest) returns (DeleteResponse) {}
 
     rpc Activate(ActivateRequest) returns (ActivateResponse) {}
 }
 
+message UpdateExtraRequest {
+    string userID = 1;
+    UserExtra update = 2;
+}
+
 message UpdateRequest {
     string userID = 1;
     UserMain update = 2;
-    string collection = 3;
 }
 
 message AddRequest {
