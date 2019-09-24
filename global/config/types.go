@@ -4,19 +4,19 @@ import "github.com/dgrijalva/jwt-go"
 
 //UserMain is used to store user main data
 type UserMain struct {
-	UserID   string `bson:"_id,omitempty,-"`
-	Username string `bson:"Username,omitempty,-"`
-	Email    string `bson:"Email,omitempty,-"`
-	Password string `bson:"Password,omitempty,-"`
+	UserID   string `bson:"_id,omitempty,-" isArg:"true" description:"Unique User Identity" readScope:"user:read:user_id"`
+	Username string `bson:"Username,omitempty,-" isArg:"true" description:"Username of the user" readScope:"user:read:username"`
+	Email    string `bson:"Email,omitempty,-" isArg:"true" description:"Email of the user" readScope:"user:read:email"`
+	Password string `bson:"Password,omitempty,-" exclude:"true"`
 }
 
 //UserExtra is used to store user extra data
 type UserExtra struct {
-	UserID      string `bson:"_id,omitempty,-"`
-	FirstName   string `bson:"FirstName,omitempty,-"`
-	LastName    string `bson:"LastName,omitempty,-"`
-	Gender      string `bson:"Gender,omitempty,-"`
-	BirthdayUTC int64  `bson:"BirthdayUTC,omitempty,-"`
+	UserID      string `bson:"_id,omitempty,-" readScope:"user:read:user_id"`
+	FirstName   string `bson:"FirstName,omitempty,-" readScope:"user:read:first_name"`
+	LastName    string `bson:"LastName,omitempty,-" readScope:"user:read:last_name"`
+	Gender      string `bson:"Gender,omitempty,-" readScope:"user:read:gender"`
+	BirthdayUTC int64  `bson:"BirthdayUTC,omitempty,-" readScope:"user:read:birthday_utc"`
 }
 
 //UserMeta is used to store user meta data
