@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"github.com/SonicRoshan/Velocity/global/config"
-	"go.uber.org/zap"
+	"github.com/SonicRoshan/Velocity/global/utils"
 )
 
 //SignUpHandler is used to handle sign up
@@ -16,23 +16,20 @@ func (handler Handler) SignUpHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	userID, msg, err := handler.users.Add(main, extra)
-	if err != nil || msg != "" {
-		handler.respond(w, nil, msg, err)
+	userID, msg := handler.users.Add(main, extra)
+	if msg != "" {
+		utils.GatewayRespond(w, nil, msg, nil, log)
 		return
 	}
 
 	go func() {
-		err = handler.emailVerification.SendVerification(main.Email)
-		if err != nil {
-			log.Error("Sending Email Verification Returned Error", zap.Error(err))
-		}
+		handler.emailVerification.SendVerification(main.Email)
 	}()
 
 	accessToken, refreshToken, msg, err := handler.jwt.AccessAndRefreshTokens(
 		userID, strings.Split(scopes, ","))
 	if err != nil || msg != "" {
-		handler.respond(w, nil, msg, err)
+		utils.GatewayRespond(w, nil, msg, err, log)
 		return
 	}
 
@@ -40,5 +37,5 @@ func (handler Handler) SignUpHandler(w http.ResponseWriter, r *http.Request) {
 		config.AuthServerConfigAccessTokenField:  accessToken,
 		config.AuthServerConfigRefreshTokenField: refreshToken,
 	}
-	handler.respond(w, output, "", nil)
+	utils.GatewayRespond(w, output, "", nil, log)
 }

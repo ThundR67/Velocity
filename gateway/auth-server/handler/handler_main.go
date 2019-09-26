@@ -5,11 +5,11 @@ import (
 	"net/http"
 
 	jsoniter "github.com/json-iterator/go"
-	"go.uber.org/zap"
 
 	"github.com/SonicRoshan/Velocity/global/clients"
 	"github.com/SonicRoshan/Velocity/global/config"
 	logger "github.com/SonicRoshan/Velocity/global/logs"
+	"github.com/SonicRoshan/Velocity/global/utils"
 	"github.com/gorilla/schema"
 	micro "github.com/micro/go-micro"
 )
@@ -33,7 +33,7 @@ func (handler Handler) getFromURL(
 		if r := recover(); r != nil {
 			msg := fmt.Sprintf("%s Value Was Not Provided", key)
 			data = ""
-			handler.respond(w, nil, msg, nil)
+			utils.GatewayRespond(w, nil, msg, nil, log)
 		}
 	}()
 
@@ -47,40 +47,15 @@ func (handler Handler) getUserFromURL(
 
 	err := decoder.Decode(&mainData, r.URL.Query())
 	if err != nil {
-		handler.respond(w, nil, "", err)
+		utils.GatewayRespond(w, nil, "", err, log)
 		return
 	}
 	err = decoder.Decode(&extraData, r.URL.Query())
 	if err != nil {
-		handler.respond(w, nil, "", err)
+		utils.GatewayRespond(w, nil, "", err, log)
 		return
 	}
 	return
-}
-
-//Respond is used to respond to client with json
-func (handler Handler) respond(
-	w http.ResponseWriter, data map[string]string, msg string, err error) {
-
-	w.Header().Set("Content-Type", "application/json")
-	if err != nil {
-		log.Error("Error While Reponding", zap.Error(err))
-
-		output := config.InternalServerError
-		if config.DebugMode {
-			output = err.Error()
-		}
-
-		data = map[string]string{
-			config.AuthServerConfigErrField: output,
-		}
-	} else if msg != "" {
-		data = map[string]string{
-			config.AuthServerConfigErrField: msg,
-		}
-	}
-
-	json.NewEncoder(w).Encode(data)
 }
 
 //Init is used to initialise
