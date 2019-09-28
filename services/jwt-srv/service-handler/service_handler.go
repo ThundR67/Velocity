@@ -3,17 +3,16 @@ package handler
 import (
 	"context"
 
-	"github.com/SonicRoshan/Velocity/global/config"
-	logger "github.com/SonicRoshan/Velocity/global/logs"
-	"github.com/SonicRoshan/Velocity/services/jwt-srv/jwt"
-	proto "github.com/SonicRoshan/Velocity/services/jwt-srv/proto"
 	"github.com/SonicRoshan/falcon"
 	"github.com/jinzhu/copier"
-	"github.com/pkg/errors"
 	"go.uber.org/zap"
+
+	"github.com/SonicRoshan/Velocity/global/config"
+	"github.com/SonicRoshan/Velocity/global/logger"
+	"github.com/SonicRoshan/Velocity/services/jwt-srv/jwt"
+	proto "github.com/SonicRoshan/Velocity/services/jwt-srv/proto"
 )
 
-//loading a logger
 var log = logger.GetLogger("jwt_service.log")
 
 //ServiceHandler is used to handle all the jwt service functions
@@ -39,34 +38,44 @@ func (serviceHandler ServiceHandler) FreshToken(
 
 	log.Info("Generated Fresh Token", zap.String("ID", request.UserIdentity))
 	response.Token = token
+
 	return nil
 }
 
-//AccessAndRefreshTokens is used to generate access and refresh token
+//AccessAndRefreshTokens is used to generate access and refresh tokens
 func (serviceHandler ServiceHandler) AccessAndRefreshTokens(
-	ctx context.Context, request *proto.JWTData, response *proto.AccessAndRefreshToken) error {
+	ctx context.Context,
+	request *proto.JWTData,
+	response *proto.AccessAndRefreshToken) error {
 
-	log.Debug("Generating Access And Refresh Token", zap.String("ID", request.UserIdentity))
+	log.Debug("Generating Access And Refresh Token",
+		zap.String("ID", request.UserIdentity))
 
 	accessToken, refreshToken := serviceHandler.jwt.AccessAndRefreshTokens(
 		request.UserIdentity,
 		request.Scopes,
 	)
 
-	log.Info("Generated Access And Refresh Token", zap.String("ID", request.UserIdentity))
+	log.Info("Generated Access And Refresh Token",
+		zap.String("ID", request.UserIdentity))
+
 	response.AcccessToken = accessToken
 	response.RefreshToken = refreshToken
+
 	return nil
 }
 
 //RefreshTokens is used to make access and refresh token based on refresh token
 func (serviceHandler ServiceHandler) RefreshTokens(
-	ctx context.Context, request *proto.Token, response *proto.AccessAndRefreshToken) error {
+	ctx context.Context,
+	request *proto.Token,
+	response *proto.AccessAndRefreshToken) error {
 
 	log.Debug("Refreshing Token", zap.String("Token", request.Token))
 
 	accessToken, refreshToken, msg, err := serviceHandler.jwt.RefreshTokens(
-		request.Token)
+		request.Token,
+	)
 
 	if err != nil {
 		return serviceHandler.errHandler.Check(
@@ -77,11 +86,17 @@ func (serviceHandler ServiceHandler) RefreshTokens(
 		).(error)
 	}
 
-	log.Info("Refreshed Token", zap.String("Token", request.Token))
+	log.Info(
+		"Refreshed Tokens",
+		zap.String("Token", request.Token),
+		zap.String("AccesToken", accessToken),
+		zap.String("RefreshToken", refreshToken),
+	)
 
 	response.Message = msg
 	response.AcccessToken = accessToken
 	response.RefreshToken = refreshToken
+
 	return nil
 }
 
@@ -95,7 +110,11 @@ func (serviceHandler ServiceHandler) ValidateToken(
 		zap.String("Token Type", request.TokenType),
 	)
 
-	valid, claims, msg, err := serviceHandler.jwt.ValidateToken(request.Token, request.TokenType)
+	valid, claims, msg, err := serviceHandler.jwt.ValidateToken(
+		request.Token,
+		request.TokenType,
+	)
+
 	if err != nil {
 		return serviceHandler.errHandler.Check(
 			err,
@@ -108,15 +127,13 @@ func (serviceHandler ServiceHandler) ValidateToken(
 
 	response.Message = msg
 	response.Valid = valid
-	err = copier.Copy(&response, &claims)
-	if err != nil {
-		return errors.Wrap(err, "Error while copying")
-	}
+	copier.Copy(&response, &claims)
 
 	log.Info(
 		"Validated Token",
 		zap.String("Token", request.Token),
 		zap.String("Token Type", request.TokenType),
 	)
+
 	return err
 }

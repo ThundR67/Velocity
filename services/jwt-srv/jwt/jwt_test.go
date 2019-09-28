@@ -4,9 +4,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/SonicRoshan/Velocity/global/config"
 	goJwt "github.com/dgrijalva/jwt-go"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/SonicRoshan/Velocity/global/config"
 )
 
 func testToken(
@@ -110,7 +111,7 @@ func TestJWT(t *testing.T) {
 	accessToken, _ = jwt.AccessAndRefreshTokens("test", nil)
 	/*
 		This should be invalid as we are passing accessToken
-		to jwt.RefreshTokens which accepts refresh token not access token
+		to jwt.RefreshTokens which accepts refresh token, not access token
 	*/
 	accessToken, refreshToken, msg, err = jwt.RefreshTokens(accessToken)
 	assert.NoError(err)

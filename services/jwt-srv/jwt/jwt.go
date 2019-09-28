@@ -3,15 +3,16 @@ package jwt
 import (
 	"time"
 
-	"github.com/SonicRoshan/Velocity/global/config"
 	goJwt "github.com/dgrijalva/jwt-go"
 	"github.com/pkg/errors"
+
+	"github.com/SonicRoshan/Velocity/global/config"
 )
 
-//JWT is a low level jason web token manager
+//JWT is a low level JSON web token manager
 type JWT struct{}
 
-//isExpired checks if a time.Duration is expired
+//isExpired is used to check if expirationTime has already occured
 func (jwt JWT) isExpired(expirationTime time.Time) bool {
 	return time.Now().After(expirationTime)
 }
@@ -60,6 +61,7 @@ func (jwt JWT) RefreshTokens(refreshTokenString string) (string, string, string,
 
 //ValidateToken is used to validate a token
 func (jwt JWT) ValidateToken(tokenString, tokenType string) (bool, config.JWTClaims, string, error) {
+
 	var claims config.JWTClaims
 	token, err := goJwt.ParseWithClaims(tokenString, &claims, jwtKeyFunc)
 
@@ -74,13 +76,11 @@ func (jwt JWT) ValidateToken(tokenString, tokenType string) (bool, config.JWTCla
 	}
 
 	switch tokenType {
-	case config.TokenTypeAccess:
-		return !claims.IsFresh && !claims.IsRefresh, claims, "", nil
 	case config.TokenTypeFresh:
 		return claims.IsFresh, claims, "", nil
 	case config.TokenTypeRefresh:
 		return claims.IsRefresh, claims, "", nil
 	}
 
-	return false, config.JWTClaims{}, "", errors.New(config.InvalidTokenMsg)
+	return !claims.IsFresh && !claims.IsRefresh, claims, "", nil
 }

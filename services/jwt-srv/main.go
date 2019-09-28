@@ -1,32 +1,23 @@
 package main
 
 import (
-	"time"
+	"go.uber.org/zap"
 
 	"github.com/SonicRoshan/Velocity/global/config"
-	logger "github.com/SonicRoshan/Velocity/global/logs"
+	"github.com/SonicRoshan/Velocity/global/logger"
+	"github.com/SonicRoshan/Velocity/global/utils"
+
 	proto "github.com/SonicRoshan/Velocity/services/jwt-srv/proto"
 	handler "github.com/SonicRoshan/Velocity/services/jwt-srv/service-handler"
-	micro "github.com/micro/go-micro"
-	"go.uber.org/zap"
 )
 
+var log = logger.GetLogger("jwt_service.log")
+
 func main() {
-	log := logger.GetLogger("jwt_service.log")
 
-	defer func() {
-		if r := recover(); r != nil {
-			log.Fatal("Service Paniced", zap.Any("Panic", r))
-		}
-	}()
+	defer utils.HandlePanic(log)
 
-	service := micro.NewService(
-		micro.Name(config.JWTService),
-		micro.RegisterTTL(time.Second*30),
-		micro.RegisterInterval(time.Second*15),
-	)
-
-	service.Init()
+	service := utils.CreateService(config.JWTService)
 
 	serviceHandler := handler.ServiceHandler{}
 	serviceHandler.Init()

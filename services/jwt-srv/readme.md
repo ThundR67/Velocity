@@ -27,16 +27,16 @@ These are the claims in every token, defined at global/config/types.go
 ```
 
 ## Service Functions
-### these are the functions of the service, also defined in proto/jwt-srv.proto
+these are the functions of the service, also defined in proto/jwt-srv.proto
 
 ### FreshToken
-#### Takes in user identity and returnes fresh access token.
+Takes in user identity and returnes fresh access token.
 
 ### AccessAndRefreshTokens
-#### Takes in user identity and scopes, then returnes access and refresh tokens.
+Takes in user identity and scopes, then returnes access and refresh tokens.
 
 ### RefreshTokens
-#### Takes in refresh token, validates it, then returned new access and refresh token.
+Takes in refresh token, validates it, then returned new access and refresh token.
 
 ### ValidateToken
-#### Takes in token and token type, then validates it.
+Takes in token and token type, then validates it.
