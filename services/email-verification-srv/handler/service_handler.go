@@ -4,13 +4,15 @@ import (
 	"context"
 	"time"
 
+	"github.com/pkg/errors"
+	"go.uber.org/zap"
+
 	"github.com/SonicRoshan/Velocity/global/config"
-	logger "github.com/SonicRoshan/Velocity/global/logs"
+	"github.com/SonicRoshan/Velocity/global/logger"
 	"github.com/SonicRoshan/Velocity/services/email-verification-srv/email"
 	proto "github.com/SonicRoshan/Velocity/services/email-verification-srv/proto"
 	"github.com/SonicRoshan/Velocity/services/email-verification-srv/verification"
-	"github.com/pkg/errors"
-	"go.uber.org/zap"
+	
 )
 
 var log = logger.GetLogger("email_verification_service.log")

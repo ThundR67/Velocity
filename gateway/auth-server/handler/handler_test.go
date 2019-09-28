@@ -8,9 +8,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/SonicRoshan/Velocity/global/config"
 	"github.com/google/go-querystring/query"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/SonicRoshan/Velocity/global/config"
 )
 
 func generateRandomString(length int) string {

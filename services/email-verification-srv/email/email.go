@@ -3,19 +3,22 @@ package email
 import (
 	"crypto/tls"
 
-	"github.com/SonicRoshan/Velocity/global/config"
 	"github.com/pkg/errors"
 	"gopkg.in/gomail.v2"
+
+	"github.com/SonicRoshan/Velocity/global/config"
 )
 
 //SendSimpleEmail Is Used To Send A Basic Text Main
 func SendSimpleEmail(text, toEmail string) error {
+
 	dialer := gomail.NewDialer(
 		config.SMTPAddress,
 		config.SMTPPort,
 		config.SMTPEmail,
 		config.SMTPPassword,
 	)
+
 	dialer.TLSConfig = &tls.Config{InsecureSkipVerify: false, ServerName: "smtp.gmail.com"}
 	dialer.SSL = true
 	message := gomail.NewMessage()
@@ -28,5 +31,6 @@ func SendSimpleEmail(text, toEmail string) error {
 	if err != nil && !config.DebugMode {
 		return errors.Wrap(err, "Error while dialing and sending simple text mail")
 	}
+
 	return nil
 }

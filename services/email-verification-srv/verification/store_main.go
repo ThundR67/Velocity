@@ -3,12 +3,13 @@ package verification
 import (
 	"context"
 
-	"github.com/SonicRoshan/Velocity/global/config"
-	logger "github.com/SonicRoshan/Velocity/global/logs"
 	"github.com/pkg/errors"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.uber.org/zap"
+
+	"github.com/SonicRoshan/Velocity/global/config"
+	"github.com/SonicRoshan/Velocity/global/logger"
 )
 
 var log = logger.GetLogger("verification_code_storage.log")
@@ -35,6 +36,7 @@ func (codeStore *CodeStore) createClient() error {
 		err = errors.Wrap(err, "Error While Creating Client To MongoDB")
 		return err
 	}
+
 	log.Info("Created A Client To MongoDB")
 	return nil
 }

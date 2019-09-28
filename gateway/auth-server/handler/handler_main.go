@@ -4,14 +4,13 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/gorilla/schema"
 	jsoniter "github.com/json-iterator/go"
 
 	"github.com/SonicRoshan/Velocity/global/clients"
 	"github.com/SonicRoshan/Velocity/global/config"
-	logger "github.com/SonicRoshan/Velocity/global/logs"
+	"github.com/SonicRoshan/Velocity/global/logger"
 	"github.com/SonicRoshan/Velocity/global/utils"
-	"github.com/gorilla/schema"
-	micro "github.com/micro/go-micro"
 )
 
 var json = jsoniter.ConfigCompatibleWithStandardLibrary
@@ -60,7 +59,7 @@ func (handler Handler) getUserFromURL(
 
 //Init is used to initialise
 func (handler *Handler) Init() {
-	authSrv := micro.NewService(micro.Name(config.AuthServerService))
+	authSrv := utils.CreateService(config.AuthServerService)
 	handler.jwt = clients.NewJWTClient(authSrv)
 	handler.users = clients.NewUsersClient(authSrv)
 	handler.emailVerification = clients.NewEmailVerificationClient(authSrv)

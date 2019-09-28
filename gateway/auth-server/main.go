@@ -1,13 +1,16 @@
 package main
 
 import (
-	"net/http"
 	"sync"
+	"net/http"
+	
+
+	"go.uber.org/zap"
 
 	"github.com/SonicRoshan/Velocity/gateway/auth-server/router"
 	"github.com/SonicRoshan/Velocity/global/config"
-	logger "github.com/SonicRoshan/Velocity/global/logs"
-	"go.uber.org/zap"
+	"github.com/SonicRoshan/Velocity/global/logger"
+	
 )
 
 //Loding Logger

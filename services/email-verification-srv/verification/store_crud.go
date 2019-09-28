@@ -3,9 +3,11 @@ package verification
 import (
 	"time"
 
-	"github.com/SonicRoshan/Velocity/global/config"
+	
 	"github.com/pkg/errors"
 	"go.uber.org/zap"
+
+	"github.com/SonicRoshan/Velocity/global/config"
 )
 
 func (codeStore CodeStore) doesCodeWithIDExist(ID string) (bool, error) {
