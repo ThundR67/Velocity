@@ -131,7 +131,6 @@ func TestJWT(t *testing.T) {
 	assert.Zero(claims)
 	assert.Zero(msg)
 	assert.Error(err)
-	assert.Equal(config.InvalidTokenMsg, err.Error())
 
 	expiredAccessToken := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySWRlbnRpdHkiOiJUZXN0IiwiSXNGcmVzaCI6ZmFsc2UsIklzUmVmcmVzaCI6ZmFsc2UsIlNjb3BlcyI6bnVsbCwiQ3JlYXRpb25VVEMiOjE1Njg1NTgwMTAsIkV4cGlyYXRpb25VVEMiOjE1Njg1NTgwMTB9.cJJkt-N-Gl_8fEXDdke8dG96M43qK7F2RkMhhZrG8QQ"
 	valid, claims, msg, err = jwt.ValidateToken(expiredAccessToken, config.TokenTypeAccess)

@@ -76,11 +76,13 @@ func (jwt JWT) ValidateToken(tokenString, tokenType string) (bool, config.JWTCla
 	}
 
 	switch tokenType {
+	case config.TokenTypeAccess:
+		return !claims.IsFresh && !claims.IsRefresh, claims, "", nil
 	case config.TokenTypeFresh:
 		return claims.IsFresh, claims, "", nil
 	case config.TokenTypeRefresh:
 		return claims.IsRefresh, claims, "", nil
 	}
 
-	return !claims.IsFresh && !claims.IsRefresh, claims, "", nil
+	return false, config.JWTClaims{}, "", errors.New(config.InvalidTokenMsg)
 }
