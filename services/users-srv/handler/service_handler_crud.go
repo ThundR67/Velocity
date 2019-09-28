@@ -3,15 +3,18 @@ package handler
 import (
 	"context"
 
-	"github.com/SonicRoshan/Velocity/global/config"
-	proto "github.com/SonicRoshan/Velocity/services/users-srv/proto"
 	"github.com/jinzhu/copier"
 	"go.uber.org/zap"
+
+	"github.com/SonicRoshan/Velocity/global/config"
+	proto "github.com/SonicRoshan/Velocity/services/users-srv/proto"
 )
 
 //Add is used to handle Add function
 func (usersService UsersService) Add(
-	ctx context.Context, request *proto.AddRequest, response *proto.AddResponse) error {
+	ctx context.Context,
+	request *proto.AddRequest,
+	response *proto.AddResponse) error {
 
 	log.Debug(
 		"Adding User",
@@ -21,8 +24,8 @@ func (usersService UsersService) Add(
 	var mainData config.UserMain
 	var extraData config.UserExtra
 
-	usersService.copy(&mainData, &request.MainData)
-	usersService.copy(&extraData, &request.ExtraData)
+	copier.Copy(&mainData, &request.MainData)
+	copier.Copy(&extraData, &request.ExtraData)
 
 	log.Debug(
 		"Adding User",
@@ -59,12 +62,13 @@ func (usersService UsersService) Get(
 	if err != nil {
 		return usersService.errHandler.Check(
 			err,
+			log,
 			"Getting User's Main Data Returned Error",
 			zap.String("UserID", request.UserID),
 		).(error)
 	}
 
-	err = usersService.copy(&response, &data)
+	err = copier.Copy(&response, &data)
 	if err != nil {
 		return err
 	}
@@ -74,6 +78,7 @@ func (usersService UsersService) Get(
 		zap.String("UserID", request.UserID),
 		zap.Any("Data", response),
 	)
+
 	return nil
 }
 
@@ -89,6 +94,7 @@ func (usersService UsersService) GetExtra(
 	if err != nil {
 		return usersService.errHandler.Check(
 			err,
+			log,
 			"Getting User's Extra Data Returned Error",
 			zap.String("UserID", request.UserID),
 		).(error)
@@ -100,7 +106,7 @@ func (usersService UsersService) GetExtra(
 		zap.Any("Data", data),
 	)
 
-	err = usersService.copy(&response, &data)
+	err = copier.Copy(&response, &data)
 	if err != nil {
 		return err
 	}
@@ -155,7 +161,7 @@ func (usersService UsersService) UpdateExtra(
 	log.Debug("Updating User Extra Data")
 	var update config.UserExtra
 
-	err := usersService.copy(&update, &request.Update)
+	err := copier.Copy(&update, &request.Update)
 	if err != nil {
 		return err
 	}

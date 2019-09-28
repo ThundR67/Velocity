@@ -3,13 +3,15 @@ package users
 import (
 	"context"
 
-	"github.com/SonicRoshan/Velocity/global/config"
-	logger "github.com/SonicRoshan/Velocity/global/logs"
+	"go.uber.org/zap"
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
-	"go.uber.org/zap"
+	
+
+	"github.com/SonicRoshan/Velocity/global/config"
+	"github.com/SonicRoshan/Velocity/global/logger"
 )
 
 var log = logger.GetLogger("users_low_level_manager.log")

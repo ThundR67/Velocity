@@ -4,11 +4,13 @@ import (
 	"strings"
 	"time"
 
-	"github.com/SonicRoshan/Velocity/global/config"
 	"github.com/asaskevich/govalidator"
 	"go.uber.org/zap"
+
+	"github.com/SonicRoshan/Velocity/global/config"
 )
 
+//checks if genderInput is a valid gender
 func isGender(genderInput string) bool {
 	for _, gender := range config.UserDataConfigGenderTypes {
 		if gender == genderInput {

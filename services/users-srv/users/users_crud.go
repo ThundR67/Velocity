@@ -1,9 +1,10 @@
 package users
 
 import (
-	"github.com/SonicRoshan/Velocity/global/config"
 	"github.com/pkg/errors"
 	"go.uber.org/zap"
+
+	"github.com/SonicRoshan/Velocity/global/config"
 )
 
 //GetByUsernameOrEmail is used to get user based on username or email
@@ -44,7 +45,6 @@ func (users Users) Auth(username, email, password string) (bool, string, string)
 	)
 
 	user, msg := users.GetByUsernameOrEmail(username, email)
-
 	if msg != "" || user == (config.UserMain{}) {
 		return false, "", msg
 	}
@@ -62,6 +62,7 @@ func (users Users) Auth(username, email, password string) (bool, string, string)
 	if !valid {
 		return false, "", config.InvalidPasswordMsg
 	}
+
 	return valid, user.UserID, ""
 }
 
@@ -87,6 +88,7 @@ func (users Users) Add(
 
 	metaData := generateUserMetaData()
 	userID, err := users.generateID()
+
 	if err != nil {
 		log.Error(
 			"Adding User Returned Error",
@@ -162,8 +164,6 @@ func (users Users) Update(userID string, update interface{}, collectionName stri
 		zap.String("Collection", collectionName),
 		zap.Any("Update", update),
 	)
-
-	//Todo Validate The Update
 
 	collection := users.database.Collection(collectionName)
 

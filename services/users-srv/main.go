@@ -1,34 +1,22 @@
 package main
 
 import (
-	"time"
+	"go.uber.org/zap"
 
 	"github.com/SonicRoshan/Velocity/global/config"
-	logger "github.com/SonicRoshan/Velocity/global/logs"
+	"github.com/SonicRoshan/Velocity/global/logger"
+	"github.com/SonicRoshan/Velocity/global/utils"
 	"github.com/SonicRoshan/Velocity/services/users-srv/handler"
 	proto "github.com/SonicRoshan/Velocity/services/users-srv/proto"
-	micro "github.com/micro/go-micro"
-	"go.uber.org/zap"
 )
 
+var log = logger.GetLogger("users_service.log")
+
 func main() {
-	//Loading logger
-	log := logger.GetLogger("users_service.log")
 
-	//Handling a panic
-	defer func() {
-		if r := recover(); r != nil {
-			log.Fatal("Service Paniced Due", zap.Any("Panic", r))
-		}
-	}()
+	defer utils.HandlePanic(log)
 
-	service := micro.NewService(
-		micro.Name(config.UsersService),
-		micro.RegisterTTL(time.Second*30),
-		micro.RegisterInterval(time.Second*15),
-	)
-
-	service.Init()
+	service := utils.CreateService(config.UsersService)
 
 	usersService := handler.UsersService{}
 	err := usersService.Init()

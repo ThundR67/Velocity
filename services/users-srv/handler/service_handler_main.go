@@ -3,13 +3,14 @@ package handler
 import (
 	"context"
 
-	"github.com/SonicRoshan/Velocity/global/config"
-	logger "github.com/SonicRoshan/Velocity/global/logs"
-	proto "github.com/SonicRoshan/Velocity/services/users-srv/proto"
-	"github.com/SonicRoshan/Velocity/services/users-srv/users"
 	"github.com/SonicRoshan/falcon"
 	"github.com/jinzhu/copier"
 	"go.uber.org/zap"
+
+	"github.com/SonicRoshan/Velocity/global/config"
+	"github.com/SonicRoshan/Velocity/global/logger"
+	proto "github.com/SonicRoshan/Velocity/services/users-srv/proto"
+	"github.com/SonicRoshan/Velocity/services/users-srv/users"
 )
 
 var log = logger.GetLogger("users_service.log")
@@ -20,26 +21,15 @@ type UsersService struct {
 	errHandler *falcon.ErrorHandler
 }
 
-func (usersService *UsersService) copy(toValue interface{}, fromValue interface{}) error {
-	err := copier.Copy(toValue, fromValue)
-	if err != nil {
-		return usersService.errHandler.Check(
-			err,
-			"Error While Copying",
-			zap.Any("From", fromValue),
-			zap.Any("To", toValue),
-		).(error)
-	}
-	return nil
-}
-
 //Init is used to initialize
 func (usersService *UsersService) Init() error {
+
 	log.Debug("Service Initializing")
 	usersService.users.Init()
 
 	usersService.errHandler = falcon.NewErrorHandler()
 	usersService.errHandler.AddHandler(config.DefaultErrorHandler)
+
 	return nil
 }
 
@@ -64,7 +54,7 @@ func (usersService UsersService) GetByUsernameOrEmail(
 		zap.String("message", msg),
 	)
 
-	usersService.copy(&response, &userData)
+	copier.Copy(&response, &userData)
 
 	log.Info(
 		"Got User By Username Or Email",
