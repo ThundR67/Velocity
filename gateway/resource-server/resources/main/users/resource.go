@@ -4,13 +4,12 @@ import (
 	"strings"
 
 	"github.com/SonicRoshan/scope"
+	"github.com/graphql-go/graphql"
+	micro "github.com/micro/go-micro"
 
 	"github.com/SonicRoshan/Velocity/global/clients"
 	"github.com/SonicRoshan/Velocity/global/config"
 	"github.com/SonicRoshan/Velocity/global/utils"
-	"github.com/graphql-go/graphql"
-
-	micro "github.com/micro/go-micro"
 )
 
 //Resource is the API For User Data

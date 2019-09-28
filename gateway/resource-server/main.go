@@ -4,15 +4,16 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/SonicRoshan/Velocity/gateway/resource-server/resources/main/users"
-	"github.com/SonicRoshan/Velocity/global/clients"
-	"github.com/SonicRoshan/Velocity/global/config"
-	logger "github.com/SonicRoshan/Velocity/global/logs"
-	"github.com/SonicRoshan/Velocity/global/utils"
 	"github.com/graphql-go/graphql"
 	"github.com/graphql-go/handler"
 	micro "github.com/micro/go-micro"
 	"go.uber.org/zap"
+
+	"github.com/SonicRoshan/Velocity/gateway/resource-server/resources/main/users"
+	"github.com/SonicRoshan/Velocity/global/clients"
+	"github.com/SonicRoshan/Velocity/global/config"
+	"github.com/SonicRoshan/Velocity/global/logger"
+	"github.com/SonicRoshan/Velocity/global/utils"
 )
 
 var srv micro.Service
@@ -21,8 +22,11 @@ var log = logger.GetLogger("resource_server.logs")
 //middleware is the middleware for graphql handler
 func middleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
 		jwtToken := r.Header.Get(config.ResourceSrvConfigJWTHeader)
+
 		log.Debug("MiddleWare Got JWT Token", zap.String("Token", jwtToken))
+
 		jwtSrv := clients.NewJWTClient(srv)
 		valid, userID, scopes, err := jwtSrv.ValidateToken(jwtToken, config.TokenTypeAccess)
 
@@ -44,9 +48,10 @@ func middleware(next http.Handler) http.Handler {
 }
 
 func main() {
-	srv = micro.NewService(
-		micro.Name(config.ResourceServerService),
-	)
+
+	defer utils.HandlePanic(log)
+
+	srv = utils.CreateService(config.ResourceServerService)
 	fields, _ := users.GetResource(srv)
 
 	rootQuery := graphql.ObjectConfig{Name: "RootQuery", Fields: fields}
