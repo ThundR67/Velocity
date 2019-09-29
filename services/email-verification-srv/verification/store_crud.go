@@ -3,40 +3,31 @@ package verification
 import (
 	"time"
 
-	
 	"github.com/pkg/errors"
-	"go.uber.org/zap"
 
 	"github.com/SonicRoshan/Velocity/global/config"
 )
 
-func (codeStore CodeStore) doesCodeWithIDExist(ID string) (bool, error) {
+func (codeStore CodeStore) doesCodeWithIDExist(ID string) bool {
 	var code config.VerificationCode
 	filter := config.VerificationCode{
 		ID: ID,
 	}
 
-	err := codeStore.mainCollection.FindOne(codeStore.ctx, filter).Decode(&code)
-	if err != nil {
-		return false, nil
-	}
+	codeStore.mainCollection.FindOne(codeStore.ctx, filter).Decode(&code)
 
-	return code != config.VerificationCode{}, nil
+	return code != config.VerificationCode{}
 }
 
 //NewCode is used to generate new and store a verification code
 func (codeStore CodeStore) NewCode(ID string) (string, error) {
-	exists, err := codeStore.doesCodeWithIDExist(ID)
-	if err != nil {
-		return "", errors.Wrap(err, "Error while checking if code with id exists")
-	} else if exists {
+
+	exists := codeStore.doesCodeWithIDExist(ID)
+	if exists {
 		return "", errors.New("Code With ID Already Exists")
 	}
 
-	codeStr, err := GenerateCode()
-	if err != nil {
-		return "", errors.Wrap(err, "Error while genrating code")
-	}
+	codeStr := GenerateCode()
 
 	code := config.VerificationCode{
 		ID:          ID,
@@ -44,35 +35,25 @@ func (codeStore CodeStore) NewCode(ID string) (string, error) {
 		Code:        codeStr,
 	}
 
-	_, err = codeStore.mainCollection.InsertOne(codeStore.ctx, code)
-	if err != nil {
-		return "", errors.Wrap(err, "Error while inserting code into DB")
-	}
+	codeStore.mainCollection.InsertOne(codeStore.ctx, code)
 	return code.Code, nil
 }
 
 //VerifyCode is used to verify a code and get the id tied to it
-func (codeStore CodeStore) VerifyCode(codeStr string) (string, error) {
+func (codeStore CodeStore) VerifyCode(codeStr string) string {
 	var code config.VerificationCode
 	filter := config.VerificationCode{
 		Code: codeStr,
 	}
 
-	err := codeStore.mainCollection.FindOne(codeStore.ctx, filter).Decode(&code)
-	if err != nil {
-		err = errors.Wrap(err, "Error while finding code with code string")
-		return "", err
-	}
+	codeStore.mainCollection.FindOne(codeStore.ctx, filter).Decode(&code)
 
-	return code.ID, nil
+	return code.ID
 }
 
 //CleanUp is used to remove expired verification codes
 func (codeStore CodeStore) CleanUp() {
-	cursor, err := codeStore.mainCollection.Find(codeStore.ctx, config.VerificationCode{})
-	if err != nil {
-		log.Error("Error while clearing up expired verification code", zap.Error(err))
-	}
+	cursor, _ := codeStore.mainCollection.Find(codeStore.ctx, config.VerificationCode{})
 
 	var code config.VerificationCode
 	for cursor.Next(codeStore.ctx) {
