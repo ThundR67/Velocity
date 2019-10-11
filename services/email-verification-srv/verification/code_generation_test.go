@@ -38,4 +38,5 @@ func TestCodeGeneration(t *testing.T) {
 	exists = codeStore.doesCodeWithIDExist("1")
 	assert.False(exists)
 
+	codeStore.Disconnect()
 }

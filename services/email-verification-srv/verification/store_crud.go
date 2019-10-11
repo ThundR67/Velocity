@@ -1,6 +1,7 @@
 package verification
 
 import (
+	"context"
 	"time"
 
 	"github.com/pkg/errors"
@@ -14,7 +15,7 @@ func (codeStore CodeStore) doesCodeWithIDExist(ID string) bool {
 		ID: ID,
 	}
 
-	codeStore.mainCollection.FindOne(codeStore.ctx, filter).Decode(&code)
+	codeStore.mainCollection.FindOne(context.TODO(), filter).Decode(&code)
 
 	return code != config.VerificationCode{}
 }
@@ -35,7 +36,7 @@ func (codeStore CodeStore) NewCode(ID string) (string, error) {
 		Code:        codeStr,
 	}
 
-	codeStore.mainCollection.InsertOne(codeStore.ctx, code)
+	codeStore.mainCollection.InsertOne(context.TODO(), code)
 	return code.Code, nil
 }
 
@@ -46,21 +47,21 @@ func (codeStore CodeStore) VerifyCode(codeStr string) string {
 		Code: codeStr,
 	}
 
-	codeStore.mainCollection.FindOne(codeStore.ctx, filter).Decode(&code)
+	codeStore.mainCollection.FindOne(context.TODO(), filter).Decode(&code)
 
 	return code.ID
 }
 
 //CleanUp is used to remove expired verification codes
 func (codeStore CodeStore) CleanUp() {
-	cursor, _ := codeStore.mainCollection.Find(codeStore.ctx, config.VerificationCode{})
+	cursor, _ := codeStore.mainCollection.Find(context.TODO(), config.VerificationCode{})
 
 	var code config.VerificationCode
-	for cursor.Next(codeStore.ctx) {
+	for cursor.Next(context.TODO()) {
 		cursor.Decode(&code)
 		expirationTime := time.Unix(code.CreationUTC, 0)
 		if time.Now().After(expirationTime) {
-			codeStore.mainCollection.DeleteOne(codeStore.ctx, code)
+			codeStore.mainCollection.DeleteOne(context.TODO(), code)
 		}
 	}
 }
