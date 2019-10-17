@@ -24,6 +24,13 @@ var (
 	SMTPPassword = getStringConfig("smtp.Password", verificationConfig)
 )
 
+const (
+	/*VerificationSendEmail determines if server will send emails or not.
+	However, if debufMode is False,
+	then emails will be sent no matter if this setting is false*/
+	VerificationSendEmail = false
+)
+
 //VerificationCode is used to store verification data into db
 type VerificationCode struct {
 	ID          string `bson:"_id,omitempty,-"`

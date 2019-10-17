@@ -1,35 +1,33 @@
 package email
 
 import (
-	"crypto/tls"
-
-	"github.com/pkg/errors"
-	"gopkg.in/gomail.v2"
+	"net/smtp"
+	"strconv"
 
 	"github.com/SonicRoshan/Velocity/global/config"
+	"github.com/pkg/errors"
 )
 
 //SendSimpleEmail Is Used To Send A Basic Text Main
 func SendSimpleEmail(text, toEmail string) error {
 
-	dialer := gomail.NewDialer(
-		config.SMTPAddress,
-		config.SMTPPort,
+	auth := smtp.PlainAuth(
+		"",
 		config.SMTPEmail,
 		config.SMTPPassword,
+		config.SMTPAddress,
 	)
 
-	dialer.TLSConfig = &tls.Config{InsecureSkipVerify: false, ServerName: "smtp.gmail.com"}
-	dialer.SSL = true
-	message := gomail.NewMessage()
+	err := smtp.SendMail(
+		config.SMTPAddress+":"+strconv.Itoa(config.SMTPPort),
+		auth,
+		config.SMTPEmail,
+		[]string{toEmail},
+		[]byte(text),
+	)
 
-	message.SetBody("text", text)
-	message.SetHeader("From", config.SMTPEmail)
-	message.SetHeader("To", toEmail)
-
-	err := dialer.DialAndSend(message)
-	if err != nil && !config.DebugMode {
-		return errors.Wrap(err, "Error while dialing and sending simple text mail")
+	if err != nil && (!config.DebugMode || config.VerificationSendEmail) {
+		return errors.Wrap(err, "Error while sending email")
 	}
 
 	return nil
