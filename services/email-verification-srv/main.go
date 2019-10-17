@@ -1,14 +1,13 @@
 package main
 
 import (
-	"time"
+	"go.uber.org/zap"
 
 	"github.com/SonicRoshan/Velocity/global/config"
-	logger "github.com/SonicRoshan/Velocity/global/logs"
+	"github.com/SonicRoshan/Velocity/global/logger"
+	"github.com/SonicRoshan/Velocity/global/utils"
 	"github.com/SonicRoshan/Velocity/services/email-verification-srv/handler"
 	proto "github.com/SonicRoshan/Velocity/services/email-verification-srv/proto"
-	micro "github.com/micro/go-micro"
-	"go.uber.org/zap"
 )
 
 func main() {
@@ -16,19 +15,9 @@ func main() {
 	log := logger.GetLogger("email_verification_service.log")
 
 	//Handling a panic
-	defer func() {
-		if r := recover(); r != nil {
-			log.Fatal("Service Paniced Due", zap.Any("Panic", r))
-		}
-	}()
+	defer utils.HandlePanic(log)
 
-	service := micro.NewService(
-		micro.Name(config.EmailVerificationSrv),
-		micro.RegisterTTL(time.Second*30),
-		micro.RegisterInterval(time.Second*15),
-	)
-
-	service.Init()
+	service := utils.CreateService(config.EmailVerificationSrv)
 
 	emailVerificationService := handler.EmailVerification{}
 	err := emailVerificationService.Init()
