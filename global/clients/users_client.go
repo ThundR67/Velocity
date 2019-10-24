@@ -5,7 +5,7 @@ import (
 
 	"github.com/SonicRoshan/Velocity/global/config"
 	proto "github.com/SonicRoshan/Velocity/services/users-srv/proto"
-	"github.com/jinzhu/copier"
+	"github.com/gorilla/schema"
 	micro "github.com/micro/go-micro"
 	"github.com/pkg/errors"
 )

@@ -12,7 +12,6 @@ import (
 	"github.com/SonicRoshan/Velocity/services/email-verification-srv/email"
 	proto "github.com/SonicRoshan/Velocity/services/email-verification-srv/proto"
 	"github.com/SonicRoshan/Velocity/services/email-verification-srv/verification"
-	
 )
 
 var log = logger.GetLogger("email_verification_service.log")
@@ -23,16 +22,9 @@ type EmailVerification struct {
 }
 
 //Init is used to initialize the handler
-func (emailVerification *EmailVerification) Init() error {
+func (emailVerification *EmailVerification) Init() {
 	emailVerification.codeStore = verification.CodeStore{}
-	err := emailVerification.codeStore.Init()
-	if err != nil {
-		log.Error(
-			"Error While Initializing Code Store",
-			zap.Error(err),
-		)
-		return errors.Wrap(err, "Error While Initializing Code Store")
-	}
+	emailVerification.codeStore.Init()
 
 	//Setting up cleaner
 	go func() {
@@ -42,7 +34,6 @@ func (emailVerification *EmailVerification) Init() error {
 		}
 	}()
 
-	return nil
 }
 
 //SendVerification is used to handler SendVerification function
@@ -75,6 +66,8 @@ func (emailVerification EmailVerification) SendVerification(
 		return errors.Wrap(err, msg)
 	}
 
+	response.Code = code
+
 	log.Info(
 		"Sent A Code",
 		zap.String("Code", code),
@@ -91,12 +84,7 @@ func (emailVerification EmailVerification) Verify(
 
 	log.Debug("Verifying Code", zap.String("Code", request.VerificationCode))
 
-	email, err := emailVerification.codeStore.VerifyCode(request.VerificationCode)
-	if err != nil {
-		msg := "Error While Verifying Code"
-		log.Error(msg, zap.Error(err))
-		return errors.Wrap(err, msg)
-	}
+	email := emailVerification.codeStore.VerifyCode(request.VerificationCode)
 
 	response.Email = email
 	log.Info("Verified Email")
